@@ -1,0 +1,9 @@
+# Local secrets for `npm run pages:dev`.
+# Copy to .dev.vars (which is gitignored) and fill in.
+#
+# In production these are set with:
+#   npx wrangler pages secret put STUDIO_TOKEN
+
+# Required only to publish Studio edits straight to the live site.
+# Exporting edits and running `npm run studio:apply` needs no token at all.
+STUDIO_TOKEN=""

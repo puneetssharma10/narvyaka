@@ -1,0 +1,467 @@
+@import 'tailwindcss';
+
+/* Self-hosted fonts — no external requests, no Google Fonts CDN, no CSP issues.
+   Every family here is selectable from the Studio's font picker. */
+/* Fraunces: `full-italic` carries the SOFT + WONK axes the wordmark uses. */
+@import '@fontsource-variable/fraunces/full-italic.css';
+@import '@fontsource-variable/fraunces/wght.css';
+@import '@fontsource-variable/source-serif-4/wght.css';
+@import '@fontsource-variable/source-serif-4/wght-italic.css';
+@import '@fontsource-variable/lora/wght.css';
+@import '@fontsource-variable/lora/wght-italic.css';
+@import '@fontsource-variable/inter/wght.css';
+@import '@fontsource-variable/public-sans/wght.css';
+
+/* ───────────────────────────────────────────────────────────────────────────
+   DESIGN TOKENS  (Build Brief §2)
+
+   These are emitted as real CSS custom properties on :root, and every Tailwind
+   utility below references them via var(). That is what makes the Studio's
+   live colour + font editing possible: overriding --color-accent on :root at
+   runtime instantly restyles every bg-accent / text-accent on the page.
+
+   Do not switch this block to `@theme inline` — that would bake the literal
+   values into the utilities and break runtime theming.
+   ─────────────────────────────────────────────────────────────────────────── */
+@theme {
+  /* Colour */
+  --color-bg: #faf8f5; /* warm off-white, not clinical white */
+  --color-surface: #ffffff;
+  --color-ink: #232220; /* soft black, never pure #000 */
+  --color-muted: #6b675f;
+  --color-hairline: #e7e2da;
+  --color-accent: #8a5a3b; /* warm terracotta-brown */
+  --color-accent-hover: #6e4830;
+  --color-accent-soft: #f3e8de;
+  --color-verified: #4c6b54; /* muted sage */
+  --color-caution: #a6702f;
+
+  /* Type */
+  --font-wordmark: 'Fraunces Variable', 'Source Serif 4 Variable', Georgia, serif;
+  --font-heading: 'Source Serif 4 Variable', 'Lora Variable', Georgia, serif;
+  --font-body: 'Inter Variable', 'Public Sans Variable', system-ui, sans-serif;
+
+  /* Radius — soft, not sharp, not pill */
+  --radius-card: 12px;
+  --radius-control: 8px;
+
+  /* Reading measure */
+  --spacing-read: 720px;
+  --spacing-wide: 1200px;
+
+  /* Motion — still, not bouncy */
+  --ease-calm: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+/* ───────────────────────────────────────────────────────────────────────────
+   BASE
+   ─────────────────────────────────────────────────────────────────────────── */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-ink);
+    font-family: var(--font-body);
+    font-size: 1.0625rem;
+    line-height: 1.65;
+    font-synthesis-weight: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-heading);
+    font-weight: 500;
+    color: var(--color-ink);
+    text-wrap: balance;
+  }
+
+  h1 {
+    font-size: clamp(2.5rem, 5.5vw, 3.5rem);
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+  }
+
+  h2 {
+    font-size: clamp(1.75rem, 3.5vw, 2.25rem);
+    line-height: 1.22;
+    letter-spacing: -0.01em;
+  }
+
+  h3 {
+    font-size: clamp(1.25rem, 2vw, 1.4rem);
+    line-height: 1.3;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background: var(--color-accent-soft);
+    color: var(--color-ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  /* Inputs inherit the body face rather than the browser default */
+  input,
+  textarea,
+  select,
+  button {
+    font: inherit;
+    color: inherit;
+  }
+}
+
+/* ───────────────────────────────────────────────────────────────────────────
+   COMPONENT PRIMITIVES
+   ─────────────────────────────────────────────────────────────────────────── */
+@layer components {
+  .wrap {
+    width: 100%;
+    max-width: var(--spacing-wide);
+    margin-inline: auto;
+    padding-inline: 1.5rem;
+  }
+
+  @media (min-width: 768px) {
+    .wrap {
+      padding-inline: 2.5rem;
+    }
+  }
+
+  .wrap-read {
+    width: 100%;
+    max-width: var(--spacing-read);
+    margin-inline: auto;
+    padding-inline: 1.5rem;
+  }
+
+  /* Section rhythm: 56px mobile / 96px desktop minimum (Build Brief §2.3) */
+  .section {
+    padding-block: 56px;
+  }
+
+  @media (min-width: 768px) {
+    .section {
+      padding-block: 96px;
+    }
+  }
+
+  .section-lg {
+    padding-block: 72px;
+  }
+
+  @media (min-width: 768px) {
+    .section-lg {
+      padding-block: 128px;
+    }
+  }
+
+  .card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-card);
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: var(--radius-control);
+    padding: 0.75rem 1.5rem;
+    font-size: 0.975rem;
+    font-weight: 500;
+    line-height: 1.2;
+    cursor: pointer;
+    transition:
+      background-color 200ms var(--ease-calm),
+      border-color 200ms var(--ease-calm),
+      color 200ms var(--ease-calm);
+  }
+
+  .btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .btn-primary {
+    background: var(--color-accent);
+    color: #fff;
+    border: 1px solid var(--color-accent);
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    background: var(--color-accent-hover);
+    border-color: var(--color-accent-hover);
+  }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--color-ink);
+    border: 1px solid var(--color-hairline);
+  }
+
+  .btn-secondary:hover:not(:disabled) {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+
+  .btn-quiet {
+    background: transparent;
+    color: var(--color-muted);
+    border: 1px solid transparent;
+    padding-inline: 0.75rem;
+  }
+
+  .btn-quiet:hover:not(:disabled) {
+    color: var(--color-ink);
+  }
+
+  .field {
+    width: 100%;
+    background: var(--color-surface);
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-control);
+    padding: 0.7rem 0.85rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    transition: border-color 200ms var(--ease-calm);
+  }
+
+  .field:focus {
+    outline: none;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 14%, transparent);
+  }
+
+  .field::placeholder {
+    color: color-mix(in srgb, var(--color-muted) 65%, transparent);
+  }
+
+  .label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--color-ink);
+    margin-bottom: 0.4rem;
+  }
+
+  .hint {
+    font-size: 0.85rem;
+    line-height: 1.5;
+    color: var(--color-muted);
+  }
+
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    background: var(--color-accent-soft);
+    color: var(--color-accent-hover);
+    border-radius: 999px;
+    padding: 0.2rem 0.7rem;
+    font-size: 0.78rem;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+  }
+
+  .prose-narvyaka {
+    font-size: 1.0625rem;
+    line-height: 1.75;
+    color: var(--color-ink);
+  }
+
+  .prose-narvyaka > * + * {
+    margin-top: 1.15em;
+  }
+
+  .prose-narvyaka h2 {
+    margin-top: 2.25em;
+    margin-bottom: 0.6em;
+  }
+
+  .prose-narvyaka h3 {
+    margin-top: 1.9em;
+    margin-bottom: 0.5em;
+  }
+
+  .prose-narvyaka a {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-thickness: 1px;
+  }
+
+  .prose-narvyaka a:hover {
+    color: var(--color-accent-hover);
+  }
+
+  .prose-narvyaka strong {
+    font-weight: 600;
+  }
+
+  .prose-narvyaka ul,
+  .prose-narvyaka ol {
+    padding-left: 1.25rem;
+  }
+
+  .prose-narvyaka li + li {
+    margin-top: 0.4em;
+  }
+
+  .prose-narvyaka ul {
+    list-style: disc;
+  }
+
+  .prose-narvyaka ol {
+    list-style: decimal;
+  }
+
+  .hairline {
+    border: 0;
+    border-top: 1px solid var(--color-hairline);
+  }
+}
+
+/* ───────────────────────────────────────────────────────────────────────────
+   MOTION — fade-in on scroll only. 200–300ms, ease-out, no parallax.
+   ─────────────────────────────────────────────────────────────────────────── */
+@layer utilities {
+  /*
+   * Scoped to .js — set by an inline script in <head>. Without JavaScript the
+   * content is simply visible. A reveal animation must never be the reason a
+   * paragraph cannot be read.
+   */
+  .js .reveal {
+    opacity: 0;
+    transform: translateY(12px);
+    transition:
+      opacity 280ms var(--ease-calm),
+      transform 280ms var(--ease-calm);
+    will-change: opacity, transform;
+  }
+
+  .js .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .js .reveal {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+  }
+
+  /* The wordmark: Fraunces, italic, with a touch of the family's optical wonk. */
+  .wordmark {
+    font-family: var(--font-wordmark);
+    font-style: italic;
+    font-weight: 500;
+    font-variation-settings:
+      'SOFT' 20,
+      'WONK' 1;
+    letter-spacing: 0.005em;
+  }
+
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+}
+
+/* ───────────────────────────────────────────────────────────────────────────
+   STUDIO — visual editor chrome. Never present unless the Studio is open.
+   ─────────────────────────────────────────────────────────────────────────── */
+[data-studio-active] [data-edit]:not([contenteditable]) {
+  outline: 1px dashed color-mix(in srgb, var(--color-accent) 45%, transparent);
+  outline-offset: 3px;
+  border-radius: 3px;
+  cursor: text;
+  transition: outline-color 150ms var(--ease-calm);
+}
+
+[data-studio-active] [data-edit]:hover:not([contenteditable]) {
+  outline-color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 6%, transparent);
+}
+
+[data-studio-active] [data-edit][contenteditable='true'] {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--color-accent) 4%, transparent);
+}
+
+[data-studio-active] [data-edit-image] {
+  position: relative;
+}
+
+[data-studio-active] [data-edit-image]::after {
+  content: 'Replace image';
+  position: absolute;
+  inset-inline-start: 50%;
+  inset-block-start: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--color-ink);
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  padding: 0.4rem 0.8rem;
+  border-radius: var(--radius-control);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 150ms var(--ease-calm);
+  z-index: 5;
+}
+
+[data-studio-active] [data-edit-image]:hover::after {
+  opacity: 1;
+}
+
+[data-studio-active] [data-edit-image]:hover {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  cursor: pointer;
+}
+
+/* Drop target highlight while a file is dragged anywhere over the page */
+[data-studio-dropping] [data-edit-image],
+[data-studio-dropping] [data-logo-slot] {
+  outline: 2px dashed var(--color-accent);
+  outline-offset: 3px;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}

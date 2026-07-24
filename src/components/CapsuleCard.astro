@@ -1,0 +1,60 @@
+---
+import Icon from './Icon.astro'
+import VerificationBadge from './VerificationBadge.astro'
+import { contextLine, displayName, type Capsule } from '../lib/capsules'
+import { content } from '../lib/content'
+
+interface Props {
+  capsule: Capsule
+  class?: string
+}
+
+const { capsule, class: className = '' } = Astro.props
+
+const name = displayName(capsule, content.capsule.anonymousName)
+const context = contextLine(capsule)
+const photo = capsule.photos[0]
+---
+
+<article class={`card group flex flex-col overflow-hidden transition-colors hover:border-accent/45 ${className}`}>
+  {
+    photo && (
+      <div class="aspect-[3/2] overflow-hidden bg-accent-soft">
+        <img src={photo.url} alt={photo.caption ?? ''} loading="lazy" class="h-full w-full object-cover" />
+      </div>
+    )
+  }
+
+  <div class="flex flex-1 flex-col gap-3 p-5">
+    <div class="flex flex-wrap items-center gap-2">
+      {capsule.is_example && <span class="tag bg-caution/12 text-caution">Example</span>}
+      {capsule.classification.primary_category && <span class="tag">{capsule.classification.primary_category}</span>}
+    </div>
+
+    <blockquote class="m-0 font-heading text-[1.15rem] leading-[1.4] text-ink">
+      <a href={`/capsule/${capsule.id}`} class="no-underline after:absolute after:inset-0 after:content-['']">
+        “{capsule.key_lesson}”
+      </a>
+    </blockquote>
+
+    <div class="mt-auto flex flex-wrap items-center justify-between gap-2 pt-1">
+      <div class="min-w-0">
+        <p class="m-0 truncate text-[0.9rem] font-medium text-ink">{name}</p>
+        {context && <p class="m-0 truncate text-[0.82rem] text-muted">{context}</p>}
+      </div>
+      {capsule.audio_url && (
+        <span class="flex items-center gap-1.5 text-[0.8rem] text-muted">
+          <Icon name="voice" size={15} /> Voice
+        </span>
+      )}
+    </div>
+
+    <VerificationBadge status={capsule.classification.verification_status} class="self-start" />
+  </div>
+</article>
+
+<style>
+  article {
+    position: relative;
+  }
+</style>

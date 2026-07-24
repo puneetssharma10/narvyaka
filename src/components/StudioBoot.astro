@@ -1,0 +1,210 @@
+---
+/**
+ * Two jobs, both tiny:
+ *
+ *  1. An inline script that applies saved Studio overrides *before first
+ *     paint*, so an edited site never flashes its default colours.
+ *  2. A bundled script that lazily pulls in the Studio editor — and only
+ *     when it is actually open. On a normal visit this is ~300 bytes and
+ *     no editor code is downloaded at all.
+ *
+ * Deliberately written without Astro's define:vars (see SECURITY.md).
+ */
+---
+
+<script is:inline>
+  ;(function () {
+    var KEY = 'narvyaka.studio.overrides.v1'
+    var PUBLISHED_KEY = 'narvyaka.studio.published.v1'
+    var root = document.documentElement
+
+    // Gates the scroll-reveal animation. Without JS the content just shows.
+    root.classList.add('js')
+
+    function safeCss(v) {
+      return (
+        typeof v === 'string' &&
+        v.length < 300 &&
+        !/[;{}<>\\]/.test(v) &&
+        !/url\s*\(/i.test(v) &&
+        !/expression\s*\(/i.test(v) &&
+        !/@import/i.test(v)
+      )
+    }
+
+    function safeSrc(v) {
+      return (
+        typeof v === 'string' &&
+        (/^data:image\/(png|jpeg|jpg|webp|gif|avif|svg\+xml);base64,[A-Za-z0-9+/=\s]+$/i.test(v) ||
+          /^\/[^\s"'<>\\]*$/.test(v) ||
+          /^https:\/\/[^\s"'<>\\]+$/i.test(v))
+      )
+    }
+
+    function applyTheme(o) {
+      var colors = (o.theme && o.theme.colors) || {}
+      for (var c in colors) {
+        if (safeCss(colors[c])) root.style.setProperty('--color-' + c, colors[c])
+      }
+      var fonts = (o.theme && o.theme.fonts) || {}
+      for (var f in fonts) {
+        if (safeCss(fonts[f])) root.style.setProperty('--font-' + f, fonts[f])
+      }
+    }
+
+    function applyContent(o) {
+      var text = o.text || {}
+      for (var path in text) {
+        var nodes = document.querySelectorAll('[data-edit="' + cssEscape(path) + '"]')
+        for (var i = 0; i < nodes.length; i++) nodes[i].textContent = text[path]
+      }
+
+      var images = o.images || {}
+      for (var ipath in images) {
+        if (!safeSrc(images[ipath])) continue
+        var holders = document.querySelectorAll('[data-edit-image="' + cssEscape(ipath) + '"]')
+        for (var j = 0; j < holders.length; j++) {
+          var img = holders[j].querySelector('img')
+          if (img) {
+            img.src = images[ipath]
+            img.removeAttribute('srcset')
+          }
+        }
+      }
+
+      var logo = o.theme && o.theme.logo
+      if (logo && safeSrc(logo.src) && logo.src) {
+        var slots = document.querySelectorAll('[data-logo-slot]')
+        for (var k = 0; k < slots.length; k++) {
+          var existing = slots[k].querySelector('[data-logo-img]')
+          if (existing) {
+            existing.src = logo.src
+            existing.alt = logo.alt || 'Narvyaka'
+            existing.style.height = (logo.height || 30) + 'px'
+          } else {
+            var el = document.createElement('img')
+            el.src = logo.src
+            el.alt = logo.alt || 'Narvyaka'
+            el.style.height = (logo.height || 30) + 'px'
+            el.style.width = 'auto'
+            el.className = 'block'
+            el.setAttribute('data-logo-img', '')
+            slots[k].innerHTML = ''
+            slots[k].appendChild(el)
+          }
+        }
+      }
+    }
+
+    function cssEscape(s) {
+      return String(s).replace(/["\\]/g, '\\$&')
+    }
+
+    function apply(o) {
+      if (!o) return
+      applyTheme(o)
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function () {
+          applyContent(o)
+        })
+      } else {
+        applyContent(o)
+      }
+    }
+
+    function read(key) {
+      try {
+        return JSON.parse(localStorage.getItem(key) || 'null')
+      } catch (e) {
+        return null
+      }
+    }
+
+    // Two layers, applied in order:
+    //   1. PUBLISHED — what the Studio pushed to the server, seen by everyone.
+    //      Cached locally so it applies before first paint on repeat visits.
+    //   2. LOCAL — this browser's unexported edits, which always win.
+    var published = read(PUBLISHED_KEY)
+    var local = read(KEY)
+
+    apply(published)
+    apply(local)
+
+    // Shared with the editor so both agree on how an override is applied.
+    window.__narvyaka = {
+      KEY: KEY,
+      applyTheme: applyTheme,
+      applyContent: applyContent,
+      current: local,
+      published: published,
+    }
+
+    // Refresh the published layer in the background. A deployment with no API
+    // (astro preview, plain static hosting) simply fails quietly here.
+    fetch('/api/studio', { headers: { accept: 'application/json' } })
+      .then(function (response) {
+        return response.ok ? response.json() : null
+      })
+      .then(function (body) {
+        var next = (body && body.overrides) || null
+        var serialised = next ? JSON.stringify(next) : null
+        var cached = published ? JSON.stringify(published) : null
+
+        // Nothing changed — and critically, this is the path taken on every
+        // ordinary page load, so it must never trigger a reload.
+        if (serialised === cached) return
+
+        if (serialised) localStorage.setItem(PUBLISHED_KEY, serialised)
+        else localStorage.removeItem(PUBLISHED_KEY)
+
+        // Someone is mid-edit in this browser; leave their page alone.
+        if (local) return
+
+        // Nothing was applied from the published layer before, so the new
+        // values can simply be layered on without a repaint.
+        if (!published) {
+          apply(next)
+          return
+        }
+
+        // The published layer changed or was withdrawn. Values already written
+        // into the DOM cannot be un-written, so re-render from source. The new
+        // state is cached above, which is what stops this repeating.
+        window.location.reload()
+      })
+      .catch(function () {
+        /* no API on this deployment — the static site is the whole site */
+      })
+  })()
+</script>
+
+<script>
+  // Loads the editor only when it is open — a normal visitor downloads none of it.
+  const params = new URLSearchParams(window.location.search)
+  const wanted =
+    params.has('studio') ||
+    window.localStorage.getItem('narvyaka.studio.open') === '1'
+
+  if (wanted) {
+    if (params.get('studio') === '0') {
+      window.localStorage.removeItem('narvyaka.studio.open')
+    } else {
+      window.localStorage.setItem('narvyaka.studio.open', '1')
+      import('../lib/studio/dock').then((m) => m.mountStudio()).catch(() => {})
+    }
+  }
+
+  // Ctrl/Cmd + Shift + E toggles the editor from anywhere on the site.
+  window.addEventListener('keydown', (event) => {
+    if (!(event.ctrlKey || event.metaKey) || !event.shiftKey) return
+    if (event.key.toLowerCase() !== 'e') return
+    event.preventDefault()
+    if (document.querySelector('[data-studio-dock]')) {
+      window.localStorage.removeItem('narvyaka.studio.open')
+      window.location.reload()
+    } else {
+      window.localStorage.setItem('narvyaka.studio.open', '1')
+      import('../lib/studio/dock').then((m) => m.mountStudio()).catch(() => {})
+    }
+  })
+</script>

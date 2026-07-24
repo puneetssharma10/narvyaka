@@ -1,0 +1,58 @@
+#
+# Narvyaka — Cloudflare Pages configuration
+#
+# The two bindings below are REQUIRED for deployment. Create them once with the
+# commands in INTEGRATIONS.md, paste the database_id here, and both local dev
+# (`npm run pages:dev`) and production use the same names.
+#
+name = "narvyaka"
+compatibility_date = "2025-01-01"
+compatibility_flags = ["nodejs_compat"]
+pages_build_output_dir = "dist"
+
+# ── Database: Cloudflare D1 ───────────────────────────────────────────────────
+# Create with:  npx wrangler d1 create narvyaka
+# Then paste the printed database_id below (it is not a secret).
+[[d1_databases]]
+binding = "DB"
+database_name = "narvyaka"
+database_id = "REPLACE_WITH_YOUR_D1_DATABASE_ID"
+
+# ── Object storage: Cloudflare R2 ─────────────────────────────────────────────
+# Create with:  npx wrangler r2 bucket create narvyaka-media
+# Audio, photographs, the raw submission JSON, and published Studio edits.
+[[r2_buckets]]
+binding = "MEDIA"
+bucket_name = "narvyaka-media"
+
+[vars]
+# Set this once the R2 bucket has a custom domain (e.g. media.narvyaka.org).
+# Leave empty and media is served through this site at /media/*, which works
+# but costs an extra hop.
+PUBLIC_MEDIA_BASE_URL = ""
+
+# Set to "1" to stop accepting new submissions without taking the site down.
+INTAKE_PAUSED = "0"
+
+# ── Secrets — never put these in this file ────────────────────────────────────
+# STUDIO_TOKEN  Required only for publishing Studio edits straight to the live
+#               site. Set it with:
+#                   npx wrangler pages secret put STUDIO_TOKEN
+#               Exporting edits and running `npm run studio:apply` needs no token.
+
+# ── Preview environment ───────────────────────────────────────────────────────
+# Pages gives every branch a preview deployment. Point it at separate stores so
+# test submissions never touch the real archive.
+[env.preview]
+[[env.preview.d1_databases]]
+binding = "DB"
+database_name = "narvyaka-preview"
+database_id = "REPLACE_WITH_YOUR_PREVIEW_D1_DATABASE_ID"
+
+[[env.preview.r2_buckets]]
+binding = "MEDIA"
+bucket_name = "narvyaka-media-preview"
+
+[env.preview.vars]
+PUBLIC_MEDIA_BASE_URL = ""
+INTAKE_PAUSED = "0"

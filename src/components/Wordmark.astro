@@ -1,0 +1,49 @@
+---
+/**
+ * The Narvyaka lockup.
+ *
+ * No logo file exists yet, so this renders a typographic wordmark — Fraunces,
+ * italic. The slot is built so a real logomark can be dropped in later
+ * (Studio → Logo, or theme.logo.src in src/data/site.json) without any
+ * component being restructured: the <img> simply replaces the text.
+ */
+import { content } from '../lib/content'
+
+interface Props {
+  /** Rendered size of the wordmark text. */
+  size?: 'sm' | 'md' | 'lg' | 'xl'
+  class?: string
+  /** Marks this as the element the Studio's logo drop-zone targets. */
+  logoSlot?: boolean
+}
+
+const { size = 'md', class: className = '', logoSlot: isSlot = true } = Astro.props
+
+const logo = content.theme.logo
+const sizes: Record<string, string> = {
+  sm: 'text-[1.1rem]',
+  md: 'text-[1.35rem]',
+  lg: 'text-[2rem]',
+  xl: 'text-[clamp(2.75rem,8vw,4.75rem)]',
+}
+---
+
+<span
+  class={`wordmark inline-flex items-center leading-none ${sizes[size]} ${className}`}
+  data-logo-slot={isSlot ? '' : undefined}
+>
+  {
+    logo.src ? (
+      <img
+        src={logo.src}
+        alt={logo.alt}
+        height={logo.height}
+        style={`height:${logo.height}px;width:auto`}
+        class="block"
+        data-logo-img
+      />
+    ) : (
+      <span data-logo-text>Narvyaka</span>
+    )
+  }
+</span>

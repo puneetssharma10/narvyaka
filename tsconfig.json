@@ -1,0 +1,19 @@
+{
+  "extends": "astro/tsconfigs/strict",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "react",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@config": ["site.config.ts"]
+    },
+    "resolveJsonModule": true,
+    "allowJs": true
+  },
+  "include": [".astro/types.d.ts", "src/**/*", "shared/**/*", "site.config.ts", "astro.config.ts"],
+  // The Pages Functions run in the Workers runtime, not the browser. They get
+  // their own config so @cloudflare/workers-types cannot shadow the DOM types
+  // the site code relies on (Response, Node.append, addEventListener options…).
+  "exclude": ["dist", "node_modules", ".astro", "functions"]
+}

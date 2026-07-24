@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Narvyaka">
+  <!--
+    Placeholder favicon: a typographic mark, matching the text wordmark.
+    Drop a real logomark in here later — nothing else needs to change.
+  -->
+  <rect width="64" height="64" rx="14" fill="#8A5A3B"/>
+  <text
+    x="32" y="45"
+    text-anchor="middle"
+    font-family="Fraunces, 'Source Serif 4', Georgia, 'Times New Roman', serif"
+    font-style="italic"
+    font-size="38"
+    font-weight="500"
+    fill="#FAF8F5"
+  >N</text>
+</svg>

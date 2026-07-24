@@ -1,0 +1,92 @@
+---
+import Base from '../layouts/Base.astro'
+import PageHeader from '../components/PageHeader.astro'
+import Icon from '../components/Icon.astro'
+import IntakeForm from '../components/forms/IntakeForm'
+import { content, editable, t } from '../lib/content'
+import { siteConfig } from '../../site.config'
+
+const p = content.preserve
+const forms = content.forms
+
+const copy = {
+  common: forms.common,
+  steps: forms.steps,
+  consent: forms.consent,
+  about: forms.about,
+  record: forms.record,
+  lineage: forms.lineage,
+  photos: forms.photos,
+  review: forms.review,
+  onBehalf: forms.onBehalf,
+  afterSubmit: p.afterSubmit,
+}
+---
+
+<Base title="Preserve your experience" description={p.intro}>
+  <PageHeader
+    eyebrow={p.eyebrow}
+    eyebrowPath="preserve.eyebrow"
+    heading={p.heading}
+    headingPath="preserve.heading"
+    intro={p.intro}
+    introPath="preserve.intro"
+  />
+
+  <!-- ── The Narvyaka Test ─────────────────────────────────────────────── -->
+  <section class="section border-b border-hairline">
+    <div class="wrap">
+      <div class="max-w-[58ch]">
+        <h2 {...editable('preserve.testHeading')}>{t('preserve.testHeading')}</h2>
+        <p class="mt-4 text-muted" {...editable('preserve.testIntro')}>{t('preserve.testIntro')}</p>
+      </div>
+
+      <ul class="mt-9 grid list-none gap-4 p-0 sm:grid-cols-2 lg:grid-cols-3">
+        {
+          p.test.map((item, i) => (
+            <li class="card reveal p-5" style={`transition-delay:${i * 50}ms`}>
+              <span class="grid h-8 w-8 place-items-center rounded-full bg-accent-soft text-accent-hover">
+                <Icon name="check" size={16} />
+              </span>
+              <h3 class="mt-3.5 font-heading text-[1.08rem] leading-[1.35]" {...editable(`preserve.test.${i}.title`)}>
+                {item.title}
+              </h3>
+              <p class="mt-2 text-[0.93rem] leading-[1.6] text-muted" {...editable(`preserve.test.${i}.body`)}>
+                {item.body}
+              </p>
+            </li>
+          ))
+        }
+      </ul>
+
+      <p class="mt-8 max-w-[62ch] text-[0.95rem] text-muted" {...editable('preserve.timeNote')}>
+        {t('preserve.timeNote')}
+      </p>
+    </div>
+  </section>
+
+  <!-- ── The form ──────────────────────────────────────────────────────── -->
+  <section class="section">
+    <div class="wrap-read">
+      <h2 class="mb-9" {...editable('preserve.submitHeading')}>{t('preserve.submitHeading')}</h2>
+
+      <IntakeForm
+        client:load
+        mode="self"
+        copy={copy}
+        endpoints={{ submissions: siteConfig.api.submissions, uploads: siteConfig.api.uploads }}
+        storageKey="narvyaka.draft.preserve.v1"
+      />
+
+      <noscript>
+        <div class="card p-6">
+          <p class="m-0">
+            This form needs JavaScript to save your answers as you type and to record your voice. If you would rather
+            not turn it on, a volunteer can take your record for you — see{' '}
+            <a href="/record-someone" class="text-accent">Record someone you know</a>.
+          </p>
+        </div>
+      </noscript>
+    </div>
+  </section>
+</Base>

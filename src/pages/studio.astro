@@ -1,0 +1,156 @@
+---
+import Base from '../layouts/Base.astro'
+import PageHeader from '../components/PageHeader.astro'
+import { content } from '../lib/content'
+
+const studio = content.studio
+
+const abilities = [
+  {
+    title: 'Text',
+    body: 'Turn editing on and click any text on any page — headings, paragraphs, button labels, footer links. Type over it and click away.',
+  },
+  {
+    title: 'Colour',
+    body: 'All ten design tokens, with a colour picker and a hex field. The whole site restyles as you drag.',
+  },
+  {
+    title: 'Type',
+    body: 'Swap the wordmark, heading and body faces between the five bundled families. Nothing is fetched from a font CDN.',
+  },
+  {
+    title: 'Logo',
+    body: 'Drag a PNG, SVG or WebP onto the drop zone — or straight onto the wordmark in the header — and it replaces the text lockup everywhere.',
+  },
+  {
+    title: 'Photographs',
+    body: 'Click any picture to replace it. A cropper opens first, with aspect presets, zoom and rotate, so nothing goes in at the wrong shape.',
+  },
+]
+
+const steps = [
+  {
+    title: 'Open the Studio',
+    body: 'Use the button below, or press Ctrl/Cmd + Shift + E on any page. It stays open as you move around the site.',
+  },
+  {
+    title: 'Make your changes',
+    body: 'Everything previews live and is saved in this browser only. Nobody else sees it, and nothing is sent anywhere.',
+  },
+  {
+    title: 'Export, then apply to the code',
+    body: 'Export writes narvyaka-overrides.json. Run npm run studio:apply on it and your changes are written into src/data/site.json — a real change you can read in a diff and commit.',
+  },
+  {
+    title: 'Or publish straight to the live site',
+    body: 'With a STUDIO_TOKEN set, Publish stores the changes in object storage and every visitor sees them immediately, without a rebuild. Useful for a quick correction; the code path is the one that lasts.',
+  },
+]
+---
+
+<Base title="Studio" description="Edit the Narvyaka site by hand — text, colours, fonts, logo and photographs." noindex>
+  <PageHeader eyebrow="Studio" heading={studio.title} intro={studio.intro} />
+
+  <section class="section">
+    <div class="wrap-read">
+      <div class="card flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between md:p-8">
+        <div>
+          <h2 class="m-0 font-heading text-[1.3rem]">Open the editor</h2>
+          <p class="m-0 mt-1.5 text-[0.95rem] text-muted">
+            Or press <kbd class="rounded border border-hairline bg-bg px-1.5 py-0.5 text-[0.8rem]">Ctrl</kbd> +
+            <kbd class="rounded border border-hairline bg-bg px-1.5 py-0.5 text-[0.8rem]">Shift</kbd> +
+            <kbd class="rounded border border-hairline bg-bg px-1.5 py-0.5 text-[0.8rem]">E</kbd> anywhere on the site.
+          </p>
+        </div>
+        <button type="button" class="btn btn-primary shrink-0" data-studio-open>Open Studio</button>
+      </div>
+
+      <h2 class="mt-16">What you can change</h2>
+      <dl class="mt-7 grid gap-4">
+        {
+          abilities.map((ability) => (
+            <div class="card p-5">
+              <dt class="font-heading text-[1.1rem]">{ability.title}</dt>
+              <dd class="m-0 mt-1.5 text-[0.96rem] leading-[1.65] text-muted">{ability.body}</dd>
+            </div>
+          ))
+        }
+      </dl>
+
+      <h2 class="mt-16">How a change becomes code</h2>
+      <ol class="mt-7 grid list-none gap-6 p-0">
+        {
+          steps.map((step, i) => (
+            <li class="flex gap-4">
+              <span class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-accent-soft font-medium text-accent-hover">
+                {i + 1}
+              </span>
+              <div>
+                <h3 class="font-heading text-[1.12rem]">{step.title}</h3>
+                <p class="mt-1.5 leading-[1.65] text-muted">{step.body}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+
+      <div class="card mt-12 p-6">
+        <h3 class="font-heading text-[1.1rem]">A note on where edits live</h3>
+        <p class="mt-2 leading-[1.7] text-muted">
+          Studio changes are stored in your browser until you export or publish them. That is deliberate: it means you
+          can try a colour for ten minutes, change your mind, and nothing has happened. It also means clearing your
+          browser data clears unexported changes — so export before you close the laptop on something you like.
+        </p>
+      </div>
+
+      <div class="mt-10">
+        <h3 class="font-heading text-[1.1rem]">Deployment status</h3>
+        <p class="mt-2 text-[0.95rem] text-muted">
+          Whether this deployment can actually receive records and publish edits:
+        </p>
+        <div class="mt-4" data-health-panel>
+          <p class="hint">Checking…</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<script>
+  document.querySelector<HTMLButtonElement>('[data-studio-open]')?.addEventListener('click', () => {
+    window.localStorage.setItem('narvyaka.studio.open', '1')
+    void import('../lib/studio/dock').then((module) => module.mountStudio())
+  })
+
+  // Live binding check, so "is it wired up?" is answered on the page rather
+  // than by reading a config file.
+  const panel = document.querySelector<HTMLElement>('[data-health-panel]')
+  if (panel) {
+    fetch('/api/health')
+      .then(async (response) => ({ status: response.status, body: await response.json() }))
+      .then(({ body }) => {
+        const checks = (body as any).checks ?? {}
+        const rows = Object.entries(checks)
+          .map(([name, value]) => {
+            const { ok, detail } = value as { ok: boolean; detail: string }
+            return `<li class="flex gap-2.5 items-start">
+              <span aria-hidden="true" class="mt-1 h-2 w-2 shrink-0 rounded-full ${ok ? 'bg-verified' : 'bg-caution'}"></span>
+              <span><strong class="font-medium capitalize">${name}</strong> — <span class="text-muted">${escapeHtml(detail)}</span></span>
+            </li>`
+          })
+          .join('')
+        panel.innerHTML = `<ul class="grid gap-2.5 list-none p-0 m-0 text-[0.93rem]">${rows}</ul>`
+      })
+      .catch(() => {
+        panel.innerHTML =
+          '<p class="hint">No API is running here. That is expected with <code>npm run dev</code> — use <code>npm run pages:dev</code> to test the functions.</p>'
+      })
+  }
+
+  function escapeHtml(value: string): string {
+    return value.replace(/[&<>"']/g, (character) => {
+      const map: Record<string, string> = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }
+      return map[character]
+    })
+  }
+</script>

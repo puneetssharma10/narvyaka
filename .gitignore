@@ -1,0 +1,29 @@
+# build
+dist/
+.astro/
+.output/
+
+# deps
+node_modules/
+
+# cloudflare / wrangler
+.wrangler/
+.dev.vars
+.dev.vars.*
+!.dev.vars.example
+
+# env
+.env
+.env.*
+!.env.example
+
+# studio exports (these are working files — apply them with `npm run studio:apply`)
+studio-exports/
+
+# os / editor
+.DS_Store
+Thumbs.db
+*.log
+npm-debug.log*
+.vscode/
+.idea/

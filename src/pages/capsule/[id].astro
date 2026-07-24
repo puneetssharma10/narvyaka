@@ -1,0 +1,196 @@
+---
+import type { GetStaticPaths } from 'astro'
+import Base from '../../layouts/Base.astro'
+import AudioPlayer from '../../components/AudioPlayer.astro'
+import VerificationBadge from '../../components/VerificationBadge.astro'
+import PlaceholderNotice from '../../components/PlaceholderNotice.astro'
+import Icon from '../../components/Icon.astro'
+import { content } from '../../lib/content'
+import { allCapsules, contextLine, displayName, type Capsule } from '../../lib/capsules'
+
+export const getStaticPaths = (() => {
+  return allCapsules.map((capsule) => ({
+    params: { id: capsule.id },
+    props: { capsule },
+  }))
+}) satisfies GetStaticPaths
+
+interface Props {
+  capsule: Capsule
+}
+
+const { capsule } = Astro.props
+const copy = content.capsule
+
+const name = displayName(capsule, copy.anonymousName)
+const context = contextLine(capsule)
+const note = capsule.note
+
+// The Wisdom Note, in the order a reader needs it: what happened, what was
+// done, what came of it, what they would change.
+const noteSections = [
+  { label: 'What happened', body: note.what_happened },
+  { label: 'What they did, and why', body: note.what_they_did },
+  { label: 'What worked, what failed', body: note.what_worked_failed },
+  { label: 'What they would do differently', body: note.what_differently },
+].filter((section) => section.body)
+
+const generations = capsule.family_learning_note.generations.filter((g) => g.what_they_knew || g.relation)
+---
+
+<Base title={capsule.key_lesson.slice(0, 70)} description={note.central_prompt.slice(0, 200)}>
+  <article>
+    <header class="border-b border-hairline pb-10 pt-10 md:pb-14 md:pt-14">
+      <div class="wrap-read">
+        <a href="/browse" class="inline-flex items-center gap-1.5 text-[0.9rem] text-muted no-underline hover:text-accent">
+          <Icon name="arrow" size={15} class="rotate-180" />
+          {copy.backLab}
+        </a>
+
+        {
+          capsule.is_example && (
+            <PlaceholderNotice label="Example" class="mt-6">
+              Not a real contributor. This record exists so the format can be seen before the first real recording is
+              made.
+            </PlaceholderNotice>
+          )
+        }
+
+        <div class="mt-7 flex flex-wrap items-center gap-2">
+          {capsule.classification.primary_category && <span class="tag">{capsule.classification.primary_category}</span>}
+          {capsule.classification.experience_type && <span class="tag">{capsule.classification.experience_type}</span>}
+          <VerificationBadge status={capsule.classification.verification_status} />
+        </div>
+
+        <h1 class="mt-5 font-heading text-[clamp(1.7rem,4.2vw,2.5rem)] leading-[1.25]">
+          “{capsule.key_lesson}”
+        </h1>
+
+        <div class="mt-7 flex flex-wrap items-center gap-x-4 gap-y-1 text-[0.95rem]">
+          <span class="font-medium text-ink">{name}</span>
+          {context && <span class="text-muted">{context}</span>}
+          {
+            capsule.contributor.record_language && (
+              <span class="text-muted">Recorded in {capsule.contributor.record_language}</span>
+            )
+          }
+        </div>
+      </div>
+    </header>
+
+    <div class="wrap-read section grid gap-14">
+      <!-- The recording is the record. It comes first. -->
+      <section>
+        <h2 class="visually-hidden">Recording</h2>
+        <AudioPlayer
+          src={capsule.audio_url ?? ''}
+          missingLabel={copy.audioMissingLabel}
+          label={copy.listenLabel}
+        />
+      </section>
+
+      {
+        capsule.photos.length > 0 && (
+          <section class="grid gap-4">
+            <h2 class="visually-hidden">Photographs</h2>
+            {capsule.photos.map((photo) => (
+              <figure class="m-0">
+                <img
+                  src={photo.url}
+                  alt={photo.caption ?? ''}
+                  loading="lazy"
+                  class="w-full rounded-[12px] border border-hairline"
+                />
+                {photo.caption && <figcaption class="mt-2 text-[0.88rem] text-muted">{photo.caption}</figcaption>}
+              </figure>
+            ))}
+          </section>
+        )
+      }
+
+      <section>
+        <h2 class="font-heading text-[1.4rem]">{copy.noteHeading}</h2>
+
+        {
+          note.central_prompt && (
+            <p class="mt-5 border-l-2 border-accent/30 pl-5 font-heading text-[1.2rem] leading-[1.65]">
+              {note.central_prompt}
+            </p>
+          )
+        }
+
+        <div class="mt-9 grid gap-8">
+          {
+            noteSections.map((section) => (
+              <div>
+                <h3 class="text-[0.8rem] font-semibold uppercase tracking-[0.1em] text-muted">{section.label}</h3>
+                <p class="mt-2 leading-[1.75] text-ink/90">{section.body}</p>
+              </div>
+            ))
+          }
+        </div>
+      </section>
+
+      {
+        note.when_not_applicable && (
+          <section class="card p-6">
+            <h2 class="font-heading text-[1.2rem]">{copy.notApplicableHeading}</h2>
+            <p class="mt-2 leading-[1.75] text-ink/90">{note.when_not_applicable}</p>
+          </section>
+        )
+      }
+
+      {
+        note.who_can_confirm && (
+          <section>
+            <h2 class="font-heading text-[1.2rem]">{copy.confirmHeading}</h2>
+            <p class="mt-2 leading-[1.75] text-ink/90">{note.who_can_confirm}</p>
+          </section>
+        )
+      }
+
+      <!--
+        The Family & Learning Note. Master Reference Part IV: it is part of the
+        record, not a feature of its own — so it sits last, at a smaller size,
+        with no navigation of its own.
+      -->
+      {
+        (capsule.family_learning_note.summary || generations.length > 0) && (
+          <section class="border-t border-hairline pt-10">
+            <h2 class="font-heading text-[1.15rem] text-muted">{copy.lineageHeading}</h2>
+
+            {capsule.family_learning_note.summary && (
+              <p class="mt-3 text-[0.98rem] leading-[1.7] text-ink/85">{capsule.family_learning_note.summary}</p>
+            )}
+
+            {generations.length > 0 && (
+              <ul class="mt-6 grid list-none gap-4 p-0">
+                {generations.map((generation) => (
+                  <li class="border-l border-hairline pl-4">
+                    <p class="m-0 text-[0.88rem] font-medium text-ink">
+                      {[generation.name, generation.relation].filter(Boolean).join(' · ')}
+                      {generation.place && <span class="font-normal text-muted"> — {generation.place}</span>}
+                    </p>
+                    {generation.what_they_knew && (
+                      <p class="m-0 mt-1 text-[0.93rem] leading-[1.65] text-muted">{generation.what_they_knew}</p>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+        )
+      }
+    </div>
+
+    <footer class="border-t border-hairline">
+      <div class="wrap-read py-12">
+        <p class="text-[1.05rem]">Do you know something that should not have to be discovered again?</p>
+        <div class="mt-5 flex flex-wrap gap-3">
+          <a href="/preserve" class="btn btn-primary">Preserve your experience</a>
+          <a href="/browse" class="btn btn-secondary">Back to the archive</a>
+        </div>
+      </div>
+    </footer>
+  </article>
+</Base>

@@ -1,0 +1,16 @@
+---
+import PolicyPage from '../components/PolicyPage.astro'
+import { content } from '../lib/content'
+
+const p = content.terms
+---
+
+<PolicyPage
+  scope="terms"
+  eyebrow={p.eyebrow}
+  heading={p.heading}
+  isPlaceholder={p.isPlaceholder}
+  placeholderNotice={p.placeholderNotice}
+  lastUpdated={p.lastUpdated}
+  sections={p.sections}
+/>

@@ -1,0 +1,29 @@
+---
+/**
+ * An honest label for content that is not final.
+ *
+ * Build Brief §7: placeholder content must be *clearly labelled as such in the
+ * UI*. This is the one component allowed to be visually loud, because a
+ * quiet placeholder is how a placeholder ends up shipping as if it were real.
+ */
+interface Props {
+  /** Short word shown in the chip: "Example", "Placeholder", "Draft". */
+  label?: string
+  class?: string
+}
+
+const { label = 'Placeholder', class: className = '' } = Astro.props
+---
+
+<aside
+  class={`rounded-[12px] border border-dashed border-caution/45 bg-caution/6 p-4 ${className}`}
+  role="note"
+>
+  <p class="m-0 flex flex-wrap items-baseline gap-x-2.5 gap-y-1 text-[0.875rem] leading-relaxed text-ink/85">
+    <span
+      class="rounded-full bg-caution px-2 py-0.5 text-[0.7rem] font-semibold uppercase tracking-[0.06em] text-white"
+      >{label}</span
+    >
+    <span><slot /></span>
+  </p>
+</aside>

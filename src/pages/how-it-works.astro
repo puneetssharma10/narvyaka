@@ -1,0 +1,142 @@
+---
+import Base from '../layouts/Base.astro'
+import PageHeader from '../components/PageHeader.astro'
+import Icon from '../components/Icon.astro'
+import CapsuleCard from '../components/CapsuleCard.astro'
+import PlaceholderNotice from '../components/PlaceholderNotice.astro'
+import { content, editable, t } from '../lib/content'
+import { getCapsule } from '../lib/capsules'
+
+const hiw = content.howItWorks
+const iconFor = { voice: 'voice', note: 'note', photo: 'photo', identity: 'identity' } as const
+const sample = getCapsule('example')
+---
+
+<Base title="How it works" description={hiw.intro}>
+  <PageHeader
+    eyebrow={hiw.eyebrow}
+    eyebrowPath="howItWorks.eyebrow"
+    heading={hiw.heading}
+    headingPath="howItWorks.heading"
+    intro={hiw.intro}
+    introPath="howItWorks.intro"
+  />
+
+  <!-- ── The four parts ────────────────────────────────────────────────── -->
+  <section class="section border-b border-hairline">
+    <div class="wrap-read">
+      <h2 {...editable('howItWorks.partsHeading')}>{t('howItWorks.partsHeading')}</h2>
+
+      <div class="mt-10 grid gap-6">
+        {
+          hiw.parts.map((part, i) => (
+            <div class="card reveal flex gap-5 p-6">
+              <span class="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-accent-soft text-accent-hover">
+                <Icon name={iconFor[part.icon as keyof typeof iconFor] ?? 'note'} size={21} />
+              </span>
+              <div>
+                <h3 class="font-heading text-[1.3rem]" {...editable(`howItWorks.parts.${i}.title`)}>
+                  {part.title}
+                </h3>
+                <p class="mt-2 leading-[1.7] text-ink/90" {...editable(`howItWorks.parts.${i}.body`)}>
+                  {part.body}
+                </p>
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Why audio ─────────────────────────────────────────────────────── -->
+  <section class="section border-b border-hairline">
+    <div class="wrap-read reveal">
+      <h2 class="max-w-[18ch]" {...editable('howItWorks.audioHeading')}>{t('howItWorks.audioHeading')}</h2>
+      <div class="prose-narvyaka mt-6">
+        {hiw.audioBody.map((paragraph, i) => <p {...editable(`howItWorks.audioBody.${i}`)}>{paragraph}</p>)}
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Three representations ─────────────────────────────────────────── -->
+  <section class="section border-b border-hairline">
+    <div class="wrap-read">
+      <h2 {...editable('howItWorks.storageHeading')}>{t('howItWorks.storageHeading')}</h2>
+      <p class="mt-4 text-muted" {...editable('howItWorks.storageIntro')}>{t('howItWorks.storageIntro')}</p>
+
+      <ol class="mt-9 grid list-none gap-5 p-0 md:grid-cols-3">
+        {
+          hiw.storage.map((item, i) => (
+            <li class="card reveal p-6" style={`transition-delay:${i * 60}ms`}>
+              <span class="font-heading text-[2rem] leading-none text-accent/35">{i + 1}</span>
+              <h3 class="mt-3 font-heading text-[1.15rem]" {...editable(`howItWorks.storage.${i}.title`)}>
+                {item.title}
+              </h3>
+              <p class="mt-2 text-[0.95rem] leading-[1.65] text-muted" {...editable(`howItWorks.storage.${i}.body`)}>
+                {item.body}
+              </p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <!-- ── Review + verification ─────────────────────────────────────────── -->
+  <section class="section border-b border-hairline">
+    <div class="wrap-read grid gap-14">
+      <div class="reveal">
+        <h2 {...editable('howItWorks.reviewHeading')}>{t('howItWorks.reviewHeading')}</h2>
+        <p class="mt-4 text-[1.05rem] leading-[1.7]" {...editable('howItWorks.reviewBody')}>
+          {t('howItWorks.reviewBody')}
+        </p>
+      </div>
+
+      <div class="reveal">
+        <h2 {...editable('howItWorks.verificationHeading')}>{t('howItWorks.verificationHeading')}</h2>
+        <p class="mt-4 text-muted" {...editable('howItWorks.verificationIntro')}>
+          {t('howItWorks.verificationIntro')}
+        </p>
+
+        <dl class="mt-8 grid gap-5">
+          {
+            hiw.verification.map((item, i) => (
+              <div class="card p-5">
+                <dt class="font-heading text-[1.1rem] text-accent-hover" {...editable(`howItWorks.verification.${i}.status`)}>
+                  {item.status}
+                </dt>
+                <dd class="m-0 mt-1.5 text-[0.98rem] leading-[1.65] text-muted" {...editable(`howItWorks.verification.${i}.body`)}>
+                  {item.body}
+                </dd>
+              </div>
+            ))
+          }
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Sample capsule ────────────────────────────────────────────────── -->
+  <section class="section">
+    <div class="wrap-read">
+      <h2 {...editable('howItWorks.sampleHeading')}>{t('howItWorks.sampleHeading')}</h2>
+      <p class="mt-4 text-muted" {...editable('howItWorks.sampleIntro')}>{t('howItWorks.sampleIntro')}</p>
+
+      {
+        sample ? (
+          <div class="mt-8 grid gap-5">
+            <CapsuleCard capsule={sample} class="max-w-md" />
+            <a href={`/capsule/${sample.id}`} class="font-medium text-accent">
+              Open the full record →
+            </a>
+          </div>
+        ) : (
+          <PlaceholderNotice label="Empty" class="mt-8">
+            No sample record is present. Add one to <code>content/capsules/</code> to show the format here.
+          </PlaceholderNotice>
+        )
+      }
+    </div>
+  </section>
+</Base>

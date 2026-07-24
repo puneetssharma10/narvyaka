@@ -1,0 +1,78 @@
+---
+import Base from '../layouts/Base.astro'
+import PageHeader from '../components/PageHeader.astro'
+import VolunteerForm from '../components/forms/VolunteerForm'
+import { content, editable, t } from '../lib/content'
+import { siteConfig } from '../../site.config'
+
+const v = content.volunteer
+const roleNames = v.roles.map((role) => role.title)
+---
+
+<Base title="Become a founding volunteer" description={v.intro}>
+  <PageHeader
+    eyebrow={v.eyebrow}
+    eyebrowPath="volunteer.eyebrow"
+    heading={v.heading}
+    headingPath="volunteer.heading"
+    intro={v.intro}
+    introPath="volunteer.intro"
+  />
+
+  <!-- ── Roles ─────────────────────────────────────────────────────────── -->
+  <section class="section border-b border-hairline">
+    <div class="wrap">
+      <h2 {...editable('volunteer.rolesHeading')}>{t('volunteer.rolesHeading')}</h2>
+
+      <ul class="mt-9 grid list-none gap-4 p-0 sm:grid-cols-2 lg:grid-cols-4">
+        {
+          v.roles.map((role, i) => (
+            <li class="card reveal p-5" style={`transition-delay:${(i % 4) * 50}ms`}>
+              <h3 class="font-heading text-[1.1rem]" {...editable(`volunteer.roles.${i}.title`)}>
+                {role.title}
+              </h3>
+              <p class="mt-2 text-[0.93rem] leading-[1.6] text-muted" {...editable(`volunteer.roles.${i}.body`)}>
+                {role.body}
+              </p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- ── What we ask ───────────────────────────────────────────────────── -->
+  <section class="section border-b border-hairline">
+    <div class="wrap-read reveal">
+      <h2 {...editable('volunteer.expectationsHeading')}>{t('volunteer.expectationsHeading')}</h2>
+      <ul class="mt-6 grid list-none gap-4 p-0">
+        {
+          v.expectations.map((item, i) => (
+            <li class="flex items-start gap-3 border-l-2 border-accent/25 pl-4">
+              <span class="text-[1.02rem] leading-[1.65]" {...editable(`volunteer.expectations.${i}`)}>
+                {item}
+              </span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- ── Application ───────────────────────────────────────────────────── -->
+  <section class="section">
+    <div class="wrap-read">
+      <h2 {...editable('volunteer.formHeading')}>{t('volunteer.formHeading')}</h2>
+      <p class="mb-9 mt-4 text-muted" {...editable('volunteer.formIntro')}>{t('volunteer.formIntro')}</p>
+
+      <VolunteerForm
+        client:load
+        copy={content.forms.volunteerForm}
+        common={content.forms.common}
+        roles={roleNames}
+        endpoint={siteConfig.api.volunteers}
+        afterSubmit={v.afterSubmit}
+      />
+    </div>
+  </section>
+</Base>

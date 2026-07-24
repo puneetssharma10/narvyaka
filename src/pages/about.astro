@@ -1,0 +1,102 @@
+---
+import Base from '../layouts/Base.astro'
+import PageHeader from '../components/PageHeader.astro'
+import { content, editable, t } from '../lib/content'
+
+const about = content.about
+const s1 = about.stage1
+const s2 = about.stage2
+
+const blocks = [
+  { heading: s1.missionHeading, body: s1.mission, hp: 'about.stage1.missionHeading', bp: 'about.stage1.mission' },
+  { heading: s1.visionHeading, body: s1.vision, hp: 'about.stage1.visionHeading', bp: 'about.stage1.vision' },
+  { heading: s1.beliefHeading, body: s1.belief, hp: 'about.stage1.beliefHeading', bp: 'about.stage1.belief' },
+]
+---
+
+<Base title="About" description={s1.mission}>
+  <PageHeader
+    eyebrow={about.eyebrow}
+    eyebrowPath="about.eyebrow"
+    heading={about.heading}
+    headingPath="about.heading"
+  />
+
+  <!--
+    STAGE 1 — Master Reference Part I.1.
+    Locked design rule: the two stages must not be collapsed into one. A
+    visitor must be able to understand Narvyaka completely without reading
+    Stage 2, and must be able to see where Stage 1 ends.
+  -->
+  <section class="section">
+    <div class="wrap-read grid gap-12">
+      {
+        blocks.map((block) => (
+          <div class="reveal">
+            <h2 class="font-heading text-[1.5rem]" {...editable(block.hp)}>
+              {block.heading}
+            </h2>
+            <p class="mt-3 text-[1.08rem] leading-[1.7]" {...editable(block.bp)}>
+              {block.body}
+            </p>
+          </div>
+        ))
+      }
+
+      <div class="reveal card p-7 md:p-9">
+        <h2 class="font-heading text-[1.5rem]" {...editable('about.stage1.nameHeading')}>{s1.nameHeading}</h2>
+        <p class="mt-3 font-heading text-[clamp(1.4rem,3vw,1.85rem)] leading-[1.3] text-accent" {...editable('about.stage1.name')}>
+          {s1.name}
+        </p>
+        <p class="mt-4 text-[1.02rem] leading-[1.7] text-muted" {...editable('about.stage1.nameBody')}>
+          {s1.nameBody}
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── The visual break between the two stages ───────────────────────── -->
+  <div class="wrap-read">
+    <div class="flex items-center gap-4 py-2" aria-hidden="true">
+      <span class="h-px flex-1 bg-hairline"></span>
+      <span class="h-1.5 w-1.5 rotate-45 bg-accent/40"></span>
+      <span class="h-px flex-1 bg-hairline"></span>
+    </div>
+  </div>
+
+  <!-- STAGE 2 — the deeper meaning. Deliberately after the break. -->
+  <section class="section">
+    <div class="wrap-read">
+      <p
+        class="m-0 text-[0.82rem] font-semibold uppercase tracking-[0.11em] text-muted"
+        {...editable('about.stage2.label')}
+      >
+        {s2.label}
+      </p>
+      <h2 class="mt-3" {...editable('about.stage2.heading')}>{t('about.stage2.heading')}</h2>
+      <p class="mt-5 text-[1.05rem] text-muted" {...editable('about.stage2.intro')}>{t('about.stage2.intro')}</p>
+
+      <div class="mt-12 grid gap-10">
+        {
+          s2.figures.map((figure, i) => (
+            <div class="reveal border-l-2 border-accent/25 pl-6">
+              <h3 class="font-heading text-[1.35rem]" {...editable(`about.stage2.figures.${i}.name`)}>
+                {figure.name}
+              </h3>
+              <p class="mt-2 leading-[1.7] text-ink/90" {...editable(`about.stage2.figures.${i}.body`)}>
+                {figure.body}
+              </p>
+            </div>
+          ))
+        }
+      </div>
+
+      <p
+        class="mt-14 text-center font-heading text-[clamp(1.3rem,3vw,1.7rem)] text-accent"
+        {...editable('about.stage2.closing')}
+      >
+        {t('about.stage2.closing')}
+      </p>
+    </div>
+  </section>
+</Base>

@@ -1,0 +1,65 @@
+---
+import Base from '../layouts/Base.astro'
+import PageHeader from '../components/PageHeader.astro'
+import PlaceholderNotice from '../components/PlaceholderNotice.astro'
+import { content, editable, t } from '../lib/content'
+
+const founder = content.founder
+---
+
+<Base title="Letter from the founder" description={founder.letter[0]}>
+  <PageHeader
+    eyebrow={founder.eyebrow}
+    eyebrowPath="founder.eyebrow"
+    heading={founder.heading}
+    headingPath="founder.heading"
+  />
+
+  <section class="section">
+    <div class="wrap-read">
+      {
+        founder.isPlaceholder && (
+          <PlaceholderNotice label="Placeholder" class="mb-10">
+            <span {...editable('founder.placeholderNotice')}>{founder.placeholderNotice}</span>
+          </PlaceholderNotice>
+        )
+      }
+
+      <article class="reveal">
+        {
+          founder.photo && (
+            <div
+              class="mb-10 aspect-[3/2] w-full overflow-hidden rounded-[12px] bg-accent-soft"
+              {...{ 'data-edit-image': 'founder.photo', 'data-edit-aspect': '3:2' }}
+            >
+              <img src={founder.photo} alt={founder.photoAlt} class="h-full w-full object-cover" />
+            </div>
+          )
+        }
+
+        <!-- Set in the heading serif rather than the body sans: this is a letter,
+             not an article, and it should read as one. -->
+        <div class="font-heading text-[clamp(1.1rem,2.2vw,1.22rem)] leading-[1.75]">
+          {
+            founder.letter.map((paragraph, i) => (
+              <p class={i === 0 ? 'mt-0' : 'mt-6'} {...editable(`founder.letter.${i}`)}>
+                {paragraph}
+              </p>
+            ))
+          }
+        </div>
+
+        <p class="mt-12 font-heading text-[1.05rem] italic text-muted" {...editable('founder.signature')}>
+          — {t('founder.signature')}
+        </p>
+      </article>
+
+      <hr class="hairline my-14" />
+
+      <div class="flex flex-wrap gap-3">
+        <a href="/preserve" class="btn btn-primary">Preserve your experience</a>
+        <a href="/record-someone" class="btn btn-secondary">Record someone you know</a>
+      </div>
+    </div>
+  </section>
+</Base>

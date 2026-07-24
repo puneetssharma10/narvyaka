@@ -1,0 +1,15 @@
+# Narvyaka
+#
+# The archive is meant to be found and read by people. It is not licensed for
+# training AI models — see /terms. Crawlers that respect this file are asked to
+# leave the intake forms and the API alone.
+
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /media/
+Disallow: /studio
+Disallow: /preserve
+Disallow: /record-someone
+
+# Sitemap is added automatically once a domain is set in site.config.ts.

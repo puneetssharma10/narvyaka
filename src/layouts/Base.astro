@@ -1,0 +1,84 @@
+---
+import '../styles/global.css'
+import fraunceItalicUrl from '@fontsource-variable/fraunces/files/fraunces-latin-full-italic.woff2?url'
+import Header from '../components/Header.astro'
+import Footer from '../components/Footer.astro'
+import StudioBoot from '../components/StudioBoot.astro'
+import { siteConfig, siteUrl, hasDomain } from '../../site.config'
+
+interface Props {
+  title: string
+  description?: string
+  /** Adds the page to the sitemap-excluded set (Studio, thank-you screens). */
+  noindex?: boolean
+  bodyClass?: string
+}
+
+const { title, description = siteConfig.description, noindex = false, bodyClass = '' } = Astro.props
+
+const fullTitle = title === siteConfig.name ? `${siteConfig.name} — ${siteConfig.tagline}` : `${title} · ${siteConfig.name}`
+const canonical = hasDomain ? new URL(Astro.url.pathname, siteUrl).href : undefined
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <meta name="generator" content={Astro.generator} />
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <!-- The wordmark is above the fold on every page; fetch its face immediately. -->
+    <link rel="preload" href={fraunceItalicUrl} as="font" type="font/woff2" crossorigin />
+
+    {canonical && <link rel="canonical" href={canonical} />}
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={siteConfig.name} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    {canonical && <meta property="og:url" content={canonical} />}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="theme-color" content="#FAF8F5" />
+
+    <StudioBoot />
+  </head>
+
+  <body class={bodyClass}>
+    <a href="#main" class="visually-hidden">Skip to content</a>
+    <Header />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer />
+
+    <script>
+      // Fade-in on scroll. 280ms, ease-out, no parallax (Build Brief §2.4).
+      const targets = document.querySelectorAll('.reveal')
+      if (targets.length) {
+        const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+        if (reduce || !('IntersectionObserver' in window)) {
+          targets.forEach((el) => el.classList.add('is-visible'))
+        } else {
+          const observer = new IntersectionObserver(
+            (entries) => {
+              entries.forEach((entry) => {
+                if (!entry.isIntersecting) return
+                entry.target.classList.add('is-visible')
+                observer.unobserve(entry.target)
+              })
+            },
+            { rootMargin: '0px 0px -8% 0px', threshold: 0.05 },
+          )
+          targets.forEach((el) => observer.observe(el))
+        }
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,88 @@
+name: Build and deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Type check and build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # Types across the site and the Pages Functions.
+      - run: npm run check
+      - run: npx tsc --noEmit -p functions/tsconfig.json
+
+      - run: npm run build
+
+      - name: Guard the locked rules
+        # These are the decisions that must survive every future change
+        # (Build Brief §9). A grep is a blunt instrument, but it fails loudly
+        # and costs nothing.
+        run: |
+          set -e
+
+          echo "→ submissions must always be written as pending_review"
+          grep -q "status: 'pending_review'" shared/record-schema.ts
+
+          echo "→ verification status must have exactly three values"
+          test "$(grep -c "'Documented'\|\"Contributor's Account\"\|'Family Tradition'" shared/record-schema.ts)" -ge 1
+          grep -q "Family Tradition" db/schema.sql
+
+          echo "→ private prefixes must not be web-readable"
+          grep -q "PUBLIC_PREFIXES" functions/media/\[\[path\]\].ts
+          ! grep -q "'submissions/'" functions/media/\[\[path\]\].ts
+
+          echo "→ define:vars must not be used (GHSA-j687-52p2-xcff)"
+          # Matches the attribute form only, so the explanation in SECURITY.md
+          # and the comment in StudioBoot.astro do not trip it.
+          if grep -rn "define:vars=" src/; then
+            echo "define:vars found — see SECURITY.md" && exit 1
+          fi
+
+          echo "All locked rules hold."
+
+  deploy:
+    name: Deploy to Cloudflare Pages
+    needs: check
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+      - run: npm run build
+
+      # Needs two repository secrets — see DEPLOYMENT.md.
+      # Without them this step fails; nothing else in the repo depends on it.
+      - name: Deploy
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy dist --project-name=narvyaka

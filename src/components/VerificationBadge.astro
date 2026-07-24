@@ -1,0 +1,44 @@
+---
+/**
+ * Master Reference Part VII.1 — exactly three values, and every published
+ * record carries one. There is deliberately no "unverified" fallback: an
+ * unsupported account is a Contributor's Account, which is a real status.
+ */
+import { VERIFICATION_STATUSES, type VerificationStatus } from '../../shared/record-schema'
+
+interface Props {
+  status: VerificationStatus | string
+  class?: string
+}
+
+const { status, class: className = '' } = Astro.props
+
+const known = (VERIFICATION_STATUSES as readonly string[]).includes(status)
+
+const styles: Record<string, string> = {
+  Documented: 'text-verified border-verified/35 bg-verified/8',
+  "Contributor's Account": 'text-accent-hover border-accent/30 bg-accent-soft',
+  'Family Tradition': 'text-caution border-caution/30 bg-caution/8',
+}
+
+const explain: Record<string, string> = {
+  Documented: 'Supported by records, artefacts or independent sources.',
+  "Contributor's Account": 'First-hand testimony from the person who was there, not independently confirmed.',
+  'Family Tradition': 'Passed down and reported as it was received.',
+}
+---
+
+{
+  known ? (
+    <span
+      class={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[0.75rem] font-medium ${styles[status]} ${className}`}
+      title={explain[status]}
+    >
+      {status}
+    </span>
+  ) : (
+    <span class={`tag ${className}`} title="Unrecognised verification status — see Master Reference Part VII.1">
+      {status || 'Status missing'}
+    </span>
+  )
+}

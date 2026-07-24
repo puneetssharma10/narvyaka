@@ -1,0 +1,90 @@
+---
+import Wordmark from './Wordmark.astro'
+import { content, editable, t } from '../lib/content'
+import { siteConfig, hasEmail, activeSocials } from '../../site.config'
+
+const year = new Date().getFullYear()
+const yearLabel = year > siteConfig.foundedYear ? `${siteConfig.foundedYear}–${year}` : String(siteConfig.foundedYear)
+
+const socialLabels: Record<string, string> = {
+  github: 'GitHub',
+  instagram: 'Instagram',
+  youtube: 'YouTube',
+  linkedin: 'LinkedIn',
+  x: 'X',
+}
+---
+
+<footer class="mt-auto border-t border-hairline bg-surface">
+  <div class="wrap py-14 md:py-20">
+    <div class="grid gap-12 md:grid-cols-[minmax(0,1.3fr)_repeat(3,minmax(0,1fr))]">
+      <div class="max-w-sm">
+        <Wordmark size="md" logoSlot={false} />
+        <p class="mt-3 text-[0.95rem] text-muted" {...editable('footer.blurb')}>
+          {t('footer.blurb')}
+        </p>
+        <p
+          class="mt-5 font-heading text-[1.05rem] text-accent"
+          {...editable('footer.philosophy')}
+        >
+          {t('footer.philosophy')}
+        </p>
+      </div>
+
+      {
+        content.footer.columns.map((column, ci) => (
+          <div>
+            <h2
+              class="font-body text-[0.8rem] font-semibold uppercase tracking-[0.09em] text-muted"
+              {...editable(`footer.columns.${ci}.title`)}
+            >
+              {column.title}
+            </h2>
+            <ul class="mt-4 space-y-2.5">
+              {column.links.map((link, li) => (
+                <li>
+                  <a
+                    href={link.href}
+                    class="text-[0.95rem] text-ink no-underline transition-colors hover:text-accent"
+                    {...editable(`footer.columns.${ci}.links.${li}.label`)}
+                  >
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
+    </div>
+
+    <hr class="hairline my-10" />
+
+    <div class="flex flex-col gap-4 text-[0.85rem] text-muted sm:flex-row sm:items-center sm:justify-between">
+      <p>© {yearLabel} {siteConfig.legalEntity}</p>
+
+      <div class="flex flex-wrap items-center gap-x-5 gap-y-2">
+        {
+          hasEmail && (
+            <a href={`mailto:${siteConfig.contactEmail}`} class="text-muted no-underline hover:text-accent">
+              {t('footer.emailLabel')}
+            </a>
+          )
+        }
+        {
+          activeSocials.map((social) => (
+            <a
+              href={social.url}
+              rel="me noopener"
+              target="_blank"
+              class="text-muted no-underline hover:text-accent"
+            >
+              {socialLabels[social.key] ?? social.key}
+            </a>
+          ))
+        }
+        <a href="/studio" class="text-muted no-underline hover:text-accent">Studio</a>
+      </div>
+    </div>
+  </div>
+</footer>

@@ -1,0 +1,201 @@
+---
+import Base from '../layouts/Base.astro'
+import Wordmark from '../components/Wordmark.astro'
+import Icon from '../components/Icon.astro'
+import AudioPlayer from '../components/AudioPlayer.astro'
+import PlaceholderNotice from '../components/PlaceholderNotice.astro'
+import { content, editable, t, list } from '../lib/content'
+import { siteConfig } from '../../site.config'
+
+const home = content.home
+const example = home.exampleCapsule
+const problemParagraphs = list<string>('home.problem.paragraphs')
+const iconFor = { voice: 'voice', note: 'note', photo: 'photo', identity: 'identity' } as const
+---
+
+<Base title={siteConfig.name}>
+  <!-- ── Hero ──────────────────────────────────────────────────────────── -->
+  <section class="section-lg border-b border-hairline">
+    <div class="wrap grid items-center gap-14 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:gap-20">
+      <div>
+        <Wordmark size="xl" class="block" />
+
+        <h1 class="mt-5 max-w-[16ch] text-balance" {...editable('home.hero.tagline')}>
+          {t('home.hero.tagline')}
+        </h1>
+
+        <p
+          class="mt-6 font-heading text-[clamp(1.25rem,2.4vw,1.6rem)] leading-snug text-accent"
+          {...editable('home.hero.subhead')}
+        >
+          {t('home.hero.subhead')}
+        </p>
+
+        <p class="mt-5 max-w-[52ch] text-[1.05rem] text-muted" {...editable('home.hero.intro')}>
+          {t('home.hero.intro')}
+        </p>
+
+        <div class="mt-9 flex flex-wrap gap-3">
+          <a href={home.hero.primaryCta.href} class="btn btn-primary" {...editable('home.hero.primaryCta.label')}>
+            {home.hero.primaryCta.label}
+          </a>
+          <a href={home.hero.secondaryCta.href} class="btn btn-secondary" {...editable('home.hero.secondaryCta.label')}>
+            {home.hero.secondaryCta.label}
+          </a>
+        </div>
+      </div>
+
+      <!-- The embedded playable capsule. Clearly marked as an example until a
+           real recording exists — we do not invent a contributor. -->
+      <div class="card overflow-hidden">
+        <div class="flex items-center justify-between gap-3 border-b border-hairline px-5 py-3">
+          <span class="tag bg-caution/12 text-caution" {...editable('home.exampleCapsule.badge')}>
+            {example.badge}
+          </span>
+          <span class="text-[0.8rem] text-muted" {...editable('home.exampleCapsule.context')}>
+            {example.context}
+          </span>
+        </div>
+
+        <div
+          class="aspect-[4/3] w-full bg-accent-soft"
+          {...{ 'data-edit-image': 'home.exampleCapsule.photo', 'data-edit-aspect': '4:3' }}
+        >
+          <img
+            src={example.photo || "/placeholder-capsule.svg"}
+            alt={example.photoCaption}
+            class="h-full w-full object-cover"
+            width="640"
+            height="480"
+          />
+        </div>
+
+        <div class="space-y-4 p-5">
+          <blockquote class="m-0 font-heading text-[1.3rem] leading-[1.35]" {...editable('home.exampleCapsule.lesson')}>
+            “{example.lesson}”
+          </blockquote>
+
+          <AudioPlayer src={example.audioSrc} missingLabel={example.audioMissingLabel} duration={example.durationLabel} />
+
+          <p class="m-0 text-[0.85rem] text-muted" {...editable('home.exampleCapsule.attribution')}>
+            {example.attribution}
+          </p>
+
+          <PlaceholderNotice label="Example">
+            <span {...editable('home.exampleCapsule.note')}>{example.note}</span>
+          </PlaceholderNotice>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── The problem ───────────────────────────────────────────────────── -->
+  <section class="section border-b border-hairline">
+    <div class="wrap-read reveal">
+      <h2 {...editable('home.problem.heading')}>{t('home.problem.heading')}</h2>
+      <div class="prose-narvyaka mt-6">
+        {
+          problemParagraphs.map((paragraph, i) => (
+            <p {...editable(`home.problem.paragraphs.${i}`)}>{paragraph}</p>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Three ways in ─────────────────────────────────────────────────── -->
+  <section class="section border-b border-hairline">
+    <div class="wrap">
+      <h2 class="reveal" {...editable('home.ctas.heading')}>{t('home.ctas.heading')}</h2>
+
+      <div class="mt-10 grid gap-5 md:grid-cols-3">
+        {
+          home.ctas.items.map((item, i) => (
+            <a
+              href={item.href}
+              class="card reveal group flex flex-col p-6 no-underline transition-colors hover:border-accent/50"
+              style={`transition-delay:${i * 60}ms`}
+            >
+              <h3 class="font-heading text-[1.3rem]" {...editable(`home.ctas.items.${i}.title`)}>
+                {item.title}
+              </h3>
+              <p class="mt-3 flex-1 text-[0.98rem] text-muted" {...editable(`home.ctas.items.${i}.body`)}>
+                {item.body}
+              </p>
+              <span class="mt-6 inline-flex items-center gap-2 text-[0.95rem] font-medium text-accent">
+                <span {...editable(`home.ctas.items.${i}.action`)}>{item.action}</span>
+                <Icon name="arrow" size={17} class="transition-transform group-hover:translate-x-1" />
+              </span>
+            </a>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ── The four parts ────────────────────────────────────────────────── -->
+  <section class="section border-b border-hairline">
+    <div class="wrap">
+      <div class="max-w-[52ch] reveal">
+        <h2 {...editable('home.howItWorks.heading')}>{t('home.howItWorks.heading')}</h2>
+        <p class="mt-4 text-muted" {...editable('home.howItWorks.intro')}>{t('home.howItWorks.intro')}</p>
+      </div>
+
+      <ol class="mt-10 grid list-none gap-x-6 gap-y-9 p-0 sm:grid-cols-2 lg:grid-cols-4">
+        {
+          home.howItWorks.items.map((item, i) => (
+            <li class="reveal" style={`transition-delay:${i * 60}ms`}>
+              <span class="grid h-11 w-11 place-items-center rounded-full bg-accent-soft text-accent-hover">
+                <Icon name={iconFor[item.icon as keyof typeof iconFor] ?? 'note'} size={21} />
+              </span>
+              <h3 class="mt-4 font-heading text-[1.2rem]" {...editable(`home.howItWorks.items.${i}.title`)}>
+                {item.title}
+              </h3>
+              <p class="mt-2 text-[0.95rem] text-muted" {...editable(`home.howItWorks.items.${i}.body`)}>
+                {item.body}
+              </p>
+            </li>
+          ))
+        }
+      </ol>
+
+      <a href={home.howItWorks.link.href} class="mt-10 inline-flex items-center gap-2 font-medium text-accent">
+        <span {...editable('home.howItWorks.link.label')}>{home.howItWorks.link.label}</span>
+        <Icon name="arrow" size={17} />
+      </a>
+    </div>
+  </section>
+
+  <!-- ── Founder line ──────────────────────────────────────────────────── -->
+  <section class="section">
+    <div class="wrap-read reveal">
+      <figure class="m-0 flex flex-col items-start gap-6 sm:flex-row sm:items-center">
+        <div
+          class="h-20 w-20 shrink-0 overflow-hidden rounded-full bg-accent-soft"
+          {...{ 'data-edit-image': 'home.founderLine.photo', 'data-edit-aspect': '1:1' }}
+        >
+          <img
+            src={home.founderLine.photo || "/placeholder-portrait.svg"}
+            alt={home.founderLine.photoAlt}
+            class="h-full w-full object-cover"
+            width="160"
+            height="160"
+            loading="lazy"
+          />
+        </div>
+
+        <div>
+          <blockquote class="m-0 font-heading text-[clamp(1.2rem,2.4vw,1.5rem)] leading-[1.4]">
+            <span {...editable('home.founderLine.quote')}>“{home.founderLine.quote}”</span>
+          </blockquote>
+          <figcaption class="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[0.9rem] text-muted">
+            <span {...editable('home.founderLine.attribution')}>{home.founderLine.attribution}</span>
+            <a href={home.founderLine.link.href} class="text-accent no-underline hover:underline">
+              {home.founderLine.link.label} →
+            </a>
+          </figcaption>
+        </div>
+      </figure>
+    </div>
+  </section>
+</Base>

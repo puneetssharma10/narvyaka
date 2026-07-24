@@ -1,0 +1,129 @@
+---
+import Base from '../layouts/Base.astro'
+import PageHeader from '../components/PageHeader.astro'
+import CapsuleCard from '../components/CapsuleCard.astro'
+import Icon from '../components/Icon.astro'
+import { content, editable, t } from '../lib/content'
+import { archiveCapsules, usedCategories, FILTER_THRESHOLD } from '../lib/capsules'
+
+const browse = content.browse
+const capsules = archiveCapsules
+const categories = usedCategories()
+
+// Below the threshold a filter bar is noise, not help (Build Brief §4.7).
+const showFilters = capsules.length >= FILTER_THRESHOLD && categories.length > 1
+const countLabel = capsules.length === 1 ? browse.countLabelOne : browse.countLabelMany
+---
+
+<Base title="Browse the archive" description={browse.emptyBody}>
+  <PageHeader
+    eyebrow={browse.eyebrow}
+    eyebrowPath="browse.eyebrow"
+    heading={browse.heading}
+    headingPath="browse.heading"
+    width="wide"
+  />
+
+  <section class="section">
+    <div class="wrap">
+      {
+        capsules.length === 0 ? (
+          <!--
+            The empty state is the design, not a failure mode. A single card
+            floating in whitespace would look broken; this looks intentional,
+            because it is.
+          -->
+          <div class="mx-auto max-w-[46ch] py-10 text-center md:py-20">
+            <span class="mx-auto grid h-14 w-14 place-items-center rounded-full bg-accent-soft text-accent-hover">
+              <Icon name="voice" size={24} />
+            </span>
+            <h2 class="mt-7 font-heading text-[clamp(1.5rem,3.5vw,2rem)]" {...editable('browse.emptyHeading')}>
+              {t('browse.emptyHeading')}
+            </h2>
+            <p class="mt-4 leading-[1.75] text-muted" {...editable('browse.emptyBody')}>
+              {t('browse.emptyBody')}
+            </p>
+            <a href={browse.emptyCta.href} class="btn btn-primary mt-8" {...editable('browse.emptyCta.label')}>
+              {browse.emptyCta.label}
+            </a>
+            <p class="mt-10 text-[0.9rem] text-muted">
+              Curious what a finished record looks like?{' '}
+              <a href="/capsule/example" class="text-accent">See the example</a>.
+            </p>
+          </div>
+        ) : (
+          <>
+            <div class="flex flex-wrap items-baseline justify-between gap-4">
+              <p class="m-0 text-muted">
+                <span class="font-medium text-ink">{capsules.length}</span> {countLabel}
+                {capsules.length < FILTER_THRESHOLD && (
+                  <span class="ml-2" {...editable('browse.sparseNote')}>
+                    {t('browse.sparseNote')}
+                  </span>
+                )}
+              </p>
+
+              {showFilters && (
+                <div class="flex flex-wrap items-center gap-2" data-filter-bar>
+                  <span class="sr-only" id="filter-label">
+                    {t('browse.filterLabel')}
+                  </span>
+                  <button type="button" class="tag cursor-pointer" data-filter="" data-active aria-pressed="true">
+                    {t('browse.allLabel')}
+                  </button>
+                  {categories.map((category) => (
+                    <button type="button" class="tag cursor-pointer opacity-65" data-filter={category} aria-pressed="false">
+                      {category}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div class="mt-9 grid gap-5 sm:grid-cols-2 lg:grid-cols-3" data-capsule-grid>
+              {capsules.map((capsule) => (
+                <div data-category={capsule.classification.primary_category}>
+                  <CapsuleCard capsule={capsule} />
+                </div>
+              ))}
+            </div>
+
+            <p class="mt-10 text-[0.9rem] text-muted" data-empty-filter hidden>
+              Nothing in that category yet.
+            </p>
+          </>
+        )
+      }
+    </div>
+  </section>
+</Base>
+
+<script>
+  // Progressive enhancement only: with JS off, every record is listed.
+  const bar = document.querySelector<HTMLElement>('[data-filter-bar]')
+  const grid = document.querySelector<HTMLElement>('[data-capsule-grid]')
+  const emptyNote = document.querySelector<HTMLElement>('[data-empty-filter]')
+
+  bar?.addEventListener('click', (event) => {
+    const button = (event.target as HTMLElement).closest<HTMLButtonElement>('[data-filter]')
+    if (!button || !grid) return
+
+    const wanted = button.dataset.filter ?? ''
+
+    bar.querySelectorAll<HTMLButtonElement>('[data-filter]').forEach((other) => {
+      const active = other === button
+      other.toggleAttribute('data-active', active)
+      other.classList.toggle('opacity-65', !active)
+      other.setAttribute('aria-pressed', String(active))
+    })
+
+    let shown = 0
+    grid.querySelectorAll<HTMLElement>('[data-category]').forEach((item) => {
+      const match = wanted === '' || item.dataset.category === wanted
+      item.hidden = !match
+      if (match) shown += 1
+    })
+
+    emptyNote?.toggleAttribute('hidden', shown > 0)
+  })
+</script>

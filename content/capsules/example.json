@@ -1,0 +1,71 @@
+{
+  "id": "example",
+  "is_example": true,
+  "_note": "NOT A REAL CONTRIBUTOR. This file exists so the capsule template can be seen and tested before the first real recording is made. It is excluded from /browse and is labelled 'Example' everywhere it appears. Delete it once a real record is published.",
+  "status": "published",
+  "submitted_at": "2026-01-01T00:00:00.000Z",
+  "source": "self",
+  "contributor": {
+    "name": "The founder",
+    "display_as_anonymous": false,
+    "preferred_name": null,
+    "location": "India",
+    "profession": "Founder, Narvyaka",
+    "languages": ["Hindi", "English"],
+    "record_language": "English",
+    "age_confirmed_30_plus": true,
+    "exception_reason": null,
+    "contact": null
+  },
+  "wisdom_record": {
+    "central_prompt_text": "The questions you will want to ask arrive about ten years after the person who could answer them has gone. Nobody warns you about this, because the people who could warn you are the same people you have already lost.",
+    "central_prompt_audio_url": null,
+    "what_happened": "My great-grandfather and my grandfather both died before I was old enough to ask them anything useful. I knew what they did. I was in the room for a great deal of it. What I did not have — and what I still do not have — is how they did it: what they tried first, what it cost them, what they would have told me not to bother with.",
+    "what_they_did": "Nothing, at the time. That is the point. It did not occur to anyone in the family that there was anything to record, because what they carried did not look like knowledge. It looked like their life. Knowledge is what other people have, in books.",
+    "what_worked_failed": "What failed was assuming there would be a later. What surprised me was finding, when I started asking other people about it, that almost everyone has exactly this same gap in exactly the same place — and almost everyone discovers it about a decade too late.",
+    "what_differently": "I would have sat down with a phone, once, for twenty minutes, and asked four plain questions: what did you do, how did you learn it, what went wrong, and what would you tell someone starting. That is all it would have taken. It was always available and I never did it.",
+    "key_lesson_text": "Ask the question while the person is still in the room. There is no later.",
+    "key_lesson_audio_url": null,
+    "when_not_applicable": "Some people do not want to be recorded, and that is a complete answer that should be accepted the first time it is given. A record taken from someone who was reluctant is worth less than no record, because it teaches the next person that consent is a formality.",
+    "who_can_confirm": null,
+    "audio": {}
+  },
+  "family_learning_note": {
+    "summary": "Two generations of work I can describe from the outside and not from the inside — which is precisely the gap this archive exists to close.",
+    "generations": [
+      {
+        "name": null,
+        "relation": "Great-grandparent",
+        "place": "India",
+        "what_they_knew": "Known within the family for his work. The details of how it was done were never written down and are now unrecoverable."
+      },
+      {
+        "name": null,
+        "relation": "Grandparent",
+        "place": "India",
+        "what_they_knew": "Carried the same work forward. I was old enough to remember him and too young to ask him anything."
+      }
+    ]
+  },
+  "photos": [],
+  "classification": {
+    "primary_category": "Family & household",
+    "subcategory": "Passing on knowledge",
+    "experience_type": "Lesson",
+    "search_filters": {
+      "country": "India",
+      "state": "",
+      "time_period": "1990s–2020s"
+    },
+    "verification_status": "Contributor's Account"
+  },
+  "access": {
+    "level": "public",
+    "release_date": null
+  },
+  "review": {
+    "reviewed_by": "Founder",
+    "reviewed_at": "2026-01-01T00:00:00.000Z",
+    "notes": "Published as an illustrative example of the record format, not as an archive entry."
+  }
+}
