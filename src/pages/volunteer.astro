@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro'
 import PageHeader from '../components/PageHeader.astro'
+import Icon from '../components/Icon.astro'
 import VolunteerForm from '../components/forms/VolunteerForm'
 import { content, editable, t } from '../lib/content'
 import { siteConfig } from '../../site.config'
@@ -90,6 +91,22 @@ const roleNames = v.openings.map((opening) => opening.title)
     </div>
   </section>
 
+  <!-- ── The founding commitment ───────────────────────────────────────── -->
+  <section class="section border-b border-hairline">
+    <div class="wrap-read reveal text-center">
+      <p class="eyebrow" {...editable('volunteer.commitmentHeading')}>{t('volunteer.commitmentHeading')}</p>
+      <blockquote
+        class="mx-auto mt-6 max-w-[26ch] font-heading text-[clamp(1.4rem,3.6vw,2rem)] leading-[1.25] tracking-tight"
+        {...editable('volunteer.commitment')}
+      >
+        “{t('volunteer.commitment')}”
+      </blockquote>
+      <p class="mx-auto mt-7 max-w-[52ch] leading-[1.7] text-muted" {...editable('volunteer.commitmentNote')}>
+        {t('volunteer.commitmentNote')}
+      </p>
+    </div>
+  </section>
+
   <!-- ── Roles that are not open yet ───────────────────────────────────── -->
   <section class="section border-b border-hairline">
     <div class="wrap-read reveal">
@@ -107,6 +124,26 @@ const roleNames = v.openings.map((opening) => opening.title)
               {...editable(`volunteer.laterRoles.${i}`)}
             >
               {role}
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- ── The Pledge ────────────────────────────────────────────────────── -->
+  <section class="section border-b border-hairline">
+    <div class="wrap-read reveal">
+      <span class="light-bar mb-6"></span>
+      <h2 {...editable('volunteer.pledgeHeading')}>{t('volunteer.pledgeHeading')}</h2>
+      <ul class="mt-8 grid list-none gap-4 p-0">
+        {
+          v.pledge.map((line, i) => (
+            <li class="flex items-start gap-4 border-b border-hairline pb-4 last:border-0">
+              <Icon name="check" size={17} class="mt-1 shrink-0 text-accent" />
+              <span class="text-[1.02rem] leading-[1.6]" {...editable(`volunteer.pledge.${i}`)}>
+                {line}
+              </span>
             </li>
           ))
         }

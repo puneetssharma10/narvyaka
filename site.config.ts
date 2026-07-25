@@ -50,8 +50,11 @@ export const siteConfig = {
   name: 'Narvyaka',
   tagline: 'Because No Generation Should Start From Zero.',
   philosophy: 'Preserve. Connect. Continue.',
+  /** From the Founding Vision's closing page. */
+  strapline: 'Preserving Humanity\'s Wisdom, One Life at a Time.',
+  founder: 'Puneet Sharma',
   description:
-    'Narvyaka preserves first-hand human experience — in the person’s own voice — so that the next generation does not have to start from nothing.',
+    'Narvyaka is a global movement to preserve lived human wisdom before it disappears — not the facts already written down, but the understanding that only comes from having actually lived through something.',
 
   /**
    * Legal entity line used in the footer and the policy pages.

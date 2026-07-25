@@ -72,6 +72,23 @@ const copy = {
     </div>
   </section>
 
+  <!-- ── The one question ──────────────────────────────────────────────── -->
+  <section class="section border-b border-hairline">
+    <div class="wrap-read reveal text-center">
+      <p class="eyebrow" {...editable('recordSomeone.askHeading')}>{t('recordSomeone.askHeading')}</p>
+      <blockquote
+        class="mx-auto mt-6 max-w-[24ch] font-heading text-[clamp(1.5rem,4vw,2.2rem)] leading-[1.25] tracking-tight"
+        {...editable('recordSomeone.askQuestion')}
+      >
+        “{t('recordSomeone.askQuestion')}”
+      </blockquote>
+      <span class="light-bar mx-auto my-9"></span>
+      <p class="mx-auto max-w-[54ch] leading-[1.7] text-muted" {...editable('recordSomeone.askNote')}>
+        {t('recordSomeone.askNote')}
+      </p>
+    </div>
+  </section>
+
   <!-- ── Consent first ─────────────────────────────────────────────────── -->
   <section class="section border-b border-hairline">
     <div class="wrap-read reveal">

@@ -1,0 +1,57 @@
+---
+/**
+ * The Narvyaka logomark.
+ *
+ * A geometric N built from two upright stems and a single rising diagonal.
+ * The stems are the two people — the one who knew, and the one who needs to
+ * know. The diagonal is the transmission between them, and it is the only part
+ * that carries colour: cobalt into Rosso, the same light signature used across
+ * the site.
+ *
+ * Constructed from paths rather than set in a typeface, so it stays identical
+ * at any size and whatever fonts are installed. Legible down to 16px.
+ *
+ * A custom logo file dropped in via the Studio replaces this entirely.
+ */
+
+interface Props {
+  size?: number
+  class?: string
+  /** Renders the diagonal in the accent gradient. Off gives a single-colour mark. */
+  gradient?: boolean
+}
+
+const { size = 28, class: className = '', gradient = true } = Astro.props
+
+// Multiple marks can appear on one page (header and footer), and duplicate
+// gradient ids would make the second one render wrong.
+const uid = `nv-mark-${Math.random().toString(36).slice(2, 9)}`
+---
+
+<svg
+  width={size}
+  height={size}
+  viewBox="0 0 64 64"
+  fill="none"
+  class={className}
+  role="img"
+  aria-label="Narvyaka"
+>
+  {
+    gradient && (
+      <defs>
+        <linearGradient id={uid} x1="18" y1="12" x2="54" y2="52" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stop-color="var(--color-accent)" />
+          <stop offset="100%" stop-color="var(--color-signal)" />
+        </linearGradient>
+      </defs>
+    )
+  }
+
+  <!-- Left stem -->
+  <path d="M10 12h8v40h-8z" fill="currentColor" />
+  <!-- Right stem -->
+  <path d="M46 12h8v40h-8z" fill="currentColor" />
+  <!-- The diagonal: the transmission -->
+  <path d="M18 12h8l28 40h-8z" fill={gradient ? `url(#${uid})` : 'currentColor'} />
+</svg>

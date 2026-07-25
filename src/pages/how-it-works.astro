@@ -117,6 +117,37 @@ const sample = getCapsule('example')
     </div>
   </section>
 
+  <!-- ── Our rule for building ─────────────────────────────────────────── -->
+  <section class="section border-b border-hairline">
+    <div class="wrap-read reveal">
+      <span class="light-bar mb-6"></span>
+      <h2 {...editable('howItWorks.ruleHeading')}>{t('howItWorks.ruleHeading')}</h2>
+      <p class="mt-5 text-muted" {...editable('howItWorks.ruleIntro')}>{t('howItWorks.ruleIntro')}</p>
+
+      <ol class="mt-9 grid list-none gap-4 p-0">
+        {
+          hiw.rules.map((rule, i) => (
+            <li class="card flex items-center gap-5 p-5">
+              <span class="font-heading text-[1.6rem] leading-none tracking-tight text-accent/30 tnum">
+                {String(i + 1).padStart(2, '0')}
+              </span>
+              <span class="text-[1.05rem] font-medium" {...editable(`howItWorks.rules.${i}`)}>
+                {rule}
+              </span>
+            </li>
+          ))
+        }
+      </ol>
+
+      <p
+        class="mt-10 border-l-2 border-signal/40 pl-6 font-heading text-[clamp(1.15rem,2.4vw,1.4rem)] leading-[1.4] tracking-tight"
+        {...editable('howItWorks.ruleClosing')}
+      >
+        {t('howItWorks.ruleClosing')}
+      </p>
+    </div>
+  </section>
+
   <!-- ── Sample capsule ────────────────────────────────────────────────── -->
   <section class="section">
     <div class="wrap-read">

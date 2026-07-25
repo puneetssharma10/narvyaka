@@ -1,22 +1,17 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Narvyaka">
   <!--
-    Placeholder favicon: a typographic mark matching the text wordmark.
-    Drop a real logomark in here later — nothing else needs to change.
+    The Narvyaka logomark: two upright stems, one rising diagonal.
+    Replace with a supplied logo file later; nothing else needs to change.
   -->
   <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+    <linearGradient id="d" x1="18" y1="12" x2="54" y2="52" gradientUnits="userSpaceOnUse">
       <stop offset="0%" stop-color="#1B34E8"/>
-      <stop offset="100%" stop-color="#0F21B0"/>
+      <stop offset="100%" stop-color="#E4002B"/>
     </linearGradient>
   </defs>
-  <rect width="64" height="64" rx="10" fill="#0B0E14"/>
-  <rect x="0" y="0" width="64" height="3" rx="1.5" fill="url(#g)"/>
-  <text
-    x="32" y="45"
-    text-anchor="middle"
-    font-family="'Space Grotesk', 'Sora', Helvetica, Arial, sans-serif"
-    font-size="34"
-    font-weight="600"
-    fill="#FFFFFF"
-  >N</text>
+  <rect width="64" height="64" rx="12" fill="#FFFFFF"/>
+  <rect x="0.5" y="0.5" width="63" height="63" rx="11.5" fill="none" stroke="#E3E6EC"/>
+  <path d="M10 12h8v40h-8z" fill="#0B0E14"/>
+  <path d="M46 12h8v40h-8z" fill="#0B0E14"/>
+  <path d="M18 12h8l28 40h-8z" fill="url(#d)"/>
 </svg>

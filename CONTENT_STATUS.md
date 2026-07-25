@@ -1,77 +1,64 @@
 # Content status — what is real and what is not
 
-Every visible string on this site is in `src/data/site.json`. This file records
-where each piece came from, so nothing placeholder ships by accident believing
-itself to be final.
+Source of truth: **NARVYAKA — Founding Vision v1.1** (Puneet Sharma, 24 July
+2026). Its own rule applies here: *"If website copy ever drifts from this
+document, this document wins — unless a change is explicitly agreed and
+recorded by the founding team."*
 
-Build Brief §7 asks for exactly this distinction. Read it before launch.
+Every visible string lives in `src/data/site.json`. This file records where each
+piece came from.
 
 ---
 
-## ✅ Verbatim from the brief — do not reword
+## ✅ From the Founding Vision — do not reword without a decision
 
-These are given text and should not be edited without a decision:
-
-| Where | Text |
+| Where | Source section |
 | --- | --- |
-| `home.hero.tagline` | "Because No Generation Should Start From Zero." |
-| `home.hero.subhead` | "What knowledge should outlive you?" |
-| `footer.philosophy` | "Preserve. Connect. Continue." |
-| `preserve.heading` | "A Lifetime of Learning Should Not Disappear in a Moment." |
-| `recordSomeone.heading` | "Begin With Someone You Know." |
-| `howItWorks.audioHeading` | "Video Can Wait. Wisdom Cannot." |
-| `about.stage1.name` | "Nar + Vyakta. A human being's knowledge, made known." |
-| `browse.emptyHeading` + `browse.sparseNote` | "This archive is just beginning." / "Here is what's here so far." |
-| `home.founderLine.quote` | "My great-grandfather and grandfather passed away before I was old enough to ask the right questions." |
-| `home.problem.paragraphs.0` (opening) | "Every day, people leave this world carrying knowledge that exists nowhere else…" |
-| `preserve.test.*` | The five Narvyaka Test questions |
-| `forms.record.questions.*.label` | The eight interview questions (Build Brief §5.3) |
-| `forms.review.levels.*` | The eight access levels (Part VI.2) |
-| `howItWorks.verification.*.status` | The three verification statuses (Part VII.1) |
+| `home.hero.tagline` / `.subhead` | Appendix A — the tagline system |
+| `home.hero.intro`, `home.problem.*` | *Why Narvyaka Exists* — the manual passage |
+| `home.status.body` | *How Narvyaka Will Grow* — "begins deliberately small" |
+| `about.stage1.mission` | *The Mission* |
+| `about.stage1.vision` | *A Letter from the Founder* |
+| `about.stage1.belief` | *Our Belief* — "Every expert deserves a successor" |
+| `about.stage1.name` / `.nameBody` | *The Meaning of Narvyaka* |
+| `about.stage2.figures.*` | *The Meaning of Narvyaka* — Vyasa/Narada/Kakabhushundi |
+| `preserve.test.*` | *The Narvyaka Test* — the five questions |
+| `howItWorks.parts.*` | *The Wisdom Record* — the four parts |
+| `howItWorks.audioBody.*` | *Why We Begin With Audio* |
+| `howItWorks.storage*` | *How Narvyaka Will Grow* — deliberate redundancy |
+| `howItWorks.reviewBody` | *Dignity, Consent, and Truth* |
+| `howItWorks.rules` / `.ruleClosing` | *Our Rule for Building* |
+| `recordSomeone.*` | *Begin with someone you know* |
+| `volunteer.*`, `volunteer.pledge.*` | *This Is Not Someone Else\'s Job*, *The Narvyaka Pledge* |
+| `founder.letter.*` | *A Letter from the Founder*, in full |
+| `forms.consent.ageWhy` / `.exception*` | *Who Can Contribute* |
+| `footer.philosophy` / `.blurb` | Closing page |
+
+### A correction worth recording
+
+An earlier build had the three figures in the wrong order **and** mapped to the
+wrong responsibilities. The Founding Vision is explicit:
+
+- **Vyasa — Preserve**
+- **Narada — Connect**
+- **Kakabhushundi — Continue**
+
+That is now what `/about` renders, in that order.
 
 ---
 
-## ✍️ Written for this build — replace with the Master Reference where it differs
-
-The brief quotes some passages only in part, and the Master Reference itself was
-not in the repository when this was built. The following were written to match
-the register and the stated policy. **They are not quotations.** Where the
-Master Reference has its own wording, paste it in — the meaning should already
-match, but the words are ours, not the source's.
-
-| Key | Note |
-| --- | --- |
-| `home.problem.paragraphs.1–2` | Only the opening line was given; these continue it. |
-| `about.stage1.mission` / `.vision` / `.belief` | Consistent with Part I.1, not quoted from it. |
-| `about.stage2.figures.*` | Narada / Vyasa / Kakabhushundi, described by their function in transmitting knowledge. Check against the Master Reference's own framing. |
-| `howItWorks.*` | The four parts, the audio-first argument, the three representations, review, verification. |
-| `recordSomeone.*`, `volunteer.*` | Roles, guidance and expectations, per Part IX. |
-| `forms.consent.points.*` | Plain-language consent text. Must not contradict the reviewed privacy policy. |
-| `preserve.intro`, `preserve.timeNote` | Framing copy. |
-
----
-
-## ⚠️ Placeholder — clearly labelled in the UI
-
-Each of these renders a visible "Placeholder" or "Example" notice on the page.
-The notice disappears automatically when you set `isPlaceholder: false`.
-
-### `/founder` — `founder.letter`
-**Replace with Appendix B of the Master Reference, verbatim.**
-The current text is a stand-in built around the one real sentence that was
-given. It reads plausibly, which is exactly why it must not stay: it is not the
-founder's letter. Set `founder.isPlaceholder` to `false` once replaced.
+## ⚠️ Still placeholder — clearly labelled in the UI
 
 ### `/privacy` and `/terms`
-Marked *pending legal review* (Part XV) and set to `noindex`. The commitments
-described are accurate to how the system is actually built — they are what the
-reviewed policy must not contradict. Set `isPlaceholder: false` and fill in
-`lastUpdated` after review.
+Marked *pending legal review* and set to `noindex`. The commitments described
+are drawn from *Dignity, Consent, and Truth* and are accurate to how the system
+is actually built. Set `isPlaceholder: false` and fill in `lastUpdated` after
+review.
 
 ### Homepage hero capsule
-Labelled **Example**, with the note "It is not a real contributor's record."
+Labelled **Example**, with the note "It is not a real contributor\'s record."
 Replace with the first real recording: set `home.exampleCapsule.audioSrc`,
-`.photo`, `.lesson`, `.attribution`, and change `.badge` from "Example".
+`.photo`, `.lesson`, `.attribution`, and change `.badge`.
 
 ### `content/capsules/example.json`
 Not a real contributor. Excluded from `/browse`, labelled "Example" on its own
@@ -80,63 +67,68 @@ page. **Delete it once a real record is published.**
 ### Placeholder imagery
 `public/placeholder-capsule.svg` and `public/placeholder-portrait.svg` are
 drawn, not photographed — deliberately, so no stock photo of strangers is ever
-implied to be a contributor (Build Brief §2.5). Replace via Studio → click the
-picture.
+implied to be a contributor. Replace via Studio → click the picture.
+
+**`/founder` is no longer a placeholder.** It carries the real letter.
 
 ---
 
-## 🎨 Changed in the redesign — flagging, because one was an explicit instruction
-
-**The wordmark is no longer Fraunces italic.** It is now Space Grotesk,
-uppercase and widely tracked, like automotive badging. The original brief asked
-for Fraunces italic, but that was chosen for the warm terracotta direction that
-has since been replaced. A humanist literary serif inside a carbon-and-cobalt
-system would have read as two different brands.
-
-To put it back: Studio → Type → Wordmark → Fraunces, or set
-`theme.fonts.wordmark` in `src/data/site.json`. The Fraunces package is still
-installed. You would also want to remove `text-transform: uppercase` and the
-`letter-spacing` from `.wordmark` in `src/styles/global.css`.
-
-**The palette is entirely new.** Warm terracotta and off-white are gone; the
-system is now cool platinum, carbon, electric cobalt and Rosso. Two tokens were
-added (`carbon`, `signal`/`signal-soft`) and all thirteen are editable in the
-Studio.
-
-**Volunteer scope narrowed to two openings.** `/volunteer` previously listed
-eight roles as an open grid. It now advertises exactly two — interviewer, and
-writer & archivist — with the rest under "Later, not now". The application form
-only offers the two. Widen it by editing `volunteer.openings`.
-
----
-
-## 🔧 Invented and needing a decision
+## 🔧 Still invented — needs the Master Reference
 
 ### `categories` in `src/data/site.json`
-Master Reference Part X defines the Primary Category list. It was not available
-when this was built, so the fifteen categories there are a **working guess**.
+The Primary Category list lives in the Master Reference (the build document),
+not the Founding Vision, and was not available. The fifteen categories there are
+a **working guess**.
 
-They are low-risk today — `/browse` hides the filter below 15 records, and no
-form asks a contributor to choose one — but replace them with the real list
-before classifying anything, because reclassifying an archive later is painful.
+Low-risk today — `/browse` hides the filter below 15 records, and no form asks a
+contributor to choose one — but replace them before classifying anything.
 
 ### `experienceTypes`
-Same situation: Method / Mistake / Decision / Skill / Memory / Lesson, taken
-from the wording of the central prompt.
+Same situation: Method / Mistake / Decision / Skill / Memory / Lesson.
+
+---
+
+## 🎨 Design decisions taken against the original brief
+
+**Palette.** The brief specified warm terracotta on cream. That was explicitly
+overridden: no brown or beige, bold colours in the register of a high-end car
+finish. The system is cool platinum pages, electric cobalt, Rosso as a signal,
+Verde and Giallo for status. Carbon (`#0B0E14`) remains a token and is used for
+text and the logomark, but no longer as a full-bleed surface — the homepage and
+footer are light throughout.
+
+**Type.** The brief asked for a humanist serif (Source Serif 4 / Lora) and
+Fraunces italic for the wordmark. Both were dropped in favour of Space Grotesk
+(wordmark) and Sora (headings) to match the "looks of the future" direction; a
+literary serif inside this palette read as two different brands. Fraunces, Lora
+and Source Serif are no longer installed — reinstate with
+`npm i @fontsource-variable/fraunces` and set `theme.fonts.wordmark`.
+
+**Everything else follows the brief**: 720px reading measure, 1200px grid,
+96px/56px section rhythm, 12px cards and 8px controls, fade-in-on-scroll only,
+drawn imagery rather than stock.
+
+**Logo.** The brief said to build a text wordmark because no logo existed. One
+now does: `src/components/LogoMark.astro` — a geometric N whose two stems are
+the person who knew and the person who needs to know, with the single rising
+diagonal between them carrying the cobalt-to-Rosso gradient. Also at
+`public/logo.svg` and in the favicon. A supplied logo file dropped in via the
+Studio still replaces it entirely, with no component changes.
+
+**Scope.** Ten records, two volunteers — stated on the homepage and enforced on
+`/volunteer`, which advertises exactly two openings and offers only those two in
+the form.
 
 ---
 
 ## Two things that must not drift
 
-**Verification status has exactly three values.** They are enforced in three
-places — `shared/record-schema.ts`, the `CHECK` constraint in `db/schema.sql`,
-and `VerificationBadge.astro`. There is no "unverified" default and there must
-not be one: an unsupported account is a *Contributor's Account*, which is a real
-status, not a lesser one (Part VII.1).
+**Verification status has exactly three values.** Enforced in
+`shared/record-schema.ts`, the `CHECK` constraint in `db/schema.sql`, and
+`VerificationBadge.astro`. No "unverified" default.
 
-**Nothing publishes itself.** Every submission is written as `pending_review`,
-and the API has no path that sets anything else. Publication is a person copying
-a file and rebuilding (Part IX.4).
+**Nothing publishes itself.** Every submission is written as `pending_review`
+and the API has no path that sets anything else.
 
 ---
 

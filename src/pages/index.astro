@@ -14,12 +14,13 @@ const iconFor = { voice: 'voice', note: 'note', photo: 'photo', identity: 'ident
 ---
 
 <Base title={siteConfig.name}>
-  <!-- ── Hero — carbon, the one full-bleed dark surface on the site ─────── -->
-  <section class="carbon relative overflow-hidden">
-    <div class="grid-field absolute inset-0" aria-hidden="true"></div>
-    <!-- Light signature: a single cobalt-to-rosso sweep across the top edge. -->
+  <!-- ── Hero ──────────────────────────────────────────────────────────── -->
+  <section class="relative overflow-hidden border-b border-hairline bg-surface">
+    <!-- The faintest technical grid, masked so it fades before the copy. -->
+    <div class="grid-field-light absolute inset-0" aria-hidden="true"></div>
+    <!-- Light signature: a single cobalt-to-Rosso sweep across the top edge. -->
     <div
-      class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-accent via-signal to-transparent"
+      class="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-accent via-signal to-transparent"
       aria-hidden="true"
     >
     </div>
@@ -27,20 +28,20 @@ const iconFor = { voice: 'voice', note: 'note', photo: 'photo', identity: 'ident
     <div class="wrap relative section-lg">
       <div class="grid items-center gap-16 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:gap-20">
         <div>
-          <Wordmark size="xl" class="block text-white" />
+          <Wordmark size="xl" class="block" />
 
-          <h1 class="mt-8 max-w-[15ch] text-white" {...editable('home.hero.tagline')}>
+          <h1 class="mt-8 max-w-[15ch]" {...editable('home.hero.tagline')}>
             {t('home.hero.tagline')}
           </h1>
 
           <p
-            class="mt-8 max-w-[24ch] font-heading text-[clamp(1.3rem,2.6vw,1.75rem)] font-normal leading-[1.25] tracking-tight text-white/55"
+            class="mt-8 max-w-[24ch] font-heading text-[clamp(1.3rem,2.6vw,1.75rem)] font-normal leading-[1.25] tracking-tight text-accent"
             {...editable('home.hero.subhead')}
           >
             {t('home.hero.subhead')}
           </p>
 
-          <p class="mt-7 max-w-[52ch] text-[1.05rem] leading-[1.7] text-white/70" {...editable('home.hero.intro')}>
+          <p class="mt-7 max-w-[52ch] text-[1.05rem] leading-[1.7] text-muted" {...editable('home.hero.intro')}>
             {t('home.hero.intro')}
           </p>
 
@@ -61,16 +62,16 @@ const iconFor = { voice: 'voice', note: 'note', photo: 'photo', identity: 'ident
 
         <!-- The embedded playable capsule. Clearly marked as an example until a
              real recording exists — we do not invent a contributor. -->
-        <div class="overflow-hidden rounded-[6px] border border-white/12 bg-white/[0.04] backdrop-blur-sm">
-          <div class="flex items-center justify-between gap-3 border-b border-white/12 px-5 py-3.5">
+        <div class="card overflow-hidden shadow-[0_1px_2px_rgba(11,14,20,0.04),0_12px_32px_-12px_rgba(11,14,20,0.10)]">
+          <div class="flex items-center justify-between gap-3 border-b border-hairline px-5 py-3.5">
             <span
-              class="rounded-[3px] bg-signal px-2 py-0.5 text-[0.7rem] font-semibold uppercase tracking-[0.12em] text-white"
+              class="rounded-[5px] bg-signal px-2 py-0.5 text-[0.7rem] font-semibold uppercase tracking-[0.12em] text-white"
               {...editable('home.exampleCapsule.badge')}
             >
               {example.badge}
             </span>
             <span
-              class="text-[0.75rem] uppercase tracking-[0.1em] text-white/45"
+              class="text-[0.75rem] uppercase tracking-[0.1em] text-muted"
               {...editable('home.exampleCapsule.context')}
             >
               {example.context}
@@ -78,7 +79,7 @@ const iconFor = { voice: 'voice', note: 'note', photo: 'photo', identity: 'ident
           </div>
 
           <div
-            class="aspect-[4/3] w-full bg-white/[0.03]"
+            class="aspect-[4/3] w-full bg-accent-soft"
             {...{ 'data-edit-image': 'home.exampleCapsule.photo', 'data-edit-aspect': '4:3' }}
           >
             <img
@@ -92,7 +93,7 @@ const iconFor = { voice: 'voice', note: 'note', photo: 'photo', identity: 'ident
 
           <div class="space-y-5 p-6">
             <blockquote
-              class="m-0 font-heading text-[1.35rem] font-medium leading-[1.3] tracking-tight text-white"
+              class="m-0 font-heading text-[1.35rem] font-medium leading-[1.3] tracking-tight"
               {...editable('home.exampleCapsule.lesson')}
             >
               “{example.lesson}”
@@ -105,7 +106,7 @@ const iconFor = { voice: 'voice', note: 'note', photo: 'photo', identity: 'ident
             />
 
             <p
-              class="m-0 text-[0.8rem] uppercase tracking-[0.1em] text-white/45"
+              class="m-0 text-[0.8rem] uppercase tracking-[0.1em] text-muted"
               {...editable('home.exampleCapsule.attribution')}
             >
               {example.attribution}

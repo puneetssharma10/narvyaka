@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480" width="640" height="480" role="img" aria-label="An abstract waveform and record frame">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480" width="640" height="480" role="img" aria-label="An abstract waveform in a viewfinder">
   <!--
-    Drawn placeholder, not a stock photograph.
+    Drawn placeholder, not a stock photograph (Build Brief §2.5).
     Replace with a real contributor photograph via Studio → click the picture.
   -->
   <defs>
@@ -8,31 +8,25 @@
       <stop offset="0%" stop-color="#1B34E8"/>
       <stop offset="100%" stop-color="#E4002B"/>
     </linearGradient>
-    <linearGradient id="fade" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#1B34E8" stop-opacity="0.10"/>
-      <stop offset="100%" stop-color="#1B34E8" stop-opacity="0.02"/>
-    </linearGradient>
   </defs>
 
-  <rect width="640" height="480" fill="#0B0E14"/>
-  <rect width="640" height="480" fill="url(#fade)"/>
+  <rect width="640" height="480" fill="#F2F4FA"/>
 
-  <!-- technical grid -->
-  <g stroke="#FFFFFF" stroke-opacity="0.05" stroke-width="1">
+  <!-- technical grid, very light -->
+  <g stroke="#1B34E8" stroke-opacity="0.07" stroke-width="1">
     <path d="M0 80h640M0 160h640M0 240h640M0 320h640M0 400h640"/>
     <path d="M80 0v480M160 0v480M240 0v480M320 0v480M400 0v480M480 0v480M560 0v480"/>
   </g>
 
   <!-- waveform: the record itself, drawn rather than photographed -->
   <g stroke="url(#sweep)" stroke-width="3" stroke-linecap="round">
-    <path d="M64 240v0"/>
     <path d="M92 218v44M120 200v80M148 172v136M176 210v60M204 156v168M232 192v96
              M260 140v200M288 186v108M316 164v152M344 204v72M372 150v180M400 196v88
              M428 174v132M456 214v52M484 188v104M512 226v28M540 206v68M568 232v16"/>
   </g>
 
-  <!-- frame corners, like a viewfinder -->
-  <g stroke="#FFFFFF" stroke-opacity="0.28" stroke-width="2" fill="none">
+  <!-- viewfinder corners -->
+  <g stroke="#0B0E14" stroke-opacity="0.22" stroke-width="2" fill="none">
     <path d="M40 72V40h32M568 40h32v32M600 408v32h-32M72 440H40v-32"/>
   </g>
 </svg>

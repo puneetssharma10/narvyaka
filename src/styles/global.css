@@ -52,13 +52,13 @@
   --font-heading: 'Sora Variable', 'Space Grotesk Variable', system-ui, sans-serif;
   --font-body: 'Inter Variable', 'Public Sans Variable', system-ui, sans-serif;
 
-  /* Radius — tight. Precision, not softness. */
-  --radius-card: 6px;
-  --radius-control: 4px;
+  /* Radius — Build Brief §2.3: soft, not sharp, not pill-shaped. */
+  --radius-card: 12px;
+  --radius-control: 8px;
 
-  /* Reading measure */
+  /* Reading measure — Build Brief §2.3 */
   --spacing-read: 720px;
-  --spacing-wide: 1240px;
+  --spacing-wide: 1200px;
 
   /* Motion — still, not bouncy */
   --ease-calm: cubic-bezier(0.22, 0.61, 0.36, 1);
@@ -359,8 +359,8 @@
     gap: 0.35rem;
     background: var(--color-accent-soft);
     color: var(--color-accent-hover);
-    border-radius: 3px;
-    padding: 0.24rem 0.6rem;
+    border-radius: 5px;
+    padding: 0.24rem 0.62rem;
     font-size: 0.7rem;
     font-weight: 600;
     text-transform: uppercase;
@@ -436,7 +436,18 @@
     background: linear-gradient(90deg, var(--color-accent) 0%, var(--color-signal) 100%);
   }
 
-  /* Technical grid, used behind the dark hero only. */
+  /* Technical grid, light: the faintest possible structure behind the hero.
+     Fades out downward so it never competes with the text sitting on it. */
+  .grid-field-light {
+    background-image:
+      linear-gradient(var(--color-hairline) 1px, transparent 1px),
+      linear-gradient(90deg, var(--color-hairline) 1px, transparent 1px);
+    background-size: 72px 72px;
+    -webkit-mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.5) 0%, transparent 78%);
+    mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.5) 0%, transparent 78%);
+  }
+
+  /* Technical grid, used behind a dark surface. */
   .grid-field {
     background-image:
       linear-gradient(color-mix(in srgb, #fff 5%, transparent) 1px, transparent 1px),

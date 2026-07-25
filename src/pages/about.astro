@@ -80,7 +80,10 @@ const blocks = [
         {
           s2.figures.map((figure, i) => (
             <div class="reveal border-l-2 border-accent/25 pl-6">
-              <h3 class="font-heading text-[1.35rem]" {...editable(`about.stage2.figures.${i}.name`)}>
+              <p class="eyebrow m-0" {...editable(`about.stage2.figures.${i}.responsibility`)}>
+                {figure.responsibility}
+              </p>
+              <h3 class="mt-2 font-heading text-[1.35rem]" {...editable(`about.stage2.figures.${i}.name`)}>
                 {figure.name}
               </h3>
               <p class="mt-2 leading-[1.7] text-ink/90" {...editable(`about.stage2.figures.${i}.body`)}>
@@ -92,10 +95,14 @@ const blocks = [
       </div>
 
       <p
-        class="mt-14 text-center font-heading text-[clamp(1.3rem,3vw,1.7rem)] text-accent"
+        class="mt-14 text-center font-heading text-[clamp(1.3rem,3vw,1.7rem)] tracking-tight text-accent"
         {...editable('about.stage2.closing')}
       >
         {t('about.stage2.closing')}
+      </p>
+
+      <p class="mx-auto mt-10 max-w-[60ch] text-center text-[0.98rem] leading-[1.7] text-muted" {...editable('about.stage2.note')}>
+        {t('about.stage2.note')}
       </p>
     </div>
   </section>

@@ -54,7 +54,7 @@
   },
   "footer": {
     "philosophy": "Preserve. Connect. Continue.",
-    "blurb": "Narvyaka preserves first-hand human experience in the person's own voice, so the next generation does not have to start from nothing.",
+    "blurb": "Preserving humanity's wisdom, one life at a time.",
     "columns": [
       {
         "title": "Contribute",
@@ -115,7 +115,7 @@
       "wordmark": "Narvyaka",
       "tagline": "Because No Generation Should Start From Zero.",
       "subhead": "What knowledge should outlive you?",
-      "intro": "A lifetime of learning should not disappear in a moment. Narvyaka records what a person actually learned — in their own voice, in their own words — and keeps it where the next person can find it.",
+      "intro": "Every generation inherits land, tools, language and technology from the generation before it. Almost none of us inherit how the people before us actually thought — the judgement earned through failure, the instinct built over decades, the one piece of advice that would have spared us years of learning it the hard way.",
       "primaryCta": {
         "label": "Preserve your experience",
         "href": "/preserve"
@@ -138,17 +138,18 @@
       "durationLabel": "—"
     },
     "problem": {
-      "heading": "The knowledge is real. The record is not.",
+      "heading": "What a manual can do, and what it cannot.",
       "paragraphs": [
-        "Every day, people leave this world carrying knowledge that exists nowhere else. Not published, not filmed, not written down — carried. A method that took thirty years to get right. A mistake that cost everything and was never repeated. The reason a decision was made the way it was.",
-        "It is not lost because it was unimportant. It is lost because nobody was there with a recorder, and because the person carrying it did not think of it as knowledge. They thought of it as their life.",
-        "So the next person starts again. Same mistake, same cost, same thirty years. Not because the answer did not exist — because it was never written down in a place they could reach."
+        "A manual can tell you what to do. It cannot tell you what an experienced person does differently — the small warning signs they have learned to notice, and what quietly went wrong before it finally went right.",
+        "That second kind of knowledge — judgement, earned the hard way — usually lives in exactly one place: a single human mind. And it usually leaves the world exactly once, on the day that mind stops being reachable.",
+        "A nurse's way of sitting with a dying patient, a farmer's read on next week's weather, a teacher's method for reaching the one child everyone else had given up on — all of it gone, the moment the person carrying it is gone.",
+        "This is not a rare tragedy. It is the ordinary, daily condition of being human, and it has always been true. What has changed is that, for the first time, we have simple, inexpensive tools — a phone, a recording, a little structure — that can finally change that."
       ]
     },
     "status": {
       "eyebrow": "Phase one",
       "heading": "Ten records. Two volunteers. That is the whole of the first phase.",
-      "body": "Narvyaka is not trying to be large. It is trying to be right. The first phase is deliberately small enough that every record can be made carefully and read by a person — and small enough to abandon if the method turns out to be wrong.",
+      "body": "Narvyaka begins deliberately small — a handful of carefully preserved Wisdom Records, a small circle of trusted volunteers — because trust, once broken, cannot be rebuilt at scale.",
       "metrics": [
         {
           "value": "0",
@@ -175,13 +176,13 @@
       "items": [
         {
           "title": "Preserve your experience",
-          "body": "Record one thing you know that another person should not have to discover again from nothing. Twenty minutes, in your own voice.",
+          "body": "Preserve one meaningful lesson: the single thing you would want someone to have, if you could only pass on one. Under an hour, in your own voice.",
           "href": "/preserve",
           "action": "Start your record"
         },
         {
           "title": "Record someone you know",
-          "body": "A parent, a grandparent, a retired colleague, a neighbour. You ask the questions. We give you the questions to ask.",
+          "body": "The first person worth preserving is very likely already in your life. Ask them one question, and listen for the real answer.",
           "href": "/record-someone",
           "action": "Begin with someone"
         },
@@ -195,27 +196,27 @@
     },
     "howItWorks": {
       "heading": "One record, four parts",
-      "intro": "Every Wisdom Record is made of the same four things. Nothing is interpreted, summarised or rewritten by a machine.",
+      "intro": "Each contribution becomes one Wisdom Record — small enough to complete in under an hour, complete enough to genuinely matter.",
       "items": [
         {
           "icon": "voice",
           "title": "Voice",
-          "body": "The person's own recording. This is the record. Everything else supports it."
+          "body": "A short recording in the contributor's own language. It is, and remains, the original source."
         },
         {
           "icon": "note",
           "title": "Written note",
-          "body": "A readable version of what was said, so it can be searched, translated and read."
+          "body": "The experience organised around a few honest questions. A method of procedure for life, not machinery."
         },
         {
           "icon": "photo",
           "title": "Photographs",
-          "body": "A face, a place, a tool, a handwritten page. Optional, and always the contributor's choice."
+          "body": "A portrait, a workplace, a tool, a handwritten note. Enough to give the voice a face."
         },
         {
           "icon": "identity",
           "title": "Identity",
-          "body": "Who said it, where, and in what context — or 'Anonymous Contributor', if that is what they choose."
+          "body": "With permission: their name, their place, their years of experience. A lesson without its author becomes advice from nowhere."
         }
       ],
       "link": {
@@ -224,8 +225,8 @@
       }
     },
     "founderLine": {
-      "quote": "My great-grandfather and grandfather passed away before I was old enough to ask the right questions.",
-      "attribution": "From the letter from the founder",
+      "quote": "My great-grandfather and grandfather passed away before I was old enough to appreciate the questions I should have asked.",
+      "attribution": "Puneet Sharma, Founder",
       "link": {
         "label": "Read the letter",
         "href": "/founder"
@@ -237,28 +238,28 @@
   "preserve": {
     "eyebrow": "Preserve your experience",
     "heading": "A Lifetime of Learning Should Not Disappear in a Moment.",
-    "intro": "You are about to make one Wisdom Record. It has four parts: your voice, a written note, photographs if you want them, and your identity — on whatever terms you choose. Nothing you write here is published automatically. Everything is reviewed by a person, and you can change or withdraw it at any point before that.",
-    "testHeading": "What belongs here",
-    "testIntro": "There is no bar to clear and no form to pass. These five questions are simply how we think about it — if a record does any one of them, it belongs in the archive.",
+    "intro": "You are about to make one Wisdom Record. Not your life story — one lesson, the single thing you would want someone to have if you could only pass on one. It has four parts: your voice, a written note, photographs if you want them, and your identity on whatever terms you choose. Nothing here is published automatically.",
+    "testHeading": "The Narvyaka Test",
+    "testIntro": "Before anything is preserved, we ask five simple questions. If the answer is yes to even one, it belongs here.",
     "test": [
       {
         "title": "Does it save someone time?",
         "body": "Something that took you years to work out, that another person could have in an hour."
       },
       {
-        "title": "Does it help avoid a mistake?",
+        "title": "Does it help someone avoid a mistake?",
         "body": "A wrong turn you took, described clearly enough that someone else can see it coming."
       },
       {
-        "title": "Does it reduce suffering?",
+        "title": "Does it reduce suffering, or improve a life?",
         "body": "Knowledge that would have made a hard thing less hard, had someone known it in time."
       },
       {
-        "title": "Does it preserve something that might disappear?",
+        "title": "Does it preserve knowledge that would otherwise disappear?",
         "body": "A craft, a method, a language of work, a way of doing something that fewer people now know."
       },
       {
-        "title": "Does it inspire someone to live or work better?",
+        "title": "Does it help someone live or work better?",
         "body": "Not motivation. Evidence — that a life or a way of working was possible."
       }
     ],
@@ -273,15 +274,16 @@
   "recordSomeone": {
     "eyebrow": "Record someone you know",
     "heading": "Begin With Someone You Know.",
-    "intro": "The most valuable records in this archive will not be made by people who came looking for us. They will be made by someone who sat down with a person they already knew, and asked.",
+    "intro": "You do not need to find a stranger, wait for training, or become an expert interviewer. The first person worth preserving is very likely already in your life.",
     "whoHeading": "Who might this be?",
     "who": [
-      "A parent or grandparent",
-      "An aunt, uncle or elder in the family",
-      "A retired colleague, teacher or mentor",
-      "A neighbour who has done one thing for forty years",
-      "Someone whose craft or trade is no longer widely practised",
-      "Anyone who has said, more than once, \"nobody does it that way any more\""
+      "Your mother or father",
+      "A grandparent",
+      "A retired teacher",
+      "A family doctor",
+      "A former soldier, a farmer, a craftsman",
+      "A colleague nearing retirement",
+      "A neighbour who has survived something others are still struggling with"
     ],
     "howHeading": "How to do it well",
     "how": [
@@ -303,13 +305,16 @@
       }
     ],
     "consentHeading": "Consent, before anything else",
-    "consentBody": "You are filling this in on someone else's behalf, so we need to know they agreed to it. Their record stays theirs: they can review it, change it, restrict it or withdraw it at any time.",
-    "formHeading": "Their record, in your hands"
+    "consentBody": "No record is published without informed, specific consent. The contributor decides, in plain language, what becomes public, what stays private, and what happens to their words — and they can change or withdraw it at any time.",
+    "formHeading": "Their record, in your hands",
+    "askHeading": "Ask them one question, and listen for the real answer",
+    "askQuestion": "What is one thing life taught you that our family — or the world — should never lose?",
+    "askNote": "That single conversation, recorded and preserved with care, is a complete act of preservation. It is also, very often, the most meaningful conversation two people will ever have."
   },
   "volunteer": {
     "eyebrow": "Founding volunteers",
-    "heading": "Become a Founding Volunteer.",
-    "intro": "Narvyaka is built by people. At this stage there is no staff, no funding round and no product team — there is a method, and there are people willing to sit with someone and ask good questions carefully. Right now we are looking for exactly two.",
+    "heading": "This Is Not Someone Else's Job.",
+    "intro": "No institution is coming to do this for us. Historians will not interview your grandmother. A university will not sit with your neighbour's father before he passes. That knowledge belongs to ordinary families, workplaces and communities — which means its survival depends on ordinary people. Right now we are looking for exactly two.",
     "rolesHeading": "Two openings",
     "roles": [
       {
@@ -347,11 +352,11 @@
     ],
     "expectationsHeading": "What we ask",
     "expectations": [
-      "One record done carefully is worth more than ten done quickly.",
+      "None of these roles require credentials. They require patience, curiosity, and enough respect for another person's story to get it right.",
+      "New volunteers begin with guidance and light review; independence is earned through reliable work — because accuracy matters exactly as much as good intentions.",
       "Consent is not a checkbox. If someone hesitates, you stop.",
       "You will encounter things you are not sure how to handle. Say so rather than deciding alone.",
-      "Nothing you collect is yours to publish. Every record goes through review.",
-      "If the method turns out to be wrong after ten records, we change it. That is what the first phase is for."
+      "Do not ask whether you are important enough to help. Ask whose wisdom you can save."
     ],
     "formHeading": "Apply",
     "formIntro": "Two places. Applications are read personally — there is no automated stage and no scoring — and everyone who applies gets a reply.",
@@ -385,99 +390,119 @@
     "laterHeading": "Later, not now",
     "laterIntro": "These roles matter, and none of them are needed to make ten records. We would rather leave them empty than recruit people we cannot yet give real work to.",
     "laterRoles": [
-      "Translator",
-      "Researcher",
-      "Photographer",
-      "Technologist",
-      "Community organiser"
+      "Translate a record",
+      "Research and add context",
+      "Photograph a person or place",
+      "Archive and protect",
+      "Build the tools",
+      "Coordinate a region",
+      "Teach others"
+    ],
+    "commitmentHeading": "The founding commitment",
+    "commitment": "I will help preserve at least one meaningful experience, from one person.",
+    "commitmentNote": "That is the entire founding commitment. Nothing more is required to start, and almost nothing is easier to keep.",
+    "pledgeHeading": "The Narvyaka Pledge",
+    "pledge": [
+      "I will not let valuable wisdom disappear without an attempt to preserve it.",
+      "I recognise human experience as a shared inheritance.",
+      "I will listen before I judge.",
+      "I will preserve meaning without deliberately distorting it.",
+      "I will respect consent, privacy, and human dignity.",
+      "I will value experienced people whether or not they are famous.",
+      "I will identify at least one person whose knowledge deserves to survive.",
+      "I will help carry useful wisdom forward."
     ]
   },
   "about": {
     "eyebrow": "About",
-    "heading": "A human being's knowledge, made known.",
+    "heading": "One person's knowledge, made known to the world.",
     "stage1": {
       "missionHeading": "Mission",
-      "mission": "To preserve first-hand human experience — the methods, mistakes, decisions and skills that people actually carry — and to keep it accessible to whoever needs it next.",
+      "mission": "Preserve at least one meaningful lesson from every willing experienced person.",
       "visionHeading": "Vision",
-      "vision": "A world where a person beginning something difficult can find out what the last person learned, instead of starting from nothing.",
+      "vision": "A future where human experience can be preserved in its original form, translated across languages, carried across borders, downloaded, shared, and passed from one generation to the next — remaining accessible wherever humanity chooses to live, on Earth or beyond.",
       "beliefHeading": "The core belief",
-      "belief": "Knowledge that only exists inside one person is one accident away from being gone. Most of what human beings know has never been written down — and most of what has been written down was written by the few people who had the means to write.",
+      "belief": "Every expert deserves a successor. Not in the narrow sense of degrees and job titles, but in the sense that actually matters: every person who has spent real years doing something has, in the process, become an expert in something. Expertise earned through living doesn't need a certificate to be real. It needs one thing it rarely gets: a way to reach the next person who needs it.",
       "nameHeading": "The name",
-      "name": "Nar + Vyakta. A human being's knowledge, made known.",
-      "nameBody": "Nar is a person. Vyakta is that which has been expressed — brought out of the unexpressed and into a form another person can receive. Narvyaka is the act of doing that with a life's worth of learning."
+      "name": "Narvyaka: one person's knowledge, made known to the world.",
+      "nameBody": "The name is not a found word. It was built, deliberately, from Sanskrit roots: nar — a human being — and vyakta — made known, expressed."
     },
     "stage2": {
       "label": "The deeper meaning",
-      "heading": "Three who carried what they were told.",
-      "intro": "The name has a second reading. It is not necessary in order to use Narvyaka, and it is placed here rather than at the front for exactly that reason.",
+      "heading": "Three responsibilities, one name.",
+      "intro": "The name carries a second meaning, inspired by three figures from the Indian knowledge tradition, each representing one responsibility the archive depends on.",
       "figures": [
         {
-          "name": "Narada",
-          "body": "The one who moved between worlds carrying what he had heard, and whose function was transmission itself — the messenger who kept knowledge in motion between those who held it and those who needed it."
+          "name": "Vyasa",
+          "responsibility": "Preserve",
+          "body": "Remembered as the great compiler of the Vedas and the Mahabharata, Vyasa represents the discipline of gathering knowledge and organising it so it can survive the person who held it. A memory, alone, is fragile. A structured record can endure."
         },
         {
-          "name": "Vyasa",
-          "body": "The compiler. The one who took what was scattered and oral and at risk of dispersal, and arranged it so that it could survive being handed on."
+          "name": "Narada",
+          "responsibility": "Connect",
+          "body": "The travelling sage — messenger, storyteller, constant mover between people, realms and generations. Narada represents the responsibility to carry wisdom to wherever it is actually needed, rather than letting it sit unused in one place."
         },
         {
           "name": "Kakabhushundi",
-          "body": "The one who lived across ages and remembered — the witness whose value was not what he did, but what he retained and could still recount long after everyone else had gone."
+          "responsibility": "Continue",
+          "body": "The crow-sage who narrates Rama's story across ages to Garuda. Kakabhushundi represents continuity itself: a voice that speaks once, and keeps teaching long after the moment it was recorded."
         }
       ],
-      "closing": "Transmission, compilation, memory. Preserve. Connect. Continue."
+      "closing": "Preserve. Connect. Continue. Three responsibilities, one name, one movement.",
+      "note": "Narvyaka's name and its three guiding figures come from India. The responsibility they describe, and the invitation to take part in it, belong equally to every country, every culture, and every person willing to preserve one honest lesson."
     }
   },
   "howItWorks": {
     "eyebrow": "How it works",
     "heading": "What a Wisdom Record is.",
-    "intro": "A Wisdom Record is one piece of first-hand experience, captured in a form that can outlast the person who gave it. It is deliberately small. One record is one thing you know — not your life story.",
+    "intro": "Each contribution becomes one Wisdom Record — small enough to complete in under an hour, complete enough to genuinely matter. Not your life story. One lesson.",
     "partsHeading": "The four parts",
     "parts": [
       {
         "icon": "voice",
-        "title": "1. The voice",
-        "body": "The contributor's own recording, kept exactly as it was made. This is the primary record. It is not cleaned up, re-read by someone else, or replaced by a summary. Hearing how someone says a thing is part of what they said."
+        "title": "1. The Person's Voice",
+        "body": "A short recording, in the contributor's own language. Voice carries what text cannot — hesitation, humour, conviction, the exact weight a person gives to the thing that mattered most. It is, and remains, the original source. Everything else — transcript, translation, summary — is a derived version of it, and is always labelled as one."
       },
       {
         "icon": "note",
-        "title": "2. The written note",
-        "body": "A readable version of the recording, so that it can be searched, quoted and translated. Transcription and translation only. Nothing is interpreted, expanded, dramatised or rewritten — if the note says it, the contributor said it."
+        "title": "2. A Clear Wisdom Note",
+        "body": "The experience, organised around a few honest questions: What happened? What did you do? What worked, and what failed? What would you do differently? What should someone else watch for? Think of it as a method of procedure — for life, not machinery."
       },
       {
         "icon": "photo",
-        "title": "3. The photographs",
-        "body": "Up to five images: the person, the place, the tool, the handwritten page. Entirely optional. A record with no photographs is a complete record."
+        "title": "3. Four or Five Photographs",
+        "body": "A portrait. A workplace. A tool, a handwritten note, a meaningful object. Enough to give the voice a face, and the lesson a place it came from."
       },
       {
         "icon": "identity",
-        "title": "4. The identity",
-        "body": "Who gave this, where they were, what they did. Identity can be full, partial, or withheld entirely — a record can be published as 'Anonymous Contributor' without losing any of its value."
+        "title": "4. Identity and Context",
+        "body": "With the contributor's permission: their name, their place, their years of experience. Narvyaka preserves the lesson and the person who earned it — because a lesson without its author quietly becomes advice from nowhere, and loses half its weight."
       }
     ],
     "audioHeading": "Video Can Wait. Wisdom Cannot.",
     "audioBody": [
-      "Audio first is a deliberate choice, not a limitation of the budget. Video needs a room, a light, a camera and a person willing to be looked at. Audio needs a phone and somebody willing to talk.",
-      "The difference matters because of who we are trying to reach. The people whose knowledge is most at risk of disappearing are rarely the people most comfortable in front of a camera. Asking for video would quietly filter the archive down to the confident — and the confident are already recorded.",
-      "Audio is also smaller, cheaper to keep for decades, and easier to transcribe and translate. Video can come later, for the records that want it. Wisdom cannot wait for the production."
+      "A professionally filmed interview needs a crew, equipment, editing, and a budget most people preserving a lesson today do not have. Waiting for that budget means losing the interviews that couldn't wait.",
+      "Audio needs almost none of that. It is affordable, portable, easy to translate — and, most importantly, it keeps the contributor's actual voice, not a professional's rendering of it, at the centre of the record.",
+      "Every Wisdom Record can grow later — into an article, a podcast, a documentary, a book. But the source has to be captured first, while the person carrying it is still here to give it. Everything else can wait. This can't."
     ],
-    "storageHeading": "Kept three ways",
-    "storageIntro": "Every record is stored in three forms at once, because the thing that destroys archives is not fire — it is formats nobody can open any more.",
+    "storageHeading": "Built to outlast us",
+    "storageIntro": "No single company, website or government will ever be the sole guardian of what Narvyaka preserves. Durability isn't a promise you make once. It's a responsibility you keep showing up for.",
     "storage": [
       {
         "title": "The original evidence",
-        "body": "The untouched audio file and the original photographs, exactly as they came from the contributor. Nothing is ever edited in place. If we are wrong about everything else, this survives."
+        "body": "The untouched recording and the original photographs, exactly as they came from the contributor. Nothing is ever edited in place. The recording remains the permanent source of truth."
       },
       {
-        "title": "The human-readable form",
-        "body": "Plain text and standard images that a person can open in fifty years with no special software — the version that survives us, our website, and whatever technology replaces it."
+        "title": "Open, documented formats",
+        "body": "Plain text and standard images that a person can open in fifty years with no special software — with regular migration as technology changes."
       },
       {
-        "title": "The machine-readable form",
-        "body": "Structured data, so a record can be found by someone who does not yet know it exists. This is what makes an archive usable rather than merely full."
+        "title": "Deliberate redundancy",
+        "body": "Independent backups and trusted institutional partners, so the archive does not depend on any one organisation continuing to exist."
       }
     ],
-    "reviewHeading": "Nothing publishes itself",
-    "reviewBody": "Every submission arrives with the status 'pending review'. A person reads it, checks it with the contributor where anything is unclear, and only then is it published — at whatever access level the contributor chose. There is no automatic pipeline from a form to a public page, and there will not be one.",
+    "reviewHeading": "Dignity, consent, and truth",
+    "reviewBody": "Narvyaka preserves people, not content. No record is published without informed, specific consent — the contributor decides, in plain language, what becomes public, what stays private, and what happens to their words. Private pain is never turned into entertainment, and a record is never selected because it might go viral. Every submission arrives marked 'pending review' and a person reads it before it goes anywhere.",
     "verificationHeading": "How certainty is marked",
     "verificationIntro": "Records are not silently presented as fact. Each carries one of exactly three labels, and no record is left unmarked.",
     "verification": [
@@ -495,13 +520,21 @@
       }
     ],
     "sampleHeading": "A sample capsule",
-    "sampleIntro": "This is the shape of a finished record. Until a real one exists, this is an illustration."
+    "sampleIntro": "This is the shape of a finished record. Until a real one exists, this is an illustration.",
+    "ruleHeading": "Our rule for building",
+    "ruleIntro": "Every feature proposal must answer three questions. If the answer is not yes to all three, it is set aside.",
+    "rules": [
+      "Does this help preserve expertise?",
+      "Will it still be useful fifty years from now?",
+      "Does it respect the contributor's ownership and intent?"
+    ],
+    "ruleClosing": "Technology may help people find human wisdom. It must never replace the human being at the centre of it."
   },
   "browse": {
     "eyebrow": "The archive",
     "heading": "What has been preserved so far.",
     "emptyHeading": "This archive is just beginning.",
-    "emptyBody": "There is nothing published here yet — not because it is broken, but because it is new. The first records are being made now. Every one that appears here will have been given deliberately by a person, and read by a person before it went up.",
+    "emptyBody": "Narvyaka begins deliberately small — because trust, once broken, cannot be rebuilt at scale. The first records are being made now. Every one that appears here will have been given deliberately by a person, and read by a person before it went up.",
     "emptyCta": {
       "label": "Make the first record",
       "href": "/preserve"
@@ -525,17 +558,22 @@
   },
   "founder": {
     "eyebrow": "Letter from the founder",
-    "heading": "Why this exists.",
-    "isPlaceholder": true,
-    "placeholderNotice": "This page is a placeholder. Replace the text below with Appendix B of the Master Reference, verbatim — either in src/data/site.json under `founder.letter`, or directly in the Studio.",
+    "heading": "A Letter from the Founder",
+    "isPlaceholder": false,
+    "placeholderNotice": "",
     "letter": [
-      "My great-grandfather and grandfather passed away before I was old enough to ask the right questions.",
-      "I know what they did. I do not know how they did it, what it cost them, what they tried first, or what they would have told me not to bother with. That knowledge existed. It was in the room with me. And it left without anyone thinking to write it down, because nobody involved — including them — thought of it as knowledge worth recording. It was just their life.",
-      "I have since found that almost everybody has this same gap, and almost everybody discovers it about ten years too late. The questions arrive when you are old enough to need the answers, which is usually after the person who had them has gone.",
-      "Narvyaka is the attempt to close that gap by a few years, for a few people, deliberately. Not to build a database of everything. To make sure that when someone does think to ask, there is somewhere for the answer to go.",
-      "If you have someone to ask, please ask them now. Whether you use this or not."
+      "I believe knowledge is humanity's greatest inheritance.",
+      "Every generation benefits from the experience of those who came before it. Yet throughout history, countless lessons have disappeared with the people who lived them. Libraries have been destroyed, languages have faded, and generations of practical wisdom have been lost simply because there was no way to preserve and pass it forward.",
+      "During my career, working with technology and with experienced professionals from different countries, I saw the same pattern again and again. Documentation may record what was done, but it rarely captures why a decision was made, the lesson learned through failure, or the judgement earned through decades of experience. When people retire or pass away, most of that knowledge disappears with them.",
+      "This mission is also personal. My great-grandfather and grandfather passed away before I was old enough to appreciate the questions I should have asked. Today, I would value not only their stories, but their thinking — the principles that guided their decisions, the mistakes that shaped them, and the wisdom they hoped future generations would carry forward.",
+      "Narvyaka was created so that this does not have to happen again.",
+      "We envision a future where human experience can be preserved in its original form, translated across languages, carried across borders, downloaded, shared, and passed from one generation to the next — remaining accessible wherever humanity chooses to live, on Earth or beyond.",
+      "Our purpose is not simply to preserve information. It is to preserve the experience, judgement, and wisdom that make us human.",
+      "Because every expert deserves a successor.",
+      "Because knowledge should outlive its owner.",
+      "Because humanity moves forward when every generation can learn from the one before it."
     ],
-    "signature": "The founder, Narvyaka",
+    "signature": "Puneet Sharma, Founder, Narvyaka",
     "photo": "",
     "photoAlt": "Portrait of the founder"
   },
@@ -669,8 +707,8 @@
       "intro": "Three things, in plain language, before you give us anything.",
       "points": [
         {
-          "title": "Your recording is transcribed and translated. Nothing else.",
-          "body": "We write down what you said so it can be read and searched, and we translate it where that is useful. Your recording is not used to train AI systems, and will not be, unless you are separately asked and separately agree. Nothing is rewritten, summarised or interpreted on your behalf."
+          "title": "Your recording is the original source. Everything else is a derived version.",
+          "body": "The recording remains the permanent source of truth. Anything made from it — a transcript, a translation — is clearly labelled as a derived version and is never mistaken for your own words. A contribution is never quietly turned into commercial data or AI training material: any such use would require a separate, explicit, fully informed decision by you."
         },
         {
           "title": "Nothing is published automatically.",
@@ -678,14 +716,14 @@
         },
         {
           "title": "You stay in control of it.",
-          "body": "You can review, edit, restrict or withdraw your record at any time, including after it is published."
+          "body": "You decide, in plain language, what becomes public, what stays private, and what happens to your words. You can review, edit, restrict or withdraw your record at any time, including after it is published."
         }
       ],
       "checkReview": "I understand I can review and edit everything before it is published.",
       "checkAge": "I am 30 years of age or older.",
-      "ageWhy": "Why 30? Because the records that help most tend to come from experience that has had time to be tested. It is a guideline, not a wall.",
-      "exceptionHeading": "Tell us why this shouldn't wait",
-      "exceptionBody": "If you are under 30 and you have something that should be recorded now, say so here. This does not block your submission — it routes it to a person to read.",
+      "ageWhy": "Narvyaka begins with contributors aged 30 and above, with priority to those 35 and above — not because age determines a person's worth, but because judgement tends to deepen with years lived.",
+      "exceptionHeading": "Some wisdom cannot be asked to wait for age",
+      "exceptionBody": "Exceptions are reviewed individually for: young people with exceptional, demonstrable expertise; someone facing a serious or life-limiting illness, because some knowledge cannot wait; and rare cultural, historical or traditional knowledge at real risk of disappearing. Telling us here does not block your submission — it routes it to a person to read.",
       "exceptionPlaceholder": "What is it, and why does it need recording now?",
       "consentRequiredError": "Please confirm the first statement before continuing."
     },

@@ -15,16 +15,16 @@ const socialLabels: Record<string, string> = {
 }
 ---
 
-<footer class="carbon mt-auto">
+<footer class="mt-auto border-t border-hairline bg-surface">
   <div class="wrap py-14 md:py-20">
     <div class="grid gap-12 md:grid-cols-[minmax(0,1.3fr)_repeat(3,minmax(0,1fr))]">
       <div class="max-w-sm">
-        <Wordmark size="md" logoSlot={false} class="text-white" />
-        <p class="mt-4 text-[0.93rem] leading-[1.65] text-white/55" {...editable('footer.blurb')}>
+        <Wordmark size="md" logoSlot={false} />
+        <p class="mt-4 text-[0.93rem] leading-[1.65] text-muted" {...editable('footer.blurb')}>
           {t('footer.blurb')}
         </p>
         <p
-          class="mt-6 font-heading text-[1.05rem] tracking-tight text-white"
+          class="mt-6 font-heading text-[1.05rem] tracking-tight text-accent"
           {...editable('footer.philosophy')}
         >
           {t('footer.philosophy')}
@@ -35,7 +35,7 @@ const socialLabels: Record<string, string> = {
         content.footer.columns.map((column, ci) => (
           <div>
             <h2
-              class="font-body text-[0.72rem] font-semibold uppercase tracking-[0.16em] text-white/40"
+              class="font-body text-[0.72rem] font-semibold uppercase tracking-[0.16em] text-muted"
               {...editable(`footer.columns.${ci}.title`)}
             >
               {column.title}
@@ -45,7 +45,7 @@ const socialLabels: Record<string, string> = {
                 <li>
                   <a
                     href={link.href}
-                    class="text-[0.93rem] text-white/75 no-underline transition-colors hover:text-white"
+                    class="text-[0.93rem] text-ink no-underline transition-colors hover:text-accent"
                     {...editable(`footer.columns.${ci}.links.${li}.label`)}
                   >
                     {link.label}
@@ -58,15 +58,15 @@ const socialLabels: Record<string, string> = {
       }
     </div>
 
-    <hr class="my-12 border-0 border-t border-white/12" />
+    <hr class="hairline my-12" />
 
-    <div class="flex flex-col gap-4 text-[0.8rem] text-white/40 sm:flex-row sm:items-center sm:justify-between">
+    <div class="flex flex-col gap-4 text-[0.8rem] text-muted sm:flex-row sm:items-center sm:justify-between">
       <p>© {yearLabel} {siteConfig.legalEntity}</p>
 
       <div class="flex flex-wrap items-center gap-x-5 gap-y-2">
         {
           hasEmail && (
-            <a href={`mailto:${siteConfig.contactEmail}`} class="text-white/50 no-underline hover:text-white">
+            <a href={`mailto:${siteConfig.contactEmail}`} class="text-muted no-underline hover:text-accent">
               {t('footer.emailLabel')}
             </a>
           )
@@ -77,13 +77,13 @@ const socialLabels: Record<string, string> = {
               href={social.url}
               rel="me noopener"
               target="_blank"
-              class="text-white/50 no-underline hover:text-white"
+              class="text-muted no-underline hover:text-accent"
             >
               {socialLabels[social.key] ?? social.key}
             </a>
           ))
         }
-        <a href="/studio" class="text-white/50 no-underline hover:text-white">Studio</a>
+        <a href="/studio" class="text-muted no-underline hover:text-accent">Studio</a>
       </div>
     </div>
   </div>

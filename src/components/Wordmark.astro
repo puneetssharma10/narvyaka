@@ -1,36 +1,44 @@
 ---
 /**
- * The Narvyaka lockup.
+ * The Narvyaka lockup: the logomark, then the name.
  *
- * No logo file exists yet, so this renders a typographic wordmark set like
- * automotive badging — uppercase, widely tracked, in Space Grotesk. The slot
- * is built so a real logomark can be dropped in later
- * (Studio → Logo, or theme.logo.src in src/data/site.json) without any
- * component being restructured: the <img> simply replaces the text.
+ * Three states, in priority order:
+ *   1. A custom logo file (Studio → Logo, or theme.logo.src) replaces the
+ *      whole lockup — that file is assumed to be a complete lockup itself.
+ *   2. Otherwise the built-in LogoMark plus the name in Space Grotesk.
+ *   3. `markOnly` renders just the mark, for tight spaces.
+ *
+ * Dropping a real logo in later needs no component changes anywhere.
  */
+import LogoMark from './LogoMark.astro'
 import { content } from '../lib/content'
 
 interface Props {
-  /** Rendered size of the wordmark text. */
+  /** Rendered size of the lockup. */
   size?: 'sm' | 'md' | 'lg' | 'xl'
   class?: string
   /** Marks this as the element the Studio's logo drop-zone targets. */
   logoSlot?: boolean
+  /** Hide the name, keep the mark. */
+  markOnly?: boolean
 }
 
-const { size = 'md', class: className = '', logoSlot: isSlot = true } = Astro.props
+const { size = 'md', class: className = '', logoSlot: isSlot = true, markOnly = false } = Astro.props
 
 const logo = content.theme.logo
-const sizes: Record<string, string> = {
-  sm: 'text-[0.95rem]',
-  md: 'text-[1.1rem]',
-  lg: 'text-[1.6rem]',
-  xl: 'text-[clamp(1.9rem,4.6vw,3.1rem)]',
+
+const scale: Record<string, { text: string; mark: number; gap: string }> = {
+  sm: { text: 'text-[0.9rem]', mark: 20, gap: 'gap-2' },
+  md: { text: 'text-[1.05rem]', mark: 26, gap: 'gap-2.5' },
+  lg: { text: 'text-[1.5rem]', mark: 34, gap: 'gap-3' },
+  xl: { text: 'text-[clamp(1.75rem,4.2vw,2.8rem)]', mark: 58, gap: 'gap-4' },
 }
+
+const s = scale[size]
 ---
 
 <span
-  class={`wordmark inline-flex items-center leading-none ${sizes[size]} ${className}`}
+  class={`inline-flex items-center ${s.gap} leading-none ${className}`}
   data-logo-slot={isSlot ? '' : undefined}
 >
   {
@@ -44,7 +52,14 @@ const sizes: Record<string, string> = {
         data-logo-img
       />
     ) : (
-      <span data-logo-text>Narvyaka</span>
+      <>
+        <LogoMark size={s.mark} class="shrink-0" />
+        {!markOnly && (
+          <span class={`wordmark ${s.text}`} data-logo-text>
+            Narvyaka
+          </span>
+        )}
+      </>
     )
   }
 </span>
