@@ -85,6 +85,31 @@ picture.
 
 ---
 
+## 🎨 Changed in the redesign — flagging, because one was an explicit instruction
+
+**The wordmark is no longer Fraunces italic.** It is now Space Grotesk,
+uppercase and widely tracked, like automotive badging. The original brief asked
+for Fraunces italic, but that was chosen for the warm terracotta direction that
+has since been replaced. A humanist literary serif inside a carbon-and-cobalt
+system would have read as two different brands.
+
+To put it back: Studio → Type → Wordmark → Fraunces, or set
+`theme.fonts.wordmark` in `src/data/site.json`. The Fraunces package is still
+installed. You would also want to remove `text-transform: uppercase` and the
+`letter-spacing` from `.wordmark` in `src/styles/global.css`.
+
+**The palette is entirely new.** Warm terracotta and off-white are gone; the
+system is now cool platinum, carbon, electric cobalt and Rosso. Two tokens were
+added (`carbon`, `signal`/`signal-soft`) and all thirteen are editable in the
+Studio.
+
+**Volunteer scope narrowed to two openings.** `/volunteer` previously listed
+eight roles as an open grid. It now advertises exactly two — interviewer, and
+writer & archivist — with the rest under "Later, not now". The application form
+only offers the two. Widen it by editing `volunteer.openings`.
+
+---
+
 ## 🔧 Invented and needing a decision
 
 ### `categories` in `src/data/site.json`

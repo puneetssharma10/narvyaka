@@ -6,7 +6,9 @@ import { content, editable, t } from '../lib/content'
 import { siteConfig } from '../../site.config'
 
 const v = content.volunteer
-const roleNames = v.roles.map((role) => role.title)
+// Only the two open positions are selectable — we do not collect applications
+// for roles that have no work attached to them yet.
+const roleNames = v.openings.map((opening) => opening.title)
 ---
 
 <Base title="Become a founding volunteer" description={v.intro}>
@@ -19,36 +21,65 @@ const roleNames = v.roles.map((role) => role.title)
     introPath="volunteer.intro"
   />
 
-  <!-- ── Roles ─────────────────────────────────────────────────────────── -->
+  <!-- ── The two openings ──────────────────────────────────────────────── -->
   <section class="section border-b border-hairline">
     <div class="wrap">
-      <h2 {...editable('volunteer.rolesHeading')}>{t('volunteer.rolesHeading')}</h2>
+      <div class="max-w-[54ch]">
+        <span class="light-bar mb-6"></span>
+        <h2 {...editable('volunteer.rolesHeading')}>{t('volunteer.rolesHeading')}</h2>
+        <p class="mt-5 text-muted" {...editable('volunteer.rolesIntro')}>{t('volunteer.rolesIntro')}</p>
+      </div>
 
-      <ul class="mt-9 grid list-none gap-4 p-0 sm:grid-cols-2 lg:grid-cols-4">
+      <div class="mt-12 grid gap-6 lg:grid-cols-2">
         {
-          v.roles.map((role, i) => (
-            <li class="card reveal p-5" style={`transition-delay:${(i % 4) * 50}ms`}>
-              <h3 class="font-heading text-[1.1rem]" {...editable(`volunteer.roles.${i}.title`)}>
-                {role.title}
-              </h3>
-              <p class="mt-2 text-[0.93rem] leading-[1.6] text-muted" {...editable(`volunteer.roles.${i}.body`)}>
-                {role.body}
+          v.openings.map((opening, i) => (
+            <article class="card reveal flex flex-col p-7 md:p-9" style={`transition-delay:${i * 70}ms`}>
+              <div class="flex items-baseline gap-4">
+                <span class="font-heading text-[2.4rem] leading-none tracking-tight text-accent/25 tnum">
+                  {opening.count}
+                </span>
+                <h3
+                  class="font-heading text-[1.5rem] tracking-tight"
+                  {...editable(`volunteer.openings.${i}.title`)}
+                >
+                  {opening.title}
+                </h3>
+              </div>
+
+              <p
+                class="mt-5 leading-[1.7] text-ink/85"
+                {...editable(`volunteer.openings.${i}.body`)}
+              >
+                {opening.body}
               </p>
-            </li>
+
+              <ul class="mt-6 grid list-none gap-3 border-t border-hairline p-0 pt-6">
+                {opening.asks.map((ask, j) => (
+                  <li class="flex items-start gap-3 text-[0.95rem] leading-[1.55] text-muted">
+                    <span class="mt-[0.55rem] h-px w-3 shrink-0 bg-accent" aria-hidden="true" />
+                    <span {...editable(`volunteer.openings.${i}.asks.${j}`)}>{ask}</span>
+                  </li>
+                ))}
+              </ul>
+            </article>
           ))
         }
-      </ul>
+      </div>
     </div>
   </section>
 
   <!-- ── What we ask ───────────────────────────────────────────────────── -->
   <section class="section border-b border-hairline">
     <div class="wrap-read reveal">
+      <span class="light-bar mb-6"></span>
       <h2 {...editable('volunteer.expectationsHeading')}>{t('volunteer.expectationsHeading')}</h2>
-      <ul class="mt-6 grid list-none gap-4 p-0">
+      <ul class="mt-8 grid list-none gap-5 p-0">
         {
           v.expectations.map((item, i) => (
-            <li class="flex items-start gap-3 border-l-2 border-accent/25 pl-4">
+            <li class="flex gap-4">
+              <span class="mt-1 font-heading text-[0.8rem] tabular-nums text-accent">
+                {String(i + 1).padStart(2, '0')}
+              </span>
               <span class="text-[1.02rem] leading-[1.65]" {...editable(`volunteer.expectations.${i}`)}>
                 {item}
               </span>
@@ -59,11 +90,36 @@ const roleNames = v.roles.map((role) => role.title)
     </div>
   </section>
 
+  <!-- ── Roles that are not open yet ───────────────────────────────────── -->
+  <section class="section border-b border-hairline">
+    <div class="wrap-read reveal">
+      <h2 class="font-heading text-[1.3rem] text-muted" {...editable('volunteer.laterHeading')}>
+        {t('volunteer.laterHeading')}
+      </h2>
+      <p class="mt-3 text-[0.98rem] text-muted" {...editable('volunteer.laterIntro')}>
+        {t('volunteer.laterIntro')}
+      </p>
+      <ul class="mt-6 flex list-none flex-wrap gap-2 p-0">
+        {
+          v.laterRoles.map((role, i) => (
+            <li
+              class="rounded-[3px] border border-hairline px-3 py-1.5 text-[0.8rem] font-medium uppercase tracking-[0.1em] text-muted"
+              {...editable(`volunteer.laterRoles.${i}`)}
+            >
+              {role}
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
   <!-- ── Application ───────────────────────────────────────────────────── -->
   <section class="section">
     <div class="wrap-read">
+      <span class="light-bar mb-6"></span>
       <h2 {...editable('volunteer.formHeading')}>{t('volunteer.formHeading')}</h2>
-      <p class="mb-9 mt-4 text-muted" {...editable('volunteer.formIntro')}>{t('volunteer.formIntro')}</p>
+      <p class="mb-10 mt-5 text-muted" {...editable('volunteer.formIntro')}>{t('volunteer.formIntro')}</p>
 
       <VolunteerForm
         client:load

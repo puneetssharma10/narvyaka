@@ -27,11 +27,11 @@ const photo = capsule.photos[0]
 
   <div class="flex flex-1 flex-col gap-3 p-5">
     <div class="flex flex-wrap items-center gap-2">
-      {capsule.is_example && <span class="tag bg-caution/12 text-caution">Example</span>}
+      {capsule.is_example && <span class="tag bg-signal-soft text-signal">Example</span>}
       {capsule.classification.primary_category && <span class="tag">{capsule.classification.primary_category}</span>}
     </div>
 
-    <blockquote class="m-0 font-heading text-[1.15rem] leading-[1.4] text-ink">
+    <blockquote class="m-0 font-heading text-[1.12rem] leading-[1.35] tracking-tight text-ink">
       <a href={`/capsule/${capsule.id}`} class="no-underline after:absolute after:inset-0 after:content-['']">
         “{capsule.key_lesson}”
       </a>

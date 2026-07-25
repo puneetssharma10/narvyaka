@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="160" height="160" role="img" aria-label="Placeholder portrait">
   <!-- Replace with a real photograph: Studio → click the picture. -->
-  <rect width="160" height="160" fill="#F3E8DE"/>
-  <g fill="none" stroke="#8A5A3B" stroke-width="3" stroke-linecap="round" opacity="0.55">
-    <circle cx="80" cy="63" r="25"/>
-    <path d="M31 141a49 49 0 0 1 98 0"/>
+  <rect width="160" height="160" fill="#E9ECFF"/>
+  <g fill="none" stroke="#1B34E8" stroke-width="4" stroke-linecap="round" opacity="0.75">
+    <circle cx="80" cy="62" r="24"/>
+    <path d="M32 142a48 48 0 0 1 96 0"/>
   </g>
 </svg>

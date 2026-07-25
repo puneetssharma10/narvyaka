@@ -29,10 +29,14 @@ npm run db:local
 
 ## The one file you need to edit
 
-**`site.config.ts`** — domain, contact email, social links. All blank on
-purpose. Anything left empty is hidden from the site automatically: no dead
-links, no empty `mailto:`, no wrong canonical URLs. Fill them in when they
-exist; nothing else has to change.
+**`site.config.ts`** — domain, contact email, social links.
+
+`domain` is currently the free Cloudflare subdomain, `narvyaka.pages.dev`.
+Replace that one line with `narvyaka.com` the day you buy it and canonical
+URLs, `og:url` and the sitemap all follow automatically.
+
+`contactEmail` and the social links are blank on purpose. Anything left empty
+is hidden from the site: no dead links, no empty `mailto:`, no dead icons.
 
 ---
 
@@ -125,13 +129,40 @@ The editor is lazily loaded — an ordinary visitor downloads **none** of it.
 
 ---
 
+## Design
+
+Precision-engineered rather than warm-archival — the reference is the finish of
+a high-end car.
+
+| | |
+| --- | --- |
+| Page | `#F6F7F9` cool platinum, and pure white cards. No cream, no beige. |
+| Carbon | `#0B0E14` — the hero and footer, the only full-bleed dark surfaces |
+| Primary | `#1B34E8` electric cobalt — buttons, links, the brand colour |
+| Signal | `#E4002B` Rosso — emphasis only, never a whole surface |
+| Verde / Giallo | `#00A355` verified, `#F5B301` caution |
+| Type | Space Grotesk (wordmark), Sora (headings), Inter (body) |
+| Geometry | 6px cards, 4px controls. Tight radii, precise lines. |
+
+Every one of those is a live token you can retune in the Studio.
+
 ## The logo
 
-There is no logo file. The header renders a text wordmark set in **Fraunces
-italic**. The slot is built so a real logomark drops in later without any
-component changing — via the Studio, or by setting `theme.logo.src` in
-`src/data/site.json`. `public/favicon.svg` is a matching typographic
-placeholder.
+There is no logo file. The header renders a text wordmark set like automotive
+badging — **Space Grotesk, uppercase, widely tracked**. The slot is built so a
+real logomark drops in later without any component changing: via the Studio, or
+by setting `theme.logo.src` in `src/data/site.json`. `public/favicon.svg` is a
+matching typographic placeholder.
+
+## Scope: phase one
+
+Ten records. Two volunteers. That is the whole of the first phase, and the site
+says so plainly — on the homepage, and on `/volunteer`, which advertises
+exactly two openings (interviewer, writer & archivist) and lists the other
+roles as explicitly not open yet. The application form only offers the two.
+
+Widening the scope means editing `volunteer.openings` and `home.status` in
+`src/data/site.json`.
 
 ---
 

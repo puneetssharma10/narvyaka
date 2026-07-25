@@ -2,8 +2,9 @@
 /**
  * The Narvyaka lockup.
  *
- * No logo file exists yet, so this renders a typographic wordmark — Fraunces,
- * italic. The slot is built so a real logomark can be dropped in later
+ * No logo file exists yet, so this renders a typographic wordmark set like
+ * automotive badging — uppercase, widely tracked, in Space Grotesk. The slot
+ * is built so a real logomark can be dropped in later
  * (Studio → Logo, or theme.logo.src in src/data/site.json) without any
  * component being restructured: the <img> simply replaces the text.
  */
@@ -21,10 +22,10 @@ const { size = 'md', class: className = '', logoSlot: isSlot = true } = Astro.pr
 
 const logo = content.theme.logo
 const sizes: Record<string, string> = {
-  sm: 'text-[1.1rem]',
-  md: 'text-[1.35rem]',
-  lg: 'text-[2rem]',
-  xl: 'text-[clamp(2.75rem,8vw,4.75rem)]',
+  sm: 'text-[0.95rem]',
+  md: 'text-[1.1rem]',
+  lg: 'text-[1.6rem]',
+  xl: 'text-[clamp(1.9rem,4.6vw,3.1rem)]',
 }
 ---
 

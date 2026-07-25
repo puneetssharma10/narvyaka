@@ -13,30 +13,29 @@ Then follow **INTEGRATIONS.md** to create the database and the bucket, and check
 
 ---
 
-## Before the domain is bought
+## Running on the free Cloudflare domain
 
-The site is fully deployable now. `site.config.ts` has `domain: ''`, and while
-that is empty:
+`site.config.ts` is set to `domain: 'narvyaka.pages.dev'` — the free subdomain
+Cloudflare Pages gives every project. Canonical URLs, `og:url` and the sitemap
+all point there, which is correct: it is the real address of the site today.
 
-- no canonical or `og:url` tags are emitted (better than emitting wrong ones)
-- no sitemap is generated
-- no `mailto:` links appear anywhere
-- no social icons appear
-- everything else works exactly as it will on the real domain
+`contactEmail` and the social links are still empty, so no `mailto:` link and
+no social icons are rendered anywhere. Nothing is broken and nothing is a
+placeholder-shaped hole.
 
-Deploy to the free `*.pages.dev` URL, use it, and change nothing when the domain
-arrives except the two lines below.
+If your Pages project ends up on a different subdomain (Cloudflare appends a
+suffix when the name is taken), put the actual one in `domain` and redeploy.
 
 ---
 
 ## The day you buy the domain
 
-**1. Add it to `site.config.ts`** — the first entry in the file:
+**1. Change one line in `site.config.ts`** — the first entry in the file:
 
 ```ts
 export const siteConfig = {
-  domain: 'narvyaka.org',          // ← no https://, no trailing slash
-  contactEmail: 'hello@narvyaka.org', // ← or leave '' until the mailbox exists
+  domain: 'narvyaka.com',            // ← was 'narvyaka.pages.dev'
+  contactEmail: 'hello@narvyaka.com',// ← or leave '' until the mailbox exists
   social: {
     github: 'https://github.com/puneetssharma10/narvyaka', // ← when you're ready
     ...

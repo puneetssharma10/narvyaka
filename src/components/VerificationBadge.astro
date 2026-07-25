@@ -17,8 +17,8 @@ const known = (VERIFICATION_STATUSES as readonly string[]).includes(status)
 
 const styles: Record<string, string> = {
   Documented: 'text-verified border-verified/35 bg-verified/8',
-  "Contributor's Account": 'text-accent-hover border-accent/30 bg-accent-soft',
-  'Family Tradition': 'text-caution border-caution/30 bg-caution/8',
+  "Contributor's Account": 'text-accent-hover border-accent/25 bg-accent-soft',
+  'Family Tradition': 'text-caution border-caution/40 bg-caution/10',
 }
 
 const explain: Record<string, string> = {
@@ -31,7 +31,7 @@ const explain: Record<string, string> = {
 {
   known ? (
     <span
-      class={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[0.75rem] font-medium ${styles[status]} ${className}`}
+      class={`inline-flex items-center gap-1.5 rounded-[3px] border px-2.5 py-1 text-[0.7rem] font-semibold uppercase tracking-[0.1em] ${styles[status]} ${className}`}
       title={explain[status]}
     >
       {status}

@@ -34,7 +34,7 @@ const {
     <div class={`card flex items-center gap-3 p-3 ${className}`} data-audio-player>
       <button
         type="button"
-        class="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-accent text-white transition-colors hover:bg-accent-hover"
+        class="grid h-11 w-11 shrink-0 place-items-center rounded-[4px] bg-accent text-white transition-colors hover:bg-accent-hover"
         data-audio-toggle
         aria-label={label}
       >
@@ -44,7 +44,7 @@ const {
 
       <div class="min-w-0 flex-1">
         <div
-          class="relative h-1.5 w-full cursor-pointer rounded-full bg-hairline"
+          class="relative h-[3px] w-full cursor-pointer rounded-full bg-hairline"
           data-audio-track
           role="slider"
           tabindex="0"
@@ -68,7 +68,7 @@ const {
     </div>
   ) : (
     <div class={`card flex items-center gap-3 p-3 text-muted ${className}`}>
-      <span class="grid h-11 w-11 shrink-0 place-items-center rounded-full border border-hairline text-muted">
+      <span class="grid h-11 w-11 shrink-0 place-items-center rounded-[4px] border border-hairline text-muted">
         <Icon name="voice" size={18} />
       </span>
       <p class="m-0 text-[0.9rem]">{missingLabel}</p>

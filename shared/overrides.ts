@@ -13,16 +13,19 @@ export const OVERRIDES_VERSION = 1
 
 /** Design tokens the Studio can recolour. Order is the order shown in the UI. */
 export const COLOR_TOKENS = [
-  { key: 'bg', label: 'Background', hint: 'Warm off-white. Avoid pure #FFFFFF.' },
-  { key: 'surface', label: 'Cards', hint: 'Panels and cards sitting on the background.' },
-  { key: 'ink', label: 'Text', hint: 'Soft black. Avoid pure #000000.' },
+  { key: 'bg', label: 'Page', hint: 'Cool platinum. Keep it very light — never cream or beige.' },
+  { key: 'surface', label: 'Cards', hint: 'Panels and cards sitting on the page.' },
+  { key: 'carbon', label: 'Dark sections', hint: 'The hero and footer. Near-black, slightly blue.' },
+  { key: 'ink', label: 'Text', hint: 'Near-black. Avoid pure #000000.' },
   { key: 'muted', label: 'Secondary text', hint: 'Captions, hints, metadata.' },
   { key: 'hairline', label: 'Lines', hint: 'Borders and dividers.' },
-  { key: 'accent', label: 'Accent', hint: 'Buttons, links, the warm brand colour.' },
-  { key: 'accent-hover', label: 'Accent (hover)', hint: 'A step darker than the accent.' },
-  { key: 'accent-soft', label: 'Accent (soft)', hint: 'Tag and badge backgrounds.' },
-  { key: 'verified', label: 'Verified', hint: 'The “Documented” badge.' },
-  { key: 'caution', label: 'Caution', hint: 'Warnings and placeholder notices.' },
+  { key: 'accent', label: 'Primary', hint: 'Buttons, links, the brand colour. Electric cobalt.' },
+  { key: 'accent-hover', label: 'Primary (hover)', hint: 'A step deeper than the primary.' },
+  { key: 'accent-soft', label: 'Primary (soft)', hint: 'Tag and badge backgrounds.' },
+  { key: 'signal', label: 'Signal', hint: 'Rosso. Emphasis only — never a whole surface.' },
+  { key: 'signal-soft', label: 'Signal (soft)', hint: 'Backgrounds for signal badges.' },
+  { key: 'verified', label: 'Verified', hint: 'The “Documented” badge. Verde.' },
+  { key: 'caution', label: 'Caution', hint: 'Warnings and placeholder notices. Giallo.' },
 ] as const
 
 export type ColorToken = (typeof COLOR_TOKENS)[number]['key']
@@ -30,22 +33,22 @@ export type ColorToken = (typeof COLOR_TOKENS)[number]['key']
 /** Every family bundled with the site. Nothing here hits an external CDN. */
 export const FONT_OPTIONS = [
   {
-    label: 'Fraunces',
-    value: "'Fraunces Variable', Georgia, serif",
-    kind: 'serif',
-    note: 'The wordmark face. Characterful — best used large.',
+    label: 'Space Grotesk',
+    value: "'Space Grotesk Variable', system-ui, sans-serif",
+    kind: 'sans',
+    note: 'The wordmark face. Technical and precise — reads like badging.',
   },
   {
-    label: 'Source Serif 4',
-    value: "'Source Serif 4 Variable', Georgia, serif",
-    kind: 'serif',
-    note: 'The default heading face. Humanist, quiet, very readable.',
+    label: 'Sora',
+    value: "'Sora Variable', system-ui, sans-serif",
+    kind: 'sans',
+    note: 'The default heading face. Geometric, confident, modern.',
   },
   {
-    label: 'Lora',
-    value: "'Lora Variable', Georgia, serif",
-    kind: 'serif',
-    note: 'Warmer and slightly more literary than Source Serif.',
+    label: 'Outfit',
+    value: "'Outfit Variable', system-ui, sans-serif",
+    kind: 'sans',
+    note: 'Cleaner and rounder than Sora. Good for a softer look.',
   },
   {
     label: 'Inter',

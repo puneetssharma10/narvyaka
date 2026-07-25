@@ -13,10 +13,25 @@
  *  Nothing else in the codebase needs to change.
  */
 
+/**
+ * The three fields at the top are typed as plain `string` rather than inferred
+ * as literals, so the "is it set yet?" checks below stay meaningful whatever
+ * you put in them.
+ */
+interface EditableConfig {
+  domain: string
+  contactEmail: string
+  social: { github: string; instagram: string; youtube: string; linkedin: string; x: string }
+}
+
 export const siteConfig = {
   // ── ADD ON PURCHASE ───────────────────────────────────────────────────────
-  /** e.g. "narvyaka.org"  — leave "" until the domain is bought. */
-  domain: '',
+  /**
+   * Currently the free Cloudflare Pages subdomain. Replace this single line
+   * with your own domain the day you buy it — e.g. 'narvyaka.com' — and
+   * canonical URLs, og:url and the sitemap all follow automatically.
+   */
+  domain: 'narvyaka.pages.dev',
 
   /** e.g. "hello@narvyaka.org" — leave "" until the mailbox exists. */
   contactEmail: '',
@@ -58,16 +73,16 @@ export const siteConfig = {
     studio: '/api/studio',
     health: '/api/health',
   },
-} as const
+} as const satisfies { [K in keyof EditableConfig]: EditableConfig[K] } & Record<string, unknown>
 
 /** Canonical origin. Falls back to a relative-safe placeholder until the domain exists. */
 export const siteUrl = siteConfig.domain ? `https://${siteConfig.domain}` : 'http://localhost:4321'
 
 /** True once a real domain is configured — gates sitemap, canonical tags, og:url. */
-export const hasDomain = siteConfig.domain !== ''
+export const hasDomain: boolean = (siteConfig.domain as string) !== ''
 
 /** True once a real mailbox exists — gates every mailto: link in the UI. */
-export const hasEmail = siteConfig.contactEmail !== ''
+export const hasEmail: boolean = (siteConfig.contactEmail as string) !== ''
 
 /** Social links that actually have a URL, in display order. */
 export const activeSocials = Object.entries(siteConfig.social)

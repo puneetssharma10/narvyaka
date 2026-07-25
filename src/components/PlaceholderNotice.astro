@@ -16,12 +16,14 @@ const { label = 'Placeholder', class: className = '' } = Astro.props
 ---
 
 <aside
-  class={`rounded-[12px] border border-dashed border-caution/45 bg-caution/6 p-4 ${className}`}
+  class={`nv-note rounded-[6px] border border-dashed border-caution/55 bg-caution/8 p-4 ${className}`}
   role="note"
 >
-  <p class="m-0 flex flex-wrap items-baseline gap-x-2.5 gap-y-1 text-[0.875rem] leading-relaxed text-ink/85">
+  <!-- Colour comes from .nv-note__text, not a utility, so the .carbon variant
+       can override it without fighting utility-layer precedence. -->
+  <p class="nv-note__text m-0 flex flex-wrap items-baseline gap-x-2.5 gap-y-1 text-[0.875rem] leading-relaxed">
     <span
-      class="rounded-full bg-caution px-2 py-0.5 text-[0.7rem] font-semibold uppercase tracking-[0.06em] text-white"
+      class="rounded-[3px] bg-caution px-2 py-0.5 text-[0.68rem] font-bold uppercase tracking-[0.12em] text-carbon"
       >{label}</span
     >
     <span><slot /></span>

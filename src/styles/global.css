@@ -2,18 +2,18 @@
 
 /* Self-hosted fonts — no external requests, no Google Fonts CDN, no CSP issues.
    Every family here is selectable from the Studio's font picker. */
-/* Fraunces: `full-italic` carries the SOFT + WONK axes the wordmark uses. */
-@import '@fontsource-variable/fraunces/full-italic.css';
-@import '@fontsource-variable/fraunces/wght.css';
-@import '@fontsource-variable/source-serif-4/wght.css';
-@import '@fontsource-variable/source-serif-4/wght-italic.css';
-@import '@fontsource-variable/lora/wght.css';
-@import '@fontsource-variable/lora/wght-italic.css';
+@import '@fontsource-variable/space-grotesk/wght.css';
+@import '@fontsource-variable/sora/wght.css';
+@import '@fontsource-variable/outfit/wght.css';
 @import '@fontsource-variable/inter/wght.css';
 @import '@fontsource-variable/public-sans/wght.css';
 
 /* ───────────────────────────────────────────────────────────────────────────
-   DESIGN TOKENS  (Build Brief §2)
+   DESIGN TOKENS
+
+   Direction: precision-engineered, not warm-archival. The reference is the
+   finish of a high-end car — a near-black carbon, a bright cool white, and
+   two saturated signal colours used sparingly and with confidence.
 
    These are emitted as real CSS custom properties on :root, and every Tailwind
    utility below references them via var(). That is what makes the Studio's
@@ -24,30 +24,41 @@
    values into the utilities and break runtime theming.
    ─────────────────────────────────────────────────────────────────────────── */
 @theme {
-  /* Colour */
-  --color-bg: #faf8f5; /* warm off-white, not clinical white */
+  /* Surfaces — cool platinum, never cream */
+  --color-bg: #f6f7f9;
   --color-surface: #ffffff;
-  --color-ink: #232220; /* soft black, never pure #000 */
-  --color-muted: #6b675f;
-  --color-hairline: #e7e2da;
-  --color-accent: #8a5a3b; /* warm terracotta-brown */
-  --color-accent-hover: #6e4830;
-  --color-accent-soft: #f3e8de;
-  --color-verified: #4c6b54; /* muted sage */
-  --color-caution: #a6702f;
+  --color-carbon: #0b0e14; /* dark sections: hero, footer, callouts */
+
+  /* Text */
+  --color-ink: #0b0e14;
+  --color-muted: #5a6270;
+  --color-hairline: #e3e6ec;
+
+  /* Primary — electric cobalt. Buttons, links, the brand colour. */
+  --color-accent: #1b34e8;
+  --color-accent-hover: #0f21b0;
+  --color-accent-soft: #e9ecff;
+
+  /* Signal — Rosso. Emphasis only: never a whole surface. */
+  --color-signal: #e4002b;
+  --color-signal-soft: #ffe8ec;
+
+  /* Status */
+  --color-verified: #00a355; /* Verde */
+  --color-caution: #f5b301; /* Giallo */
 
   /* Type */
-  --font-wordmark: 'Fraunces Variable', 'Source Serif 4 Variable', Georgia, serif;
-  --font-heading: 'Source Serif 4 Variable', 'Lora Variable', Georgia, serif;
+  --font-wordmark: 'Space Grotesk Variable', 'Sora Variable', system-ui, sans-serif;
+  --font-heading: 'Sora Variable', 'Space Grotesk Variable', system-ui, sans-serif;
   --font-body: 'Inter Variable', 'Public Sans Variable', system-ui, sans-serif;
 
-  /* Radius — soft, not sharp, not pill */
-  --radius-card: 12px;
-  --radius-control: 8px;
+  /* Radius — tight. Precision, not softness. */
+  --radius-card: 6px;
+  --radius-control: 4px;
 
   /* Reading measure */
   --spacing-read: 720px;
-  --spacing-wide: 1200px;
+  --spacing-wide: 1240px;
 
   /* Motion — still, not bouncy */
   --ease-calm: cubic-bezier(0.22, 0.61, 0.36, 1);
@@ -84,26 +95,28 @@
   h3,
   h4 {
     font-family: var(--font-heading);
-    font-weight: 500;
+    font-weight: 600;
     color: var(--color-ink);
     text-wrap: balance;
+    letter-spacing: -0.025em;
   }
 
   h1 {
-    font-size: clamp(2.5rem, 5.5vw, 3.5rem);
-    line-height: 1.15;
-    letter-spacing: -0.015em;
+    font-size: clamp(2.6rem, 6vw, 4.25rem);
+    line-height: 1.02;
+    letter-spacing: -0.04em;
   }
 
   h2 {
-    font-size: clamp(1.75rem, 3.5vw, 2.25rem);
-    line-height: 1.22;
-    letter-spacing: -0.01em;
+    font-size: clamp(1.9rem, 4vw, 2.6rem);
+    line-height: 1.1;
+    letter-spacing: -0.032em;
   }
 
   h3 {
-    font-size: clamp(1.25rem, 2vw, 1.4rem);
+    font-size: clamp(1.15rem, 2vw, 1.3rem);
     line-height: 1.3;
+    letter-spacing: -0.018em;
   }
 
   p {
@@ -111,17 +124,16 @@
   }
 
   ::selection {
-    background: var(--color-accent-soft);
-    color: var(--color-ink);
+    background: var(--color-accent);
+    color: #fff;
   }
 
   :focus-visible {
     outline: 2px solid var(--color-accent);
     outline-offset: 3px;
-    border-radius: 4px;
+    border-radius: 2px;
   }
 
-  /* Inputs inherit the body face rather than the browser default */
   input,
   textarea,
   select,
@@ -155,7 +167,6 @@
     padding-inline: 1.5rem;
   }
 
-  /* Section rhythm: 56px mobile / 96px desktop minimum (Build Brief §2.3) */
   .section {
     padding-block: 56px;
   }
@@ -182,25 +193,82 @@
     border-radius: var(--radius-card);
   }
 
+  /* ── Dark carbon sections ────────────────────────────────────────────── */
+  .carbon {
+    background: var(--color-carbon);
+    color: #fff;
+  }
+
+  .carbon h1,
+  .carbon h2,
+  .carbon h3,
+  .carbon h4 {
+    color: #fff;
+  }
+
+  .carbon .card {
+    background: color-mix(in srgb, #fff 5%, transparent);
+    border-color: color-mix(in srgb, #fff 12%, transparent);
+    color: #fff;
+  }
+
+  .carbon .text-muted,
+  .carbon .hint {
+    color: #98a0b0 !important;
+  }
+
+  .carbon .hairline {
+    border-color: color-mix(in srgb, #fff 12%, transparent);
+  }
+
+  .carbon .btn-secondary {
+    color: #fff;
+    border-color: color-mix(in srgb, #fff 26%, transparent);
+  }
+
+  .carbon .btn-secondary:hover:not(:disabled) {
+    border-color: #fff;
+    color: #fff;
+    background: color-mix(in srgb, #fff 8%, transparent);
+  }
+
+  .nv-note__text {
+    color: color-mix(in srgb, var(--color-ink) 88%, transparent);
+  }
+
+  /* A placeholder notice on carbon: the default is near-black text on a pale
+     Giallo wash, which is invisible against a dark surface. */
+  .carbon .nv-note {
+    background: color-mix(in srgb, var(--color-caution) 16%, transparent);
+    border-color: color-mix(in srgb, var(--color-caution) 55%, transparent);
+  }
+
+  .carbon .nv-note__text {
+    color: rgba(255, 255, 255, 0.82);
+  }
+
+  /* ── Buttons ─────────────────────────────────────────────────────────── */
   .btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
+    gap: 0.55rem;
     border-radius: var(--radius-control);
-    padding: 0.75rem 1.5rem;
-    font-size: 0.975rem;
-    font-weight: 500;
+    padding: 0.8rem 1.6rem;
+    font-size: 0.9rem;
+    font-weight: 600;
     line-height: 1.2;
+    letter-spacing: 0.01em;
     cursor: pointer;
     transition:
-      background-color 200ms var(--ease-calm),
-      border-color 200ms var(--ease-calm),
-      color 200ms var(--ease-calm);
+      background-color 180ms var(--ease-calm),
+      border-color 180ms var(--ease-calm),
+      color 180ms var(--ease-calm),
+      transform 180ms var(--ease-calm);
   }
 
   .btn:disabled {
-    opacity: 0.5;
+    opacity: 0.45;
     cursor: not-allowed;
   }
 
@@ -237,31 +305,34 @@
     color: var(--color-ink);
   }
 
+  /* ── Fields ──────────────────────────────────────────────────────────── */
   .field {
     width: 100%;
     background: var(--color-surface);
     border: 1px solid var(--color-hairline);
     border-radius: var(--radius-control);
-    padding: 0.7rem 0.85rem;
+    padding: 0.72rem 0.9rem;
     font-size: 1rem;
     line-height: 1.5;
-    transition: border-color 200ms var(--ease-calm);
+    transition:
+      border-color 180ms var(--ease-calm),
+      box-shadow 180ms var(--ease-calm);
   }
 
   .field:focus {
     outline: none;
     border-color: var(--color-accent);
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 14%, transparent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 16%, transparent);
   }
 
   .field::placeholder {
-    color: color-mix(in srgb, var(--color-muted) 65%, transparent);
+    color: color-mix(in srgb, var(--color-muted) 60%, transparent);
   }
 
   .label {
     display: block;
-    font-size: 0.9rem;
-    font-weight: 500;
+    font-size: 0.88rem;
+    font-weight: 600;
     color: var(--color-ink);
     margin-bottom: 0.4rem;
   }
@@ -272,19 +343,31 @@
     color: var(--color-muted);
   }
 
+  /* ── Micro-labels: uppercase, wide-tracked, technical ────────────────── */
+  .eyebrow {
+    font-family: var(--font-body);
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--color-accent);
+  }
+
   .tag {
     display: inline-flex;
     align-items: center;
     gap: 0.35rem;
     background: var(--color-accent-soft);
     color: var(--color-accent-hover);
-    border-radius: 999px;
-    padding: 0.2rem 0.7rem;
-    font-size: 0.78rem;
-    font-weight: 500;
-    letter-spacing: 0.01em;
+    border-radius: 3px;
+    padding: 0.24rem 0.6rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
   }
 
+  /* ── Prose ───────────────────────────────────────────────────────────── */
   .prose-narvyaka {
     font-size: 1.0625rem;
     line-height: 1.75;
@@ -341,10 +424,29 @@
     border: 0;
     border-top: 1px solid var(--color-hairline);
   }
+
+  /* ── Signature light bar — the one decorative flourish ─────────────────
+     A thin accent rule under section headings, echoing the light signature
+     on a modern car. Used sparingly; it is the only ornament in the system. */
+  .light-bar {
+    display: block;
+    width: 44px;
+    height: 3px;
+    border-radius: 2px;
+    background: linear-gradient(90deg, var(--color-accent) 0%, var(--color-signal) 100%);
+  }
+
+  /* Technical grid, used behind the dark hero only. */
+  .grid-field {
+    background-image:
+      linear-gradient(color-mix(in srgb, #fff 5%, transparent) 1px, transparent 1px),
+      linear-gradient(90deg, color-mix(in srgb, #fff 5%, transparent) 1px, transparent 1px);
+    background-size: 64px 64px;
+  }
 }
 
 /* ───────────────────────────────────────────────────────────────────────────
-   MOTION — fade-in on scroll only. 200–300ms, ease-out, no parallax.
+   MOTION — fade-in on scroll only. ~280ms, ease-out, no parallax.
    ─────────────────────────────────────────────────────────────────────────── */
 @layer utilities {
   /*
@@ -374,15 +476,15 @@
     }
   }
 
-  /* The wordmark: Fraunces, italic, with a touch of the family's optical wonk. */
+  /* The wordmark: set like automotive badging — uppercase, widely tracked. */
   .wordmark {
     font-family: var(--font-wordmark);
-    font-style: italic;
-    font-weight: 500;
-    font-variation-settings:
-      'SOFT' 20,
-      'WONK' 1;
-    letter-spacing: 0.005em;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    /* The tracking adds space after the final letter; pull it back so the
+       mark stays optically centred against anything beside it. */
+    margin-inline-end: -0.2em;
   }
 
   .visually-hidden {
@@ -396,6 +498,10 @@
     white-space: nowrap;
     border: 0;
   }
+
+  .tnum {
+    font-variant-numeric: tabular-nums;
+  }
 }
 
 /* ───────────────────────────────────────────────────────────────────────────
@@ -404,21 +510,21 @@
 [data-studio-active] [data-edit]:not([contenteditable]) {
   outline: 1px dashed color-mix(in srgb, var(--color-accent) 45%, transparent);
   outline-offset: 3px;
-  border-radius: 3px;
+  border-radius: 2px;
   cursor: text;
   transition: outline-color 150ms var(--ease-calm);
 }
 
 [data-studio-active] [data-edit]:hover:not([contenteditable]) {
   outline-color: var(--color-accent);
-  background: color-mix(in srgb, var(--color-accent) 6%, transparent);
+  background: color-mix(in srgb, var(--color-accent) 8%, transparent);
 }
 
 [data-studio-active] [data-edit][contenteditable='true'] {
   outline: 2px solid var(--color-accent);
   outline-offset: 3px;
-  border-radius: 3px;
-  background: color-mix(in srgb, var(--color-accent) 4%, transparent);
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--color-accent) 5%, transparent);
 }
 
 [data-studio-active] [data-edit-image] {
@@ -431,7 +537,7 @@
   inset-inline-start: 50%;
   inset-block-start: 50%;
   transform: translate(-50%, -50%);
-  background: var(--color-ink);
+  background: var(--color-carbon);
   color: #fff;
   font-family: var(--font-body);
   font-size: 0.8rem;
@@ -453,7 +559,6 @@
   cursor: pointer;
 }
 
-/* Drop target highlight while a file is dragged anywhere over the page */
 [data-studio-dropping] [data-edit-image],
 [data-studio-dropping] [data-logo-slot] {
   outline: 2px dashed var(--color-accent);

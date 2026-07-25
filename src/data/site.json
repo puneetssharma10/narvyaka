@@ -1,23 +1,25 @@
 {
   "version": 1,
   "_readme": "SINGLE SOURCE OF TRUTH for every editable string, colour, font and image on the site. The Studio (/studio) edits an in-browser copy of this file; `npm run studio:apply <export.json>` writes the changes back here, which is how a GUI edit becomes a code change. Dotted paths below match the data-edit attributes in the .astro files.",
-
   "theme": {
     "colors": {
-      "bg": "#FAF8F5",
+      "bg": "#F6F7F9",
       "surface": "#FFFFFF",
-      "ink": "#232220",
-      "muted": "#6B675F",
-      "hairline": "#E7E2DA",
-      "accent": "#8A5A3B",
-      "accent-hover": "#6E4830",
-      "accent-soft": "#F3E8DE",
-      "verified": "#4C6B54",
-      "caution": "#A6702F"
+      "carbon": "#0B0E14",
+      "ink": "#0B0E14",
+      "muted": "#5A6270",
+      "hairline": "#E3E6EC",
+      "accent": "#1B34E8",
+      "accent-hover": "#0F21B0",
+      "accent-soft": "#E9ECFF",
+      "signal": "#E4002B",
+      "signal-soft": "#FFE8EC",
+      "verified": "#00A355",
+      "caution": "#F5B301"
     },
     "fonts": {
-      "wordmark": "'Fraunces Variable', 'Source Serif 4 Variable', Georgia, serif",
-      "heading": "'Source Serif 4 Variable', 'Lora Variable', Georgia, serif",
+      "wordmark": "'Space Grotesk Variable', 'Sora Variable', system-ui, sans-serif",
+      "heading": "'Sora Variable', 'Space Grotesk Variable', system-ui, sans-serif",
       "body": "'Inter Variable', 'Public Sans Variable', system-ui, sans-serif"
     },
     "logo": {
@@ -26,17 +28,30 @@
       "height": 30
     }
   },
-
   "nav": {
     "items": [
-      { "label": "How it works", "href": "/how-it-works" },
-      { "label": "Browse", "href": "/browse" },
-      { "label": "About", "href": "/about" },
-      { "label": "Volunteer", "href": "/volunteer" }
+      {
+        "label": "How it works",
+        "href": "/how-it-works"
+      },
+      {
+        "label": "Browse",
+        "href": "/browse"
+      },
+      {
+        "label": "About",
+        "href": "/about"
+      },
+      {
+        "label": "Volunteer",
+        "href": "/volunteer"
+      }
     ],
-    "cta": { "label": "Preserve your experience", "href": "/preserve" }
+    "cta": {
+      "label": "Preserve your experience",
+      "href": "/preserve"
+    }
   },
-
   "footer": {
     "philosophy": "Preserve. Connect. Continue.",
     "blurb": "Narvyaka preserves first-hand human experience in the person's own voice, so the next generation does not have to start from nothing.",
@@ -44,39 +59,71 @@
       {
         "title": "Contribute",
         "links": [
-          { "label": "Preserve your experience", "href": "/preserve" },
-          { "label": "Record someone you know", "href": "/record-someone" },
-          { "label": "Become a founding volunteer", "href": "/volunteer" }
+          {
+            "label": "Preserve your experience",
+            "href": "/preserve"
+          },
+          {
+            "label": "Record someone you know",
+            "href": "/record-someone"
+          },
+          {
+            "label": "Become a founding volunteer",
+            "href": "/volunteer"
+          }
         ]
       },
       {
         "title": "Understand",
         "links": [
-          { "label": "How it works", "href": "/how-it-works" },
-          { "label": "Browse the archive", "href": "/browse" },
-          { "label": "About Narvyaka", "href": "/about" },
-          { "label": "Letter from the founder", "href": "/founder" }
+          {
+            "label": "How it works",
+            "href": "/how-it-works"
+          },
+          {
+            "label": "Browse the archive",
+            "href": "/browse"
+          },
+          {
+            "label": "About Narvyaka",
+            "href": "/about"
+          },
+          {
+            "label": "Letter from the founder",
+            "href": "/founder"
+          }
         ]
       },
       {
         "title": "Policy",
         "links": [
-          { "label": "Privacy", "href": "/privacy" },
-          { "label": "Terms of use", "href": "/terms" }
+          {
+            "label": "Privacy",
+            "href": "/privacy"
+          },
+          {
+            "label": "Terms of use",
+            "href": "/terms"
+          }
         ]
       }
     ],
     "emailLabel": "Write to us"
   },
-
   "home": {
     "hero": {
       "wordmark": "Narvyaka",
       "tagline": "Because No Generation Should Start From Zero.",
       "subhead": "What knowledge should outlive you?",
       "intro": "A lifetime of learning should not disappear in a moment. Narvyaka records what a person actually learned — in their own voice, in their own words — and keeps it where the next person can find it.",
-      "primaryCta": { "label": "Preserve your experience", "href": "/preserve" },
-      "secondaryCta": { "label": "See how it works", "href": "/how-it-works" }
+      "primaryCta": {
+        "label": "Preserve your experience",
+        "href": "/preserve"
+      },
+      "secondaryCta": {
+        "label": "See how it works",
+        "href": "/how-it-works"
+      }
     },
     "exampleCapsule": {
       "badge": "Example",
@@ -98,6 +145,31 @@
         "So the next person starts again. Same mistake, same cost, same thirty years. Not because the answer did not exist — because it was never written down in a place they could reach."
       ]
     },
+    "status": {
+      "eyebrow": "Phase one",
+      "heading": "Ten records. Two volunteers. That is the whole of the first phase.",
+      "body": "Narvyaka is not trying to be large. It is trying to be right. The first phase is deliberately small enough that every record can be made carefully and read by a person — and small enough to abandon if the method turns out to be wrong.",
+      "metrics": [
+        {
+          "value": "0",
+          "target": "10",
+          "label": "Records preserved",
+          "note": "Interviews completed and reviewed"
+        },
+        {
+          "value": "0",
+          "target": "2",
+          "label": "Founding volunteers",
+          "note": "Two people, chosen carefully"
+        },
+        {
+          "value": "0",
+          "target": "—",
+          "label": "Records published",
+          "note": "Nothing goes live without review"
+        }
+      ]
+    },
     "ctas": {
       "heading": "Three ways to begin",
       "items": [
@@ -115,9 +187,9 @@
         },
         {
           "title": "Become a founding volunteer",
-          "body": "Interviewers, writers, translators, researchers, photographers, technologists. The archive is built by people, not software.",
+          "body": "Two openings for the first ten records: one interviewer, one writer and archivist. The archive is built by people, not software.",
           "href": "/volunteer",
-          "action": "See the roles"
+          "action": "See both openings"
         }
       ]
     },
@@ -125,22 +197,43 @@
       "heading": "One record, four parts",
       "intro": "Every Wisdom Record is made of the same four things. Nothing is interpreted, summarised or rewritten by a machine.",
       "items": [
-        { "icon": "voice", "title": "Voice", "body": "The person's own recording. This is the record. Everything else supports it." },
-        { "icon": "note", "title": "Written note", "body": "A readable version of what was said, so it can be searched, translated and read." },
-        { "icon": "photo", "title": "Photographs", "body": "A face, a place, a tool, a handwritten page. Optional, and always the contributor's choice." },
-        { "icon": "identity", "title": "Identity", "body": "Who said it, where, and in what context — or 'Anonymous Contributor', if that is what they choose." }
+        {
+          "icon": "voice",
+          "title": "Voice",
+          "body": "The person's own recording. This is the record. Everything else supports it."
+        },
+        {
+          "icon": "note",
+          "title": "Written note",
+          "body": "A readable version of what was said, so it can be searched, translated and read."
+        },
+        {
+          "icon": "photo",
+          "title": "Photographs",
+          "body": "A face, a place, a tool, a handwritten page. Optional, and always the contributor's choice."
+        },
+        {
+          "icon": "identity",
+          "title": "Identity",
+          "body": "Who said it, where, and in what context — or 'Anonymous Contributor', if that is what they choose."
+        }
       ],
-      "link": { "label": "How a Wisdom Record is made", "href": "/how-it-works" }
+      "link": {
+        "label": "How a Wisdom Record is made",
+        "href": "/how-it-works"
+      }
     },
     "founderLine": {
       "quote": "My great-grandfather and grandfather passed away before I was old enough to ask the right questions.",
       "attribution": "From the letter from the founder",
-      "link": { "label": "Read the letter", "href": "/founder" },
+      "link": {
+        "label": "Read the letter",
+        "href": "/founder"
+      },
       "photo": "",
       "photoAlt": "Portrait of the founder"
     }
   },
-
   "preserve": {
     "eyebrow": "Preserve your experience",
     "heading": "A Lifetime of Learning Should Not Disappear in a Moment.",
@@ -148,11 +241,26 @@
     "testHeading": "What belongs here",
     "testIntro": "There is no bar to clear and no form to pass. These five questions are simply how we think about it — if a record does any one of them, it belongs in the archive.",
     "test": [
-      { "title": "Does it save someone time?", "body": "Something that took you years to work out, that another person could have in an hour." },
-      { "title": "Does it help avoid a mistake?", "body": "A wrong turn you took, described clearly enough that someone else can see it coming." },
-      { "title": "Does it reduce suffering?", "body": "Knowledge that would have made a hard thing less hard, had someone known it in time." },
-      { "title": "Does it preserve something that might disappear?", "body": "A craft, a method, a language of work, a way of doing something that fewer people now know." },
-      { "title": "Does it inspire someone to live or work better?", "body": "Not motivation. Evidence — that a life or a way of working was possible." }
+      {
+        "title": "Does it save someone time?",
+        "body": "Something that took you years to work out, that another person could have in an hour."
+      },
+      {
+        "title": "Does it help avoid a mistake?",
+        "body": "A wrong turn you took, described clearly enough that someone else can see it coming."
+      },
+      {
+        "title": "Does it reduce suffering?",
+        "body": "Knowledge that would have made a hard thing less hard, had someone known it in time."
+      },
+      {
+        "title": "Does it preserve something that might disappear?",
+        "body": "A craft, a method, a language of work, a way of doing something that fewer people now know."
+      },
+      {
+        "title": "Does it inspire someone to live or work better?",
+        "body": "Not motivation. Evidence — that a life or a way of working was possible."
+      }
     ],
     "timeNote": "Most records take twenty to forty minutes. Your answers save in this browser as you go, so a lost connection does not cost you your work.",
     "submitHeading": "Your record",
@@ -162,7 +270,6 @@
       "reference": "Your reference"
     }
   },
-
   "recordSomeone": {
     "eyebrow": "Record someone you know",
     "heading": "Begin With Someone You Know.",
@@ -178,46 +285,113 @@
     ],
     "howHeading": "How to do it well",
     "how": [
-      { "title": "Ask first, record second.", "body": "Consent comes before the recorder is switched on, and it is theirs to withdraw at any time." },
-      { "title": "Let them finish.", "body": "The most useful part of an answer usually comes after the pause you were about to fill." },
-      { "title": "Ask for the specific.", "body": "Not \"what did you learn\" but \"what happened, and what did you do\". Detail is what makes a record usable." },
-      { "title": "Do not correct them.", "body": "Their account is the record. Where something is uncertain, it is marked as their account — not removed." }
+      {
+        "title": "Ask first, record second.",
+        "body": "Consent comes before the recorder is switched on, and it is theirs to withdraw at any time."
+      },
+      {
+        "title": "Let them finish.",
+        "body": "The most useful part of an answer usually comes after the pause you were about to fill."
+      },
+      {
+        "title": "Ask for the specific.",
+        "body": "Not \"what did you learn\" but \"what happened, and what did you do\". Detail is what makes a record usable."
+      },
+      {
+        "title": "Do not correct them.",
+        "body": "Their account is the record. Where something is uncertain, it is marked as their account — not removed."
+      }
     ],
     "consentHeading": "Consent, before anything else",
     "consentBody": "You are filling this in on someone else's behalf, so we need to know they agreed to it. Their record stays theirs: they can review it, change it, restrict it or withdraw it at any time.",
     "formHeading": "Their record, in your hands"
   },
-
   "volunteer": {
     "eyebrow": "Founding volunteers",
     "heading": "Become a Founding Volunteer.",
-    "intro": "Narvyaka is built by people. At this stage there is no staff, no funding round and no product team — there is a method, and there are people willing to sit with someone and ask good questions carefully. If that is you, this is the useful thing you can do.",
-    "rolesHeading": "The roles",
+    "intro": "Narvyaka is built by people. At this stage there is no staff, no funding round and no product team — there is a method, and there are people willing to sit with someone and ask good questions carefully. Right now we are looking for exactly two.",
+    "rolesHeading": "Two openings",
     "roles": [
-      { "title": "Interviewer", "body": "Sits with a contributor, asks the questions in Part V, and does not rush them." },
-      { "title": "Writer", "body": "Turns a recording into a readable Wisdom Note without changing what was meant." },
-      { "title": "Translator", "body": "Carries a record into another language, and marks what does not translate cleanly." },
-      { "title": "Researcher", "body": "Checks what can be checked, and is honest about what cannot." },
-      { "title": "Photographer", "body": "Makes one good photograph of a person, a place, or the thing they made." },
-      { "title": "Technologist", "body": "Keeps the archive readable in fifty years, which is mostly a question of formats and discipline." },
-      { "title": "Archivist", "body": "Classifies, files and keeps the record consistent as the collection grows." },
-      { "title": "Community organiser", "body": "Finds the people whose knowledge would otherwise never reach us." }
+      {
+        "title": "Interviewer",
+        "body": "Sits with a contributor, asks the questions in Part V, and does not rush them."
+      },
+      {
+        "title": "Writer",
+        "body": "Turns a recording into a readable Wisdom Note without changing what was meant."
+      },
+      {
+        "title": "Translator",
+        "body": "Carries a record into another language, and marks what does not translate cleanly."
+      },
+      {
+        "title": "Researcher",
+        "body": "Checks what can be checked, and is honest about what cannot."
+      },
+      {
+        "title": "Photographer",
+        "body": "Makes one good photograph of a person, a place, or the thing they made."
+      },
+      {
+        "title": "Technologist",
+        "body": "Keeps the archive readable in fifty years, which is mostly a question of formats and discipline."
+      },
+      {
+        "title": "Archivist",
+        "body": "Classifies, files and keeps the record consistent as the collection grows."
+      },
+      {
+        "title": "Community organiser",
+        "body": "Finds the people whose knowledge would otherwise never reach us."
+      }
     ],
     "expectationsHeading": "What we ask",
     "expectations": [
       "One record done carefully is worth more than ten done quickly.",
       "Consent is not a checkbox. If someone hesitates, you stop.",
       "You will encounter things you are not sure how to handle. Say so rather than deciding alone.",
-      "Nothing you collect is yours to publish. Every record goes through review."
+      "Nothing you collect is yours to publish. Every record goes through review.",
+      "If the method turns out to be wrong after ten records, we change it. That is what the first phase is for."
     ],
     "formHeading": "Apply",
-    "formIntro": "Founding volunteers are reviewed personally. There is no automated stage and no scoring.",
+    "formIntro": "Two places. Applications are read personally — there is no automated stage and no scoring — and everyone who applies gets a reply.",
     "afterSubmit": {
       "heading": "Thank you — your application is in.",
-      "body": "A person will read this, not a filter. Because this is the founding stage, replies take time, and everyone who applies gets one."
-    }
+      "body": "A person will read this, not a filter. There are two places, so replies take time, and everyone who applies gets one either way."
+    },
+    "rolesIntro": "Two people, for the first ten records. Not a shortlist to be whittled down — two roles that need filling, and then we stop recruiting and start recording.",
+    "openings": [
+      {
+        "count": "01",
+        "title": "Interviewer",
+        "body": "Sits with a contributor, works through the eight questions in the protocol, and does not rush them. The single most important role in the project: everything downstream is only as good as the conversation.",
+        "asks": [
+          "Roughly two hours per record, including the arranging and the follow-up.",
+          "Comfortable with long silences and with people who wander off the question.",
+          "Willing to stop the moment someone hesitates about consent."
+        ]
+      },
+      {
+        "count": "02",
+        "title": "Writer & archivist",
+        "body": "Turns each recording into a readable Wisdom Note without changing what was meant, then files it so it can still be found in fifty years. Transcription and translation only — never interpretation.",
+        "asks": [
+          "Roughly two hours per record.",
+          "Fastidious about not improving on what someone actually said.",
+          "Happy to be pedantic about file names, formats and dates."
+        ]
+      }
+    ],
+    "laterHeading": "Later, not now",
+    "laterIntro": "These roles matter, and none of them are needed to make ten records. We would rather leave them empty than recruit people we cannot yet give real work to.",
+    "laterRoles": [
+      "Translator",
+      "Researcher",
+      "Photographer",
+      "Technologist",
+      "Community organiser"
+    ]
   },
-
   "about": {
     "eyebrow": "About",
     "heading": "A human being's knowledge, made known.",
@@ -237,14 +411,22 @@
       "heading": "Three who carried what they were told.",
       "intro": "The name has a second reading. It is not necessary in order to use Narvyaka, and it is placed here rather than at the front for exactly that reason.",
       "figures": [
-        { "name": "Narada", "body": "The one who moved between worlds carrying what he had heard, and whose function was transmission itself — the messenger who kept knowledge in motion between those who held it and those who needed it." },
-        { "name": "Vyasa", "body": "The compiler. The one who took what was scattered and oral and at risk of dispersal, and arranged it so that it could survive being handed on." },
-        { "name": "Kakabhushundi", "body": "The one who lived across ages and remembered — the witness whose value was not what he did, but what he retained and could still recount long after everyone else had gone." }
+        {
+          "name": "Narada",
+          "body": "The one who moved between worlds carrying what he had heard, and whose function was transmission itself — the messenger who kept knowledge in motion between those who held it and those who needed it."
+        },
+        {
+          "name": "Vyasa",
+          "body": "The compiler. The one who took what was scattered and oral and at risk of dispersal, and arranged it so that it could survive being handed on."
+        },
+        {
+          "name": "Kakabhushundi",
+          "body": "The one who lived across ages and remembered — the witness whose value was not what he did, but what he retained and could still recount long after everyone else had gone."
+        }
       ],
       "closing": "Transmission, compilation, memory. Preserve. Connect. Continue."
     }
   },
-
   "howItWorks": {
     "eyebrow": "How it works",
     "heading": "What a Wisdom Record is.",
@@ -281,36 +463,55 @@
     "storageHeading": "Kept three ways",
     "storageIntro": "Every record is stored in three forms at once, because the thing that destroys archives is not fire — it is formats nobody can open any more.",
     "storage": [
-      { "title": "The original evidence", "body": "The untouched audio file and the original photographs, exactly as they came from the contributor. Nothing is ever edited in place. If we are wrong about everything else, this survives." },
-      { "title": "The human-readable form", "body": "Plain text and standard images that a person can open in fifty years with no special software — the version that survives us, our website, and whatever technology replaces it." },
-      { "title": "The machine-readable form", "body": "Structured data, so a record can be found by someone who does not yet know it exists. This is what makes an archive usable rather than merely full." }
+      {
+        "title": "The original evidence",
+        "body": "The untouched audio file and the original photographs, exactly as they came from the contributor. Nothing is ever edited in place. If we are wrong about everything else, this survives."
+      },
+      {
+        "title": "The human-readable form",
+        "body": "Plain text and standard images that a person can open in fifty years with no special software — the version that survives us, our website, and whatever technology replaces it."
+      },
+      {
+        "title": "The machine-readable form",
+        "body": "Structured data, so a record can be found by someone who does not yet know it exists. This is what makes an archive usable rather than merely full."
+      }
     ],
     "reviewHeading": "Nothing publishes itself",
     "reviewBody": "Every submission arrives with the status 'pending review'. A person reads it, checks it with the contributor where anything is unclear, and only then is it published — at whatever access level the contributor chose. There is no automatic pipeline from a form to a public page, and there will not be one.",
     "verificationHeading": "How certainty is marked",
     "verificationIntro": "Records are not silently presented as fact. Each carries one of exactly three labels, and no record is left unmarked.",
     "verification": [
-      { "status": "Documented", "body": "Supported by records, artefacts or independent sources that can be pointed to." },
-      { "status": "Contributor's Account", "body": "First-hand testimony from the person who was there. Not independently confirmed, and not treated as lesser for it." },
-      { "status": "Family Tradition", "body": "Knowledge passed down and reported as it was received, with the chain of telling shown rather than hidden." }
+      {
+        "status": "Documented",
+        "body": "Supported by records, artefacts or independent sources that can be pointed to."
+      },
+      {
+        "status": "Contributor's Account",
+        "body": "First-hand testimony from the person who was there. Not independently confirmed, and not treated as lesser for it."
+      },
+      {
+        "status": "Family Tradition",
+        "body": "Knowledge passed down and reported as it was received, with the chain of telling shown rather than hidden."
+      }
     ],
     "sampleHeading": "A sample capsule",
     "sampleIntro": "This is the shape of a finished record. Until a real one exists, this is an illustration."
   },
-
   "browse": {
     "eyebrow": "The archive",
     "heading": "What has been preserved so far.",
     "emptyHeading": "This archive is just beginning.",
     "emptyBody": "There is nothing published here yet — not because it is broken, but because it is new. The first records are being made now. Every one that appears here will have been given deliberately by a person, and read by a person before it went up.",
-    "emptyCta": { "label": "Make the first record", "href": "/preserve" },
+    "emptyCta": {
+      "label": "Make the first record",
+      "href": "/preserve"
+    },
     "sparseNote": "Here is what's here so far.",
     "filterLabel": "Filter by category",
     "allLabel": "Everything",
     "countLabelOne": "record",
     "countLabelMany": "records"
   },
-
   "capsule": {
     "backLab": "All records",
     "lessonHeading": "What should be remembered",
@@ -322,7 +523,6 @@
     "listenLabel": "Listen",
     "audioMissingLabel": "No recording available for this record."
   },
-
   "founder": {
     "eyebrow": "Letter from the founder",
     "heading": "Why this exists.",
@@ -339,7 +539,6 @@
     "photo": "",
     "photoAlt": "Portrait of the founder"
   },
-
   "privacy": {
     "eyebrow": "Privacy",
     "heading": "Privacy Policy",
@@ -347,16 +546,36 @@
     "placeholderNotice": "Placeholder — pending legal review (Master Reference Part XV). The commitments below describe how the system is actually built today, and are what the reviewed policy must not contradict.",
     "lastUpdated": "",
     "sections": [
-      { "title": "What we collect", "body": "Only what you type into a form or record into a microphone, plus the technical minimum needed to serve the page. There is no analytics script, no advertising pixel, no third-party tracker and no cookie used to follow you between sites." },
-      { "title": "What we do with a recording", "body": "We transcribe it and, where relevant, translate it. That is the whole list. Recordings are not used to train AI models, and will not be, unless a contributor gives separate, explicit, specific consent for that purpose — which we do not currently ask for." },
-      { "title": "Who can see your record", "body": "Whoever you chose, at the access level you set when you submitted it. The default is that nothing is public. A record can be public, public but anonymous, family-only, restricted to research use, private, preserved but unpublished, published after a date you name, or released only after your death." },
-      { "title": "Changing your mind", "body": "You can review, correct, restrict or withdraw your record at any time, before or after publication. Withdrawal means removal from the public archive; tell us if you also want the underlying files destroyed, and they will be." },
-      { "title": "Where it is stored", "body": "On infrastructure operated by Cloudflare. Recordings and images are held in object storage, the structured record in a database, both under our account and neither shared with, sold to, or licensed to anyone." },
-      { "title": "Children and minors", "body": "This is not a service for children. Contributions are intended for people aged 30 or over; a younger contributor may apply, but their submission is reviewed by a person before anything is accepted." },
-      { "title": "How to reach us", "body": "Until a permanent address is published, use the contact route given on the volunteer page. A named contact will be added here before any record is made public." }
+      {
+        "title": "What we collect",
+        "body": "Only what you type into a form or record into a microphone, plus the technical minimum needed to serve the page. There is no analytics script, no advertising pixel, no third-party tracker and no cookie used to follow you between sites."
+      },
+      {
+        "title": "What we do with a recording",
+        "body": "We transcribe it and, where relevant, translate it. That is the whole list. Recordings are not used to train AI models, and will not be, unless a contributor gives separate, explicit, specific consent for that purpose — which we do not currently ask for."
+      },
+      {
+        "title": "Who can see your record",
+        "body": "Whoever you chose, at the access level you set when you submitted it. The default is that nothing is public. A record can be public, public but anonymous, family-only, restricted to research use, private, preserved but unpublished, published after a date you name, or released only after your death."
+      },
+      {
+        "title": "Changing your mind",
+        "body": "You can review, correct, restrict or withdraw your record at any time, before or after publication. Withdrawal means removal from the public archive; tell us if you also want the underlying files destroyed, and they will be."
+      },
+      {
+        "title": "Where it is stored",
+        "body": "On infrastructure operated by Cloudflare. Recordings and images are held in object storage, the structured record in a database, both under our account and neither shared with, sold to, or licensed to anyone."
+      },
+      {
+        "title": "Children and minors",
+        "body": "This is not a service for children. Contributions are intended for people aged 30 or over; a younger contributor may apply, but their submission is reviewed by a person before anything is accepted."
+      },
+      {
+        "title": "How to reach us",
+        "body": "Until a permanent address is published, use the contact route given on the volunteer page. A named contact will be added here before any record is made public."
+      }
     ]
   },
-
   "terms": {
     "eyebrow": "Terms",
     "heading": "Terms of Use",
@@ -364,15 +583,32 @@
     "placeholderNotice": "Placeholder — pending legal review (Master Reference Part XV).",
     "lastUpdated": "",
     "sections": [
-      { "title": "What Narvyaka is", "body": "An archive of first-hand accounts, given voluntarily. It is not a professional, medical, legal, financial or safety advice service, and nothing in it should be relied on as one." },
-      { "title": "Accounts are accounts", "body": "Records are what a person said happened. Each carries a label — Documented, Contributor's Account, or Family Tradition — describing how much independent support it has. Read the label before you rely on the record." },
-      { "title": "Who owns a record", "body": "The contributor. By submitting, you grant Narvyaka permission to preserve your record and to make it available at the access level you selected, and nothing beyond that. You may withdraw that permission." },
-      { "title": "Using what you find here", "body": "Read it, learn from it, quote it with attribution. Do not republish records wholesale, scrape the archive, or use it to build a commercial dataset. Records are not licensed for AI training." },
-      { "title": "What we will remove", "body": "Anything submitted without the subject's consent, anything that identifies a living person who did not agree to be identified, and anything a contributor asks us to remove." },
-      { "title": "Nothing is guaranteed forever", "body": "We intend this archive to outlast us and we build accordingly. We cannot promise permanence, and we would rather say so than imply otherwise." }
+      {
+        "title": "What Narvyaka is",
+        "body": "An archive of first-hand accounts, given voluntarily. It is not a professional, medical, legal, financial or safety advice service, and nothing in it should be relied on as one."
+      },
+      {
+        "title": "Accounts are accounts",
+        "body": "Records are what a person said happened. Each carries a label — Documented, Contributor's Account, or Family Tradition — describing how much independent support it has. Read the label before you rely on the record."
+      },
+      {
+        "title": "Who owns a record",
+        "body": "The contributor. By submitting, you grant Narvyaka permission to preserve your record and to make it available at the access level you selected, and nothing beyond that. You may withdraw that permission."
+      },
+      {
+        "title": "Using what you find here",
+        "body": "Read it, learn from it, quote it with attribution. Do not republish records wholesale, scrape the archive, or use it to build a commercial dataset. Records are not licensed for AI training."
+      },
+      {
+        "title": "What we will remove",
+        "body": "Anything submitted without the subject's consent, anything that identifies a living person who did not agree to be identified, and anything a contributor asks us to remove."
+      },
+      {
+        "title": "Nothing is guaranteed forever",
+        "body": "We intend this archive to outlast us and we build accordingly. We cannot promise permanence, and we would rather say so than imply otherwise."
+      }
     ]
   },
-
   "forms": {
     "common": {
       "next": "Continue",
@@ -397,20 +633,53 @@
       "recordPermission": "Your browser did not give permission to use the microphone. You can type your answer instead."
     },
     "steps": [
-      { "id": "consent", "title": "Consent", "short": "Consent" },
-      { "id": "about", "title": "About you", "short": "About you" },
-      { "id": "record", "title": "The Wisdom Record", "short": "The record" },
-      { "id": "lineage", "title": "Family & learning note", "short": "Family note" },
-      { "id": "photos", "title": "Photographs", "short": "Photos" },
-      { "id": "review", "title": "Access & review", "short": "Review" }
+      {
+        "id": "consent",
+        "title": "Consent",
+        "short": "Consent"
+      },
+      {
+        "id": "about",
+        "title": "About you",
+        "short": "About you"
+      },
+      {
+        "id": "record",
+        "title": "The Wisdom Record",
+        "short": "The record"
+      },
+      {
+        "id": "lineage",
+        "title": "Family & learning note",
+        "short": "Family note"
+      },
+      {
+        "id": "photos",
+        "title": "Photographs",
+        "short": "Photos"
+      },
+      {
+        "id": "review",
+        "title": "Access & review",
+        "short": "Review"
+      }
     ],
     "consent": {
       "heading": "Before you begin",
       "intro": "Three things, in plain language, before you give us anything.",
       "points": [
-        { "title": "Your recording is transcribed and translated. Nothing else.", "body": "We write down what you said so it can be read and searched, and we translate it where that is useful. Your recording is not used to train AI systems, and will not be, unless you are separately asked and separately agree. Nothing is rewritten, summarised or interpreted on your behalf." },
-        { "title": "Nothing is published automatically.", "body": "Your record arrives marked 'pending review'. A person reads it. If anything is unclear we come back to you. Only then does it go anywhere — at the access level you choose at the end." },
-        { "title": "You stay in control of it.", "body": "You can review, edit, restrict or withdraw your record at any time, including after it is published." }
+        {
+          "title": "Your recording is transcribed and translated. Nothing else.",
+          "body": "We write down what you said so it can be read and searched, and we translate it where that is useful. Your recording is not used to train AI systems, and will not be, unless you are separately asked and separately agree. Nothing is rewritten, summarised or interpreted on your behalf."
+        },
+        {
+          "title": "Nothing is published automatically.",
+          "body": "Your record arrives marked 'pending review'. A person reads it. If anything is unclear we come back to you. Only then does it go anywhere — at the access level you choose at the end."
+        },
+        {
+          "title": "You stay in control of it.",
+          "body": "You can review, edit, restrict or withdraw your record at any time, including after it is published."
+        }
       ],
       "checkReview": "I understand I can review and edit everything before it is published.",
       "checkAge": "I am 30 years of age or older.",
@@ -520,7 +789,15 @@
         "place": "Place",
         "whatTheyKnew": "What they did or knew"
       },
-      "relations": ["Parent", "Grandparent", "Great-grandparent", "Aunt or uncle", "Elder in the family", "Teacher or mentor", "Other"]
+      "relations": [
+        "Parent",
+        "Grandparent",
+        "Great-grandparent",
+        "Aunt or uncle",
+        "Elder in the family",
+        "Teacher or mentor",
+        "Other"
+      ]
     },
     "photos": {
       "heading": "Photographs",
@@ -540,14 +817,46 @@
       "accessHeading": "Who should be able to see this?",
       "accessIntro": "You can change this later. If you are unsure, choose the most private option — nothing is harder to undo than publication.",
       "levels": [
-        { "value": "public", "title": "Public", "body": "Anyone can find and read this record, with your name on it." },
-        { "value": "public_anonymous", "title": "Public, anonymous", "body": "Anyone can read it. Your name is replaced with 'Anonymous Contributor'." },
-        { "value": "family_only", "title": "Family only", "body": "Kept for the people you name. Not listed publicly." },
-        { "value": "restricted_research", "title": "Restricted — research use", "body": "Available to researchers on request and on record. Not published openly." },
-        { "value": "private", "title": "Private", "body": "Held for you alone. Nobody else is given access." },
-        { "value": "preserved_not_published", "title": "Preserved, not published", "body": "Kept safely in the archive with no publication planned. Preservation is the point." },
-        { "value": "publish_after_date", "title": "Publish after a date", "body": "Held until a date you name, then published as public." },
-        { "value": "release_after_death", "title": "Release after my death", "body": "Held until we are notified and have confirmed it. Then published as public." }
+        {
+          "value": "public",
+          "title": "Public",
+          "body": "Anyone can find and read this record, with your name on it."
+        },
+        {
+          "value": "public_anonymous",
+          "title": "Public, anonymous",
+          "body": "Anyone can read it. Your name is replaced with 'Anonymous Contributor'."
+        },
+        {
+          "value": "family_only",
+          "title": "Family only",
+          "body": "Kept for the people you name. Not listed publicly."
+        },
+        {
+          "value": "restricted_research",
+          "title": "Restricted — research use",
+          "body": "Available to researchers on request and on record. Not published openly."
+        },
+        {
+          "value": "private",
+          "title": "Private",
+          "body": "Held for you alone. Nobody else is given access."
+        },
+        {
+          "value": "preserved_not_published",
+          "title": "Preserved, not published",
+          "body": "Kept safely in the archive with no publication planned. Preservation is the point."
+        },
+        {
+          "value": "publish_after_date",
+          "title": "Publish after a date",
+          "body": "Held until a date you name, then published as public."
+        },
+        {
+          "value": "release_after_death",
+          "title": "Release after my death",
+          "body": "Held until we are notified and have confirmed it. Then published as public."
+        }
       ],
       "releaseDateLabel": "Publish on",
       "previewHeading": "Everything you have entered",
@@ -569,7 +878,12 @@
       "approach": "Describe your approach to privacy, consent, and handling information you're unsure about.",
       "approachHint": "There is no correct answer here. We are reading for judgement, not for the right words.",
       "time": "Roughly how much time could you give?",
-      "timeOptions": ["An hour or two, once", "A few hours a month", "A few hours a week", "As much as is useful"],
+      "timeOptions": [
+        "An hour or two, once",
+        "A few hours a month",
+        "A few hours a week",
+        "As much as is useful"
+      ],
       "submit": "Send application"
     },
     "onBehalf": {
@@ -585,7 +899,6 @@
       "theirAnonymous": "They asked to stay anonymous"
     }
   },
-
   "studio": {
     "title": "Narvyaka Studio",
     "intro": "Edit the site by hand — text, colours, fonts, the logo and the photographs. Changes preview instantly and are stored in this browser only. When you are happy, export them and apply them to the code.",
@@ -594,7 +907,6 @@
     "exportLabel": "Export changes",
     "applyHint": "Then run: npm run studio:apply ~/Downloads/narvyaka-overrides.json"
   },
-
   "categories": [
     "Craft & trade",
     "Farming & land",
@@ -612,8 +924,17 @@
     "Survival & hardship",
     "Other"
   ],
-
-  "experienceTypes": ["Method", "Mistake", "Decision", "Skill", "Memory", "Lesson"],
-
-  "verificationStatuses": ["Documented", "Contributor's Account", "Family Tradition"]
+  "experienceTypes": [
+    "Method",
+    "Mistake",
+    "Decision",
+    "Skill",
+    "Memory",
+    "Lesson"
+  ],
+  "verificationStatuses": [
+    "Documented",
+    "Contributor's Account",
+    "Family Tradition"
+  ]
 }

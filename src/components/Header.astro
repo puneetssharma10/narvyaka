@@ -8,19 +8,19 @@ const path = Astro.url.pathname
 const isActive = (href: string) => path === href || (href !== '/' && path.startsWith(href))
 ---
 
-<header class="sticky top-0 z-40 border-b border-hairline bg-bg/85 backdrop-blur-sm">
+<header class="sticky top-0 z-40 border-b border-hairline bg-bg/80 backdrop-blur-md">
   <div class="wrap flex h-[68px] items-center justify-between gap-4">
     <a href="/" class="shrink-0 text-ink no-underline" aria-label="Narvyaka — home">
       <Wordmark size="md" />
     </a>
 
-    <nav class="hidden items-center gap-7 md:flex" aria-label="Main">
+    <nav class="hidden items-center gap-8 md:flex" aria-label="Main">
       {
         navItems.map((item, i) => (
           <a
             href={item.href}
-            class={`text-[0.95rem] no-underline transition-colors hover:text-accent ${
-              isActive(item.href) ? 'text-ink' : 'text-muted'
+            class={`text-[0.78rem] font-semibold uppercase tracking-[0.12em] no-underline transition-colors hover:text-accent ${
+              isActive(item.href) ? 'text-accent' : 'text-muted'
             }`}
             aria-current={isActive(item.href) ? 'page' : undefined}
             {...editable(`nav.items.${i}.label`)}
@@ -29,7 +29,7 @@ const isActive = (href: string) => path === href || (href !== '/' && path.starts
           </a>
         ))
       }
-      <a href={cta.href} class="btn btn-primary py-2 text-[0.9rem]" {...editable('nav.cta.label')}>
+      <a href={cta.href} class="btn btn-primary px-4 py-2.5 text-[0.78rem] uppercase tracking-[0.1em]" {...editable('nav.cta.label')}>
         {cta.label}
       </a>
     </nav>
@@ -52,7 +52,7 @@ const isActive = (href: string) => path === href || (href !== '/' && path.starts
     <div class="wrap flex flex-col gap-1 py-4">
       {
         navItems.map((item) => (
-          <a href={item.href} class="rounded-[8px] px-2 py-2.5 text-ink no-underline hover:bg-accent-soft">
+          <a href={item.href} class="rounded-[4px] px-2 py-2.5 text-[0.85rem] font-semibold uppercase tracking-[0.1em] text-ink no-underline hover:bg-accent-soft">
             {item.label}
           </a>
         ))
