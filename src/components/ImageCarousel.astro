@@ -1,0 +1,213 @@
+---
+/**
+ * A small auto-advancing image carousel for the homepage's example capsule.
+ *
+ * Each slide is its own `data-edit-image` holder addressed by array index
+ * (`home.exampleCapsule.photos.0`, `.1`, …) — the Studio's existing
+ * click-to-replace / drag-and-drop image editor already understands that
+ * addressing scheme, so no changes were needed there to make every slide
+ * individually replaceable.
+ *
+ * Autoplay speed is read from `data-interval` (ms) on the root element, and
+ * can be changed live from the Studio (see dock.ts, "Carousel speed").
+ * Respects prefers-reduced-motion: without it, autoplay never starts.
+ */
+interface Props {
+  images: string[]
+  imagePathPrefix: string
+  alt: string
+  intervalMs: number
+  aspect?: string
+  class?: string
+}
+
+const { images, imagePathPrefix, alt, intervalMs, aspect = '4:3', class: className = '' } = Astro.props
+---
+
+<div
+  class={`nv-capsule-carousel relative ${className}`}
+  data-capsule-carousel
+  data-interval={intervalMs}
+  role="group"
+  aria-roledescription="carousel"
+  aria-label={alt}
+>
+  <div class="aspect-[4/3] w-full overflow-hidden bg-accent-soft">
+    {
+      images.map((src, i) => (
+        <div
+          class="nv-capsule-carousel__slide"
+          data-carousel-slide
+          aria-hidden={i === 0 ? 'false' : 'true'}
+          {...{ 'data-edit-image': `${imagePathPrefix}.${i}`, 'data-edit-aspect': aspect }}
+        >
+          <img
+            src={src || '/placeholder-capsule.svg'}
+            alt={`${alt} — photograph ${i + 1} of ${images.length}`}
+            class="h-full w-full object-cover"
+            width="640"
+            height="480"
+            loading={i === 0 ? 'eager' : 'lazy'}
+          />
+        </div>
+      ))
+    }
+  </div>
+
+  <button type="button" class="nv-capsule-carousel__arrow nv-capsule-carousel__arrow--prev" data-carousel-prev aria-label="Previous photograph">
+    <svg width="9" height="14" viewBox="0 0 9 14" fill="none" aria-hidden="true">
+      <path d="M8 1 2 7l6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+  <button type="button" class="nv-capsule-carousel__arrow nv-capsule-carousel__arrow--next" data-carousel-next aria-label="Next photograph">
+    <svg width="9" height="14" viewBox="0 0 9 14" fill="none" aria-hidden="true">
+      <path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+
+  <div class="nv-capsule-carousel__dots" aria-hidden="true">
+    {images.map((_, i) => <span class="nv-capsule-carousel__dot" data-carousel-dot data-index={i} />)}
+  </div>
+</div>
+
+<style>
+  .nv-capsule-carousel__slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 520ms ease;
+    pointer-events: none;
+  }
+
+  .nv-capsule-carousel__slide[aria-hidden='false'] {
+    position: relative;
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .nv-capsule-carousel__arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 999px;
+    border: none;
+    background: rgba(11, 14, 20, 0.45);
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 160ms ease;
+  }
+
+  .nv-capsule-carousel__arrow:hover {
+    background: rgba(11, 14, 20, 0.7);
+  }
+
+  .nv-capsule-carousel__arrow--prev {
+    left: 10px;
+  }
+
+  .nv-capsule-carousel__arrow--next {
+    right: 10px;
+  }
+
+  .nv-capsule-carousel__dots {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 6px;
+  }
+
+  .nv-capsule-carousel__dot {
+    display: block;
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.55);
+    transition: background-color 200ms ease, transform 200ms ease;
+  }
+
+  .nv-capsule-carousel__dot[data-on] {
+    background: #fff;
+    transform: scale(1.25);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .nv-capsule-carousel__slide {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-capsule-carousel]').forEach((root) => {
+    const slides = Array.from(root.querySelectorAll<HTMLElement>('[data-carousel-slide]'))
+    const dots = Array.from(root.querySelectorAll<HTMLElement>('[data-carousel-dot]'))
+    const prevBtn = root.querySelector<HTMLButtonElement>('[data-carousel-prev]')
+    const nextBtn = root.querySelector<HTMLButtonElement>('[data-carousel-next]')
+    if (slides.length < 2) {
+      prevBtn?.remove()
+      nextBtn?.remove()
+      root.querySelector('.nv-capsule-carousel__dots')?.remove()
+      return
+    }
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    let current = 0
+    let timer: number | undefined
+
+    function show(next: number) {
+      slides[current].setAttribute('aria-hidden', 'true')
+      dots[current]?.removeAttribute('data-on')
+      current = (next + slides.length) % slides.length
+      slides[current].setAttribute('aria-hidden', 'false')
+      dots[current]?.setAttribute('data-on', '')
+    }
+
+    function start() {
+      if (reduceMotion) return
+      const ms = Number(root.dataset.interval) || 4200
+      window.clearInterval(timer)
+      timer = window.setInterval(() => show(current + 1), ms)
+    }
+
+    function stop() {
+      window.clearInterval(timer)
+    }
+
+    dots[0]?.setAttribute('data-on', '')
+    start()
+
+    root.addEventListener('mouseenter', stop)
+    root.addEventListener('mouseleave', start)
+    root.addEventListener('focusin', stop)
+    root.addEventListener('focusout', start)
+
+    prevBtn?.addEventListener('click', () => {
+      stop()
+      show(current - 1)
+      start()
+    })
+    nextBtn?.addEventListener('click', () => {
+      stop()
+      show(current + 1)
+      start()
+    })
+    dots.forEach((dot, i) => {
+      dot.style.cursor = 'pointer'
+      dot.addEventListener('click', () => {
+        stop()
+        show(i)
+        start()
+      })
+    })
+
+    // Lets the Studio's speed slider change autoplay timing without a reload.
+    root.addEventListener('nv:carousel-speed', () => start())
+  })
+</script>

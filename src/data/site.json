@@ -20,7 +20,8 @@
     "fonts": {
       "wordmark": "'Fraunces Variable', 'Source Serif 4 Variable', Georgia, serif",
       "heading": "'Fraunces Variable', 'Source Serif 4 Variable', Georgia, serif",
-      "body": "'Inter Variable', 'Public Sans Variable', system-ui, sans-serif"
+      "body": "'Inter Variable', 'Public Sans Variable', system-ui, sans-serif",
+      "heroTagline": "'Caveat Variable', cursive"
     },
     "logo": {
       "src": "/logo-mark.png",
@@ -127,12 +128,15 @@
       "secondaryCta": {
         "label": "See how it works",
         "href": "/how-it-works"
-      }
+      },
+      "backgroundMotion": "",
+      "backgroundMotionAlt": "A small looping image symbolising continuity, behind the headline"
     },
     "exampleCapsule": {
       "badge": "Example",
       "note": "This is an illustrative capsule showing the format. It is not a real contributor's record. It will be replaced by the first real Wisdom Record once one has been made.",
-      "photo": "",
+      "photos": ["", "", "", "", "", "", "", ""],
+      "carouselIntervalMs": 4200,
       "photoCaption": "Placeholder — a real contributor photograph goes here.",
       "lesson": "Ask the question while the person is still in the room. There is no later.",
       "attribution": "Founder's own account",

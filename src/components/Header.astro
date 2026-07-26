@@ -10,6 +10,20 @@ const isActive = (href: string) => path === href || (href !== '/' && path.starts
 ---
 
 <header class="sticky top-0 z-40 border-b border-hairline bg-bg/80 backdrop-blur-md">
+  <!-- Top utility bar — sign-in only, always the topmost thing on the page. -->
+  <div class="hidden border-b border-hairline/60 md:block">
+    <div class="wrap flex h-8 items-center justify-end">
+      <a
+        href={login.href}
+        class="text-[0.72rem] font-semibold uppercase tracking-[0.1em] text-muted no-underline transition-colors hover:text-accent"
+        aria-current={isActive(login.href) ? 'page' : undefined}
+        {...editable('nav.login.label')}
+      >
+        {login.label}
+      </a>
+    </div>
+  </div>
+
   <div class="wrap flex h-[68px] items-center justify-between gap-4">
     <a href="/" class="shrink-0 text-ink no-underline" aria-label="Narvyaka — home">
       <Wordmark size="md" />
@@ -30,16 +44,6 @@ const isActive = (href: string) => path === href || (href !== '/' && path.starts
           </a>
         ))
       }
-      <a
-        href={login.href}
-        class={`text-[0.78rem] font-semibold uppercase tracking-[0.12em] no-underline transition-colors hover:text-accent ${
-          isActive(login.href) ? 'text-accent' : 'text-muted'
-        }`}
-        aria-current={isActive(login.href) ? 'page' : undefined}
-        {...editable('nav.login.label')}
-      >
-        {login.label}
-      </a>
       <a href={cta.href} class="btn btn-primary px-4 py-2.5 text-[0.78rem] uppercase tracking-[0.1em]" {...editable('nav.cta.label')}>
         {cta.label}
       </a>

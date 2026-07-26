@@ -63,6 +63,30 @@ export const FONT_OPTIONS = [
     note: 'A touch more open than Inter.',
   },
   {
+    label: 'Fraunces',
+    value: "'Fraunces Variable', 'Source Serif 4 Variable', Georgia, serif",
+    kind: 'serif',
+    note: 'The logo’s own serif. Editorial and considered.',
+  },
+  {
+    label: 'Source Serif 4',
+    value: "'Source Serif 4 Variable', Georgia, serif",
+    kind: 'serif',
+    note: 'A classic, book-like text serif.',
+  },
+  {
+    label: 'Lora',
+    value: "'Lora Variable', Georgia, serif",
+    kind: 'serif',
+    note: 'Warmer and more rounded than Source Serif 4 — a graceful reading face.',
+  },
+  {
+    label: 'Caveat (handwritten)',
+    value: "'Caveat Variable', cursive",
+    kind: 'script',
+    note: 'Looks written by hand, not typeset — use sparingly, for one line at most.',
+  },
+  {
     label: 'System default',
     value: 'system-ui, -apple-system, Segoe UI, Roboto, sans-serif',
     kind: 'sans',
@@ -74,6 +98,11 @@ export const FONT_SLOTS = [
   { key: 'wordmark', label: 'Wordmark', hint: 'The “Narvyaka” lockup in the header.' },
   { key: 'heading', label: 'Headings', hint: 'H1–H4 across the site.' },
   { key: 'body', label: 'Body text', hint: 'Paragraphs, forms, buttons.' },
+  {
+    key: 'heroTagline',
+    label: 'Homepage headline',
+    hint: 'Just “Because No Generation Should Start From Zero.” — kept separate from other headings so it can look handwritten without changing anything else.',
+  },
 ] as const
 
 export type FontSlot = (typeof FONT_SLOTS)[number]['key']

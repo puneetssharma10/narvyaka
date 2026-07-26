@@ -330,12 +330,40 @@ class Dock {
     refresh()
     this.store.subscribe(refresh)
 
+    const carouselRoot = document.querySelector<HTMLElement>('[data-capsule-carousel]')
+
     return this.section('Photographs', false, [
       h('p', { class: 'nv-sec__note' }, [
         'Click any picture on the page to replace it. You can drag a file straight onto it. Every replacement opens a cropper first, so nothing goes in at the wrong shape.',
       ]),
+      ...(carouselRoot ? [this.carouselSpeedControl(carouselRoot)] : []),
       list,
     ])
+  }
+
+  private carouselSpeedControl(root: HTMLElement): HTMLElement {
+    const path = 'home.exampleCapsule.carouselIntervalMs'
+    const current = Number(root.dataset.interval) || 4200
+
+    const label = h('label', { class: 'nv-label' }, [`Carousel speed — ${(current / 1000).toFixed(1)}s per photo`])
+
+    const slider = h('input', {
+      type: 'range',
+      min: '1500',
+      max: '10000',
+      step: '250',
+      value: String(current),
+      style: 'width:100%;accent-color:var(--nv-accent)',
+      onInput: (e: Event) => {
+        const ms = Number((e.target as HTMLInputElement).value)
+        label.textContent = `Carousel speed — ${(ms / 1000).toFixed(1)}s per photo`
+        root.dataset.interval = String(ms)
+        root.dispatchEvent(new CustomEvent('nv:carousel-speed'))
+        this.store.setText(path, String(ms))
+      },
+    }) as HTMLInputElement
+
+    return h('div', { class: 'nv-row', style: 'flex-direction:column;align-items:stretch;gap:6px' }, [label, slider])
   }
 
   private sectionPublish(): HTMLElement {
@@ -495,20 +523,53 @@ class Dock {
   }
 
   private pickImageFor(holder: HTMLElement) {
+    const raw = holder.hasAttribute('data-edit-raw')
     const input = h('input', {
       type: 'file',
-      accept: 'image/png,image/jpeg,image/webp,image/avif',
+      accept: raw ? 'image/png,image/jpeg,image/webp,image/avif,image/gif' : 'image/png,image/jpeg,image/webp,image/avif',
       style: 'display:none',
     }) as HTMLInputElement
 
     input.addEventListener('change', () => {
       const file = input.files?.[0]
       input.remove()
-      if (file) void this.openCropper(holder, file)
+      if (!file) return
+      if (raw) void this.acceptRawImage(holder, file)
+      else void this.openCropper(holder, file)
     })
 
     document.body.appendChild(input)
     input.click()
+  }
+
+  /**
+   * Used for holders marked `data-edit-raw` (currently: the hero's background
+   * motion image). Skips the cropper entirely — the cropper always re-encodes
+   * to a static JPEG, which would silently kill a GIF's animation. This path
+   * stores the file exactly as chosen, so a small looping image stays moving.
+   */
+  private async acceptRawImage(holder: HTMLElement, file: File) {
+    const path = holder.getAttribute('data-edit-image')
+    if (!path) return
+
+    if (!fileIsImage(file, true)) {
+      this.say('That file type is not supported. Use JPEG, PNG, WebP or GIF.', 'warn')
+      return
+    }
+    if (file.size > MAX_UPLOAD_BYTES) {
+      this.say(`That file is ${formatBytes(file.size)} — the limit is 300 MB.`, 'warn')
+      return
+    }
+
+    const url = await readAsDataUrl(file)
+    this.store.setImage(path, url)
+
+    const img = holder.querySelector('img')
+    if (img) {
+      img.src = url
+      img.removeAttribute('srcset')
+    }
+    this.say(`Picture replaced (${formatBytes(file.size)}). Export your changes to keep it.`, 'ok')
   }
 
   private async openCropper(holder: HTMLElement, file: File) {
@@ -668,7 +729,8 @@ class Dock {
 
       if (imageHolder && !this.root.contains(imageHolder)) {
         e.preventDefault()
-        void this.openCropper(imageHolder, file)
+        if (imageHolder.hasAttribute('data-edit-raw')) void this.acceptRawImage(imageHolder, file)
+        else void this.openCropper(imageHolder, file)
       } else if (logoSlot) {
         e.preventDefault()
         void this.acceptLogo(file)

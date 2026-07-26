@@ -5,6 +5,7 @@ import Icon from '../components/Icon.astro'
 import AudioPlayer from '../components/AudioPlayer.astro'
 import PlaceholderNotice from '../components/PlaceholderNotice.astro'
 import RotatingShowcase from '../components/RotatingShowcase.astro'
+import ImageCarousel from '../components/ImageCarousel.astro'
 import { content, editable, t, list } from '../lib/content'
 import { siteConfig } from '../../site.config'
 
@@ -53,9 +54,24 @@ const showcaseItems = [
         <div>
           <Wordmark size="xl" class="block" />
 
-          <h1 class="mt-8 max-w-[15ch]" data-type-target {...editable('home.hero.tagline')}>
-            {t('home.hero.tagline')}
-          </h1>
+          <div class="relative">
+            <!-- A small looping image (drop a GIF here via Studio) symbolising
+                 continuity, sitting quietly behind the headline only. -->
+            <div
+              class="hero-bg-motion absolute -inset-x-6 -inset-y-8 -z-10"
+              {...{ 'data-edit-image': 'home.hero.backgroundMotion', 'data-edit-raw': '', 'data-edit-aspect': 'free' }}
+            >
+              <img
+                src={home.hero.backgroundMotion || '/placeholder-continuity.svg'}
+                alt={home.hero.backgroundMotionAlt}
+                class="h-full w-full object-cover"
+              />
+            </div>
+
+            <h1 class="hero-tagline-font relative mt-8 max-w-[15ch]" data-type-target {...editable('home.hero.tagline')}>
+              {t('home.hero.tagline')}
+            </h1>
+          </div>
 
           <p
             class="mt-8 max-w-[24ch] font-heading text-[clamp(1.3rem,2.6vw,1.75rem)] font-normal leading-[1.25] tracking-tight text-accent"
@@ -101,18 +117,12 @@ const showcaseItems = [
             </span>
           </div>
 
-          <div
-            class="aspect-[4/3] w-full bg-accent-soft"
-            {...{ 'data-edit-image': 'home.exampleCapsule.photo', 'data-edit-aspect': '4:3' }}
-          >
-            <img
-              src={example.photo || '/placeholder-capsule.svg'}
-              alt={example.photoCaption}
-              class="h-full w-full object-cover"
-              width="640"
-              height="480"
-            />
-          </div>
+          <ImageCarousel
+            images={example.photos}
+            imagePathPrefix="home.exampleCapsule.photos"
+            alt={example.photoCaption}
+            intervalMs={example.carouselIntervalMs}
+          />
 
           <div class="space-y-5 p-6">
             <blockquote

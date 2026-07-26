@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480" width="640" height="480" role="img" aria-label="Three interlocking rings, symbolising one generation passing to the next">
+  <!--
+    Drawn placeholder, not a stock photograph or a real motion clip.
+    Replace with a small looping image (GIF) via Studio → click this background.
+  -->
+  <defs>
+    <linearGradient id="continuity-sweep" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#8A5A22"/>
+      <stop offset="50%" stop-color="#2B6CB0"/>
+      <stop offset="100%" stop-color="#8A5A22"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="640" height="480" fill="#F6F7F9"/>
+
+  <g fill="none" stroke="url(#continuity-sweep)" stroke-width="3">
+    <circle cx="230" cy="240" r="110"/>
+    <circle cx="320" cy="240" r="110"/>
+    <circle cx="410" cy="240" r="110"/>
+  </g>
+</svg>
