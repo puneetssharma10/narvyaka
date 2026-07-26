@@ -50,6 +50,10 @@
     "cta": {
       "label": "Preserve your experience",
       "href": "/preserve"
+    },
+    "login": {
+      "label": "Sign in",
+      "href": "/login"
     }
   },
   "footer": {
