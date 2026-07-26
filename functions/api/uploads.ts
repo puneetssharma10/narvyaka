@@ -16,6 +16,11 @@ import {
  * Files land in R2 under uploads/<record id>/, so everything belonging to a
  * submission stays together and can be deleted together if the contributor
  * withdraws it.
+ *
+ * The intake form no longer calls this — see /api/uploads/presign and
+ * /api/uploads/confirm, which upload straight to R2 and aren't bounded by a
+ * Function's own request-size ceiling. This endpoint is kept for anything
+ * small enough not to need that (well under the platform's ~100 MB floor).
  */
 export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
   const missing = requireBindings(env, ['MEDIA'])

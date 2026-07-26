@@ -1,4 +1,5 @@
 import { normaliseRecord } from '../../shared/record-schema'
+import { getSession } from '../_shared/auth'
 import {
   BadJson,
   PayloadTooLarge,
@@ -57,6 +58,10 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     return fail(422, 'Some parts of the record still need attention.', { code: 'invalid', details: errors })
   }
 
+  // Signed-in volunteers/admins own the records they submit — nothing changes
+  // for the public intake form, which has no session at all.
+  const session = await getSession(env, request)
+
   // Two representations, written together (Master Reference Part XI):
   //  - the untouched submission in R2, which is the evidence
   //  - the structured row in D1, which is what makes it findable
@@ -81,13 +86,13 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
          contributor_name, display_as_anonymous, contributor_location, contributor_profession,
          record_language, contact, age_confirmed_30_plus, exception_reason,
          key_lesson, access_level, release_date, verification_status,
-         has_audio, photo_count, payload_json, client_ip
+         has_audio, photo_count, payload_json, client_ip, owner_user_id
        ) VALUES (
          ?1, ?2, ?3, ?4, ?5,
          ?6, ?7, ?8, ?9,
          ?10, ?11, ?12, ?13,
          ?14, ?15, ?16, ?17,
-         ?18, ?19, ?20, ?21
+         ?18, ?19, ?20, ?21, ?22
        )`,
     )
       .bind(
@@ -112,6 +117,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
         record.photos.length,
         JSON.stringify(record),
         ip,
+        session?.id ?? null,
       )
       .run()
   } catch (error) {

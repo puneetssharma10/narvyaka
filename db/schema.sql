@@ -110,3 +110,54 @@ CREATE TABLE IF NOT EXISTS rate_limits (
 );
 
 CREATE INDEX IF NOT EXISTS idx_rate_limits_window ON rate_limits (window_start);
+
+-- ── Accounts ───────────────────────────────────────────────────────────────
+-- Four tiers. Only three ever get a row here — a reader is just a visitor,
+-- nothing to store.
+--
+--   super_admin   You. Site content (the Studio), creating/revoking admins,
+--                 everything an admin can do.
+--   admin         Reviews and edits any record, approves/revokes volunteer
+--                 accounts. Cannot touch the Studio and cannot create another
+--                 admin — that boundary is deliberate, see CONTENT_STATUS.md.
+--   volunteer     Can create records and edit only the records they own
+--                 (submissions.owner_user_id = their own id). Nothing else.
+--
+-- Passwords are salted PBKDF2-SHA256, hashed in the Worker with WebCrypto —
+-- never anything reversible, never plaintext, never logged.
+CREATE TABLE IF NOT EXISTS users (
+  id              TEXT PRIMARY KEY,
+  email           TEXT NOT NULL UNIQUE COLLATE NOCASE,
+  password_hash   TEXT NOT NULL,          -- "pbkdf2$<iterations>$<salt_b64>$<hash_b64>"
+  role            TEXT NOT NULL,
+  status          TEXT NOT NULL DEFAULT 'active',
+  must_change_password INTEGER NOT NULL DEFAULT 0,  -- set on admin-issued temp passwords
+  created_at      TEXT NOT NULL,
+  created_by      TEXT,                   -- user id that approved/created this account
+  last_login_at   TEXT,
+
+  CHECK (role IN ('super_admin', 'admin', 'volunteer')),
+  CHECK (status IN ('active', 'revoked'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_users_role ON users (role, status);
+
+-- Server-side sessions, so revoking access is immediate — no waiting for a
+-- JWT to expire. The cookie holds a random token; only its hash lives here,
+-- the same reasoning as the password itself: a database read must not be
+-- enough to impersonate someone.
+CREATE TABLE IF NOT EXISTS sessions (
+  token_hash   TEXT PRIMARY KEY,
+  user_id      TEXT NOT NULL REFERENCES users(id),
+  created_at   TEXT NOT NULL,
+  expires_at   TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_sessions_user ON sessions (user_id);
+CREATE INDEX IF NOT EXISTS idx_sessions_expires ON sessions (expires_at);
+
+-- The `owner_user_id` / `user_id` ownership columns on submissions/volunteers
+-- are NOT here — SQLite has no "ADD COLUMN IF NOT EXISTS", so an ALTER TABLE
+-- cannot safely live in a file that is re-run on every deploy. That one-time
+-- change lives in db/migrations/0001_accounts.sql — run once, per environment,
+-- per INTEGRATIONS.md § Accounts.

@@ -9,7 +9,7 @@
 
 export const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/avif', 'image/gif']
 export const ACCEPTED_LOGO_TYPES = [...ACCEPTED_IMAGE_TYPES, 'image/svg+xml']
-export const MAX_UPLOAD_BYTES = 10 * 1024 * 1024 // 10 MB
+export const MAX_UPLOAD_BYTES = 300 * 1024 * 1024 // 300 MB per file
 
 export interface LoadedImage {
   el: HTMLImageElement

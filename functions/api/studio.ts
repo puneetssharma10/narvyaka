@@ -1,4 +1,5 @@
 import { parseOverrides } from '../../shared/overrides'
+import { getSession } from '../_shared/auth'
 import { BadJson, PayloadTooLarge, fail, json, readJson, requireBindings, safeEqual, type Env } from '../_shared/env'
 
 const OVERRIDES_KEY = 'site/overrides.json'
@@ -6,12 +7,25 @@ const MAX_OVERRIDES_BYTES = 4 * 1024 * 1024 // inlined images add up quickly
 
 /**
  * GET  /api/studio — the overrides currently published to the live site.
- * POST /api/studio — publish overrides. Requires the STUDIO_TOKEN secret.
+ * POST /api/studio — publish overrides.
+ *
+ * Only the super_admin can publish site content directly (Founding Vision
+ * decision — admins review records, they don't edit the site itself). The
+ * older STUDIO_TOKEN secret still works too, as a fallback for scripted use
+ * (`npm run studio:apply` and similar) — either one is accepted.
  *
  * This is the quick-correction path. The durable path is still
  * `npm run studio:apply`, which puts the change into the code where it can be
  * reviewed in a diff.
  */
+async function canPublish(request: Request, env: Env): Promise<boolean> {
+  const session = await getSession(env, request)
+  if (session?.role === 'super_admin') return true
+
+  if (!env.STUDIO_TOKEN) return false
+  const provided = request.headers.get('x-studio-token') ?? ''
+  return provided !== '' && safeEqual(provided, env.STUDIO_TOKEN)
+}
 
 export const onRequestGet: PagesFunction<Env> = async ({ env }) => {
   if (!env.MEDIA) return json({ overrides: null, published: false })
@@ -32,19 +46,11 @@ export const onRequestGet: PagesFunction<Env> = async ({ env }) => {
 }
 
 export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
-  if (!env.STUDIO_TOKEN) {
-    return fail(501, 'Publishing from the Studio is switched off on this deployment.', {
-      code: 'not_configured',
+  if (!(await canPublish(request, env))) {
+    return fail(401, 'Sign in as the super_admin to publish, or use a valid Studio token.', {
       hint:
-        'Set a STUDIO_TOKEN secret: `npx wrangler pages secret put STUDIO_TOKEN`. ' +
-        'Until then, use Export changes and `npm run studio:apply` — that path always works.',
-    })
-  }
-
-  const provided = request.headers.get('x-studio-token') ?? ''
-  if (!provided || !safeEqual(provided, env.STUDIO_TOKEN)) {
-    return fail(401, 'That Studio token was not accepted.', {
-      hint: 'Check the token in Studio → Save & publish against the STUDIO_TOKEN secret on this deployment.',
+        'Sign in at /login, or set a STUDIO_TOKEN secret for scripted publishing: ' +
+        '`npx wrangler pages secret put STUDIO_TOKEN`.',
     })
   }
 
@@ -89,10 +95,9 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 }
 
 export const onRequestDelete: PagesFunction<Env> = async ({ request, env }) => {
-  if (!env.STUDIO_TOKEN) return fail(501, 'Publishing from the Studio is switched off on this deployment.')
-
-  const provided = request.headers.get('x-studio-token') ?? ''
-  if (!provided || !safeEqual(provided, env.STUDIO_TOKEN)) return fail(401, 'That Studio token was not accepted.')
+  if (!(await canPublish(request, env))) {
+    return fail(401, 'Sign in as the super_admin to do this, or use a valid Studio token.')
+  }
 
   const missing = requireBindings(env, ['MEDIA'])
   if (missing) return missing

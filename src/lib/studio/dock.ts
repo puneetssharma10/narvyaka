@@ -520,7 +520,7 @@ class Dock {
       return
     }
     if (file.size > MAX_UPLOAD_BYTES) {
-      this.say(`That file is ${formatBytes(file.size)} — the limit is 10 MB.`, 'warn')
+      this.say(`That file is ${formatBytes(file.size)} — the limit is 300 MB.`, 'warn')
       return
     }
 
@@ -596,7 +596,7 @@ class Dock {
       return
     }
     if (file.size > MAX_UPLOAD_BYTES) {
-      this.say(`That file is ${formatBytes(file.size)} — the limit is 10 MB.`, 'warn')
+      this.say(`That file is ${formatBytes(file.size)} — the limit is 300 MB.`, 'warn')
       return
     }
 

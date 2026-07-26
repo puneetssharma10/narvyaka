@@ -128,7 +128,35 @@ the form.
 `VerificationBadge.astro`. No "unverified" default.
 
 **Nothing publishes itself.** Every submission is written as `pending_review`
-and the API has no path that sets anything else.
+and the intake API has no path that sets anything else. An admin or the
+super_admin *can* move a record through `approved` → `published` →
+`withdrawn` from `/admin` (`functions/api/submissions/[id].ts`) — but that
+only updates the D1 status. `/browse` and `/capsule/<id>` still read from
+`content/capsules/*.json` at build time, so an in-app "publish" is the review
+decision, not the last step; see INTEGRATIONS.md §6.4 for the manual copy
+that's still required until those pages read from D1 directly.
+
+---
+
+## Accounts — why admins can't touch the Studio or create other admins
+
+`functions/_shared/auth.ts` draws a boundary that's worth stating plainly,
+since nothing in the code itself explains a *decision* — only what it does:
+
+An admin can review and edit any Wisdom Record and approve or revoke a
+volunteer's account. They cannot publish anything through the Studio, and
+they cannot create another admin account. Both of those stay with the
+super_admin alone. The reasoning: the Studio changes what every visitor sees
+on the homepage, the founder's letter, the palette — the site's voice, not
+one contributor's record — and deciding who else gets that same reach is the
+same kind of decision. Reviewing records and vetting volunteers is real,
+substantial trust; it is still a different, narrower kind of trust than
+being able to rewrite the site itself or hand that power to someone else.
+
+If this ever needs to change — say, a second person who should also be able
+to publish Studio edits — that's a one-line change in `auth.ts`'s
+`requireRole` calls (`functions/api/studio.ts` and `functions/api/admin/users.ts`),
+not a redesign. It was left narrow on purpose, not by oversight.
 
 ---
 

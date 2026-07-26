@@ -138,8 +138,9 @@
       "durationLabel": "—"
     },
     "problem": {
-      "heading": "What a manual can do, and what it cannot.",
+      "heading": "Why Narvyaka Exists",
       "paragraphs": [
+        "Consider what a manual can do, and what it cannot.",
         "A manual can tell you what to do. It cannot tell you what an experienced person does differently — the small warning signs they have learned to notice, and what quietly went wrong before it finally went right.",
         "That second kind of knowledge — judgement, earned the hard way — usually lives in exactly one place: a single human mind. And it usually leaves the world exactly once, on the day that mind stops being reachable.",
         "A nurse's way of sitting with a dying patient, a farmer's read on next week's weather, a teacher's method for reaching the one child everyone else had given up on — all of it gone, the moment the person carrying it is gone.",
@@ -398,7 +399,7 @@
       "Coordinate a region",
       "Teach others"
     ],
-    "commitmentHeading": "The founding commitment",
+    "commitmentHeading": "One volunteer. One contributor. One beginning.",
     "commitment": "I will help preserve at least one meaningful experience, from one person.",
     "commitmentNote": "That is the entire founding commitment. Nothing more is required to start, and almost nothing is easier to keep.",
     "pledgeHeading": "The Narvyaka Pledge",
@@ -415,13 +416,13 @@
   },
   "about": {
     "eyebrow": "About",
-    "heading": "One person's knowledge, made known to the world.",
+    "heading": "The Meaning of Narvyaka",
     "stage1": {
       "missionHeading": "Mission",
       "mission": "Preserve at least one meaningful lesson from every willing experienced person.",
       "visionHeading": "Vision",
       "vision": "A future where human experience can be preserved in its original form, translated across languages, carried across borders, downloaded, shared, and passed from one generation to the next — remaining accessible wherever humanity chooses to live, on Earth or beyond.",
-      "beliefHeading": "The core belief",
+      "beliefHeading": "Our Belief",
       "belief": "Every expert deserves a successor. Not in the narrow sense of degrees and job titles, but in the sense that actually matters: every person who has spent real years doing something has, in the process, become an expert in something. Expertise earned through living doesn't need a certificate to be real. It needs one thing it rarely gets: a way to reach the next person who needs it.",
       "nameHeading": "The name",
       "name": "Narvyaka: one person's knowledge, made known to the world.",
@@ -429,7 +430,7 @@
     },
     "stage2": {
       "label": "The deeper meaning",
-      "heading": "Three responsibilities, one name.",
+      "heading": "Preserve. Connect. Continue.",
       "intro": "The name carries a second meaning, inspired by three figures from the Indian knowledge tradition, each representing one responsibility the archive depends on.",
       "figures": [
         {
@@ -448,13 +449,13 @@
           "body": "The crow-sage who narrates Rama's story across ages to Garuda. Kakabhushundi represents continuity itself: a voice that speaks once, and keeps teaching long after the moment it was recorded."
         }
       ],
-      "closing": "Preserve. Connect. Continue. Three responsibilities, one name, one movement.",
+      "closing": "Three responsibilities, one name, one movement.",
       "note": "Narvyaka's name and its three guiding figures come from India. The responsibility they describe, and the invitation to take part in it, belong equally to every country, every culture, and every person willing to preserve one honest lesson."
     }
   },
   "howItWorks": {
     "eyebrow": "How it works",
-    "heading": "What a Wisdom Record is.",
+    "heading": "The Wisdom Record",
     "intro": "Each contribution becomes one Wisdom Record — small enough to complete in under an hour, complete enough to genuinely matter. Not your life story. One lesson.",
     "partsHeading": "The four parts",
     "parts": [
@@ -485,7 +486,7 @@
       "Audio needs almost none of that. It is affordable, portable, easy to translate — and, most importantly, it keeps the contributor's actual voice, not a professional's rendering of it, at the centre of the record.",
       "Every Wisdom Record can grow later — into an article, a podcast, a documentary, a book. But the source has to be captured first, while the person carrying it is still here to give it. Everything else can wait. This can't."
     ],
-    "storageHeading": "Built to outlast us",
+    "storageHeading": "How Narvyaka Will Grow",
     "storageIntro": "No single company, website or government will ever be the sole guardian of what Narvyaka preserves. Durability isn't a promise you make once. It's a responsibility you keep showing up for.",
     "storage": [
       {
@@ -501,7 +502,7 @@
         "body": "Independent backups and trusted institutional partners, so the archive does not depend on any one organisation continuing to exist."
       }
     ],
-    "reviewHeading": "Dignity, consent, and truth",
+    "reviewHeading": "Dignity, Consent, and Truth",
     "reviewBody": "Narvyaka preserves people, not content. No record is published without informed, specific consent — the contributor decides, in plain language, what becomes public, what stays private, and what happens to their words. Private pain is never turned into entertainment, and a record is never selected because it might go viral. Every submission arrives marked 'pending review' and a person reads it before it goes anywhere.",
     "verificationHeading": "How certainty is marked",
     "verificationIntro": "Records are not silently presented as fact. Each carries one of exactly three labels, and no record is left unmarked.",
@@ -521,7 +522,7 @@
     ],
     "sampleHeading": "A sample capsule",
     "sampleIntro": "This is the shape of a finished record. Until a real one exists, this is an illustration.",
-    "ruleHeading": "Our rule for building",
+    "ruleHeading": "Our Rule for Building",
     "ruleIntro": "Every feature proposal must answer three questions. If the answer is not yes to all three, it is set aside.",
     "rules": [
       "Does this help preserve expertise?",
@@ -841,13 +842,13 @@
       "heading": "Photographs",
       "intro": "Up to five. A face, a place, a tool, a handwritten page. A record with no photographs is a complete record — this step can be skipped entirely.",
       "dropLabel": "Drag photographs here, or choose files",
-      "dropHint": "JPEG, PNG, WebP or HEIC. Up to 10 MB each.",
+      "dropHint": "JPEG, PNG, WebP or HEIC. Up to 300 MB each.",
       "captionLabel": "Who, what, or where",
       "captionPlaceholder": "One line, if you want one",
       "removeLabel": "Remove",
       "cropLabel": "Crop",
       "maxReached": "That is five photographs — the maximum for one record.",
-      "tooLarge": "That file is over 10 MB. Try a smaller version.",
+      "tooLarge": "That file is over 300 MB. Try a smaller version.",
       "wrongType": "That file type isn't supported. Use JPEG, PNG or WebP."
     },
     "review": {

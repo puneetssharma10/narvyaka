@@ -1,0 +1,19 @@
+---
+import Base from '../layouts/Base.astro'
+import PageHeader from '../components/PageHeader.astro'
+import LoginForm from '../components/admin/LoginForm'
+---
+
+<Base title="Sign in" noindex>
+  <PageHeader
+    eyebrow="Narvyaka"
+    heading="Sign in"
+    intro="For volunteers, admins, and the site's super_admin. Everyone else can read the archive without an account."
+  />
+
+  <section class="section">
+    <div class="wrap-read">
+      <LoginForm client:load />
+    </div>
+  </section>
+</Base>

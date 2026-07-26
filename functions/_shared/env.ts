@@ -14,15 +14,34 @@ export interface Env {
   /** Secret. Required before the Studio can publish overrides to the live site. */
   STUDIO_TOKEN?: string
   /**
+   * Secret. Only used once, by POST /api/auth/bootstrap, to create the very
+   * first super_admin account. The endpoint refuses to run at all once a
+   * super_admin row already exists, so this can stay set indefinitely without
+   * becoming a standing risk — but removing it after first use is still fine.
+   */
+  BOOTSTRAP_TOKEN?: string
+  /**
    * Public base URL for the R2 bucket, e.g. https://media.narvyaka.org.
    * Leave unset and media is served through this site at /media/*.
    */
   PUBLIC_MEDIA_BASE_URL?: string
   /** Set to "1" to stop accepting new submissions without taking the site down. */
   INTAKE_PAUSED?: string
+
+  /**
+   * R2's S3-compatible API credentials — only used to sign direct-to-R2
+   * upload URLs (functions/api/uploads/presign.ts), so a 300 MB recording
+   * never has to pass through a Function's own request-body limit. Created
+   * once in the Cloudflare dashboard: R2 → Manage R2 API Tokens → Create API
+   * Token (Object Read & Write, scoped to this bucket). See INTEGRATIONS.md.
+   */
+  R2_ACCOUNT_ID?: string
+  R2_ACCESS_KEY_ID?: string
+  R2_SECRET_ACCESS_KEY?: string
+  R2_BUCKET_NAME?: string
 }
 
-export const MAX_UPLOAD_BYTES = 10 * 1024 * 1024 // 10 MB
+export const MAX_UPLOAD_BYTES = 300 * 1024 * 1024 // 300 MB per file
 export const MAX_JSON_BYTES = 1 * 1024 * 1024 // 1 MB of text is a very long record
 
 export const ALLOWED_UPLOAD_TYPES: Record<string, string> = {

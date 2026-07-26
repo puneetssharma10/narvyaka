@@ -35,10 +35,18 @@ PUBLIC_MEDIA_BASE_URL = ""
 INTAKE_PAUSED = "0"
 
 # ── Secrets — never put these in this file ────────────────────────────────────
-# STUDIO_TOKEN  Required only for publishing Studio edits straight to the live
-#               site. Set it with:
-#                   npx wrangler pages secret put STUDIO_TOKEN
-#               Exporting edits and running `npm run studio:apply` needs no token.
+# STUDIO_TOKEN         Optional. Scripted/CI Studio publishing only — once you've
+#                      bootstrapped a super_admin (INTEGRATIONS.md §6), the
+#                      Studio publishes using that session instead.
+# BOOTSTRAP_TOKEN      Required once, to create the first super_admin account.
+#                      See INTEGRATIONS.md §6.2.
+# R2_ACCOUNT_ID
+# R2_ACCESS_KEY_ID
+# R2_SECRET_ACCESS_KEY
+# R2_BUCKET_NAME       Required for uploads over ~100 MB (direct-to-R2 presigned
+#                      URLs). See INTEGRATIONS.md §7.
+#
+#   npx wrangler pages secret put <NAME>
 
 # ── Preview environment ───────────────────────────────────────────────────────
 # Pages gives every branch a preview deployment. Point it at separate stores so

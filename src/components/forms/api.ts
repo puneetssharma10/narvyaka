@@ -42,20 +42,51 @@ export interface UploadResult {
   bytes: number
 }
 
-/** Uploads one file to object storage and returns the URL to store in the record. */
+/**
+ * Uploads one file to object storage and returns the URL to store in the record.
+ *
+ * Goes straight to R2 via a presigned URL rather than through a Pages
+ * Function — Cloudflare caps a Function's own request body at 100–500 MB
+ * depending on plan, which a 300 MB recording can exceed on anything but
+ * Enterprise. The `endpoint` parameter is kept for compatibility with
+ * existing callers but is no longer used to receive the file's bytes.
+ */
 export async function uploadFile(
-  endpoint: string,
+  _endpoint: string,
   blob: Blob,
   opts: { filename: string; kind: 'audio' | 'photo'; recordId: string },
 ): Promise<UploadResult> {
-  const form = new FormData()
-  form.append('file', blob, opts.filename)
-  form.append('kind', opts.kind)
-  form.append('record_id', opts.recordId)
+  const contentType = blob.type || (opts.kind === 'audio' ? 'audio/webm' : 'image/jpeg')
 
-  const response = await fetch(endpoint, { method: 'POST', body: form })
-  if (!response.ok) throw await readError(response)
-  return (await response.json()) as UploadResult
+  const presignResponse = await fetch('/api/uploads/presign', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({
+      record_id: opts.recordId,
+      kind: opts.kind,
+      content_type: contentType,
+      bytes: blob.size,
+    }),
+  })
+  if (!presignResponse.ok) throw await readError(presignResponse)
+  const { uploadUrl, key } = (await presignResponse.json()) as { uploadUrl: string; key: string }
+
+  const putResponse = await fetch(uploadUrl, {
+    method: 'PUT',
+    headers: { 'content-type': contentType },
+    body: blob,
+  })
+  if (!putResponse.ok) {
+    throw new ApiError('That upload did not reach storage.', putResponse.status)
+  }
+
+  const confirmResponse = await fetch('/api/uploads/confirm', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ key, record_id: opts.recordId, kind: opts.kind, content_type: contentType }),
+  })
+  if (!confirmResponse.ok) throw await readError(confirmResponse)
+  return (await confirmResponse.json()) as UploadResult
 }
 
 export interface SubmitResult {

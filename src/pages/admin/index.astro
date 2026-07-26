@@ -1,0 +1,15 @@
+---
+import Base from '../../layouts/Base.astro'
+import PageHeader from '../../components/PageHeader.astro'
+import AdminDashboard from '../../components/admin/AdminDashboard'
+---
+
+<Base title="Admin" noindex>
+  <PageHeader eyebrow="Narvyaka" heading="Review and accounts" />
+
+  <section class="section">
+    <div class="wrap">
+      <AdminDashboard client:load />
+    </div>
+  </section>
+</Base>
