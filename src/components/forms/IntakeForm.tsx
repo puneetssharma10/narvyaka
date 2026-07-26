@@ -762,12 +762,9 @@ function RecordStep({
       {/* Progressive disclosure: one question at a time, so this reads like a
           conversation rather than a job application. */}
       <div className="mt-8 card p-6 md:p-7">
-        <div className="flex items-center justify-between gap-4">
-          <p className="m-0 text-[0.82rem] font-semibold uppercase tracking-[0.09em] text-accent">
-            {copy.record.progressLabel} {index + 1} / {questions.length}
-          </p>
-          {!question.required && <span className="hint">{copy.common.optional}</span>}
-        </div>
+        <p className="m-0 text-[0.82rem] font-semibold uppercase tracking-[0.09em] text-accent">
+          {copy.record.progressLabel} {index + 1} / {questions.length}
+        </p>
 
         <h3 className="mt-3 font-heading text-[clamp(1.15rem,2.4vw,1.4rem)] leading-[1.4]">{question.label}</h3>
         {question.hint && <p className="hint mt-2">{question.hint}</p>}

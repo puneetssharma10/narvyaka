@@ -5,8 +5,7 @@
  * A geometric N built from two upright stems and a single rising diagonal.
  * The stems are the two people — the one who knew, and the one who needs to
  * know. The diagonal is the transmission between them, and it is the only part
- * that carries colour: cobalt into Rosso, the same light signature used across
- * the site.
+ * that carries colour: the same brown-gold-to-blue sweep as the wordmark.
  *
  * Constructed from paths rather than set in a typeface, so it stays identical
  * at any size and whatever fonts are installed. Legible down to 16px.
@@ -41,8 +40,8 @@ const uid = `nv-mark-${Math.random().toString(36).slice(2, 9)}`
     gradient && (
       <defs>
         <linearGradient id={uid} x1="18" y1="12" x2="54" y2="52" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stop-color="var(--color-accent)" />
-          <stop offset="100%" stop-color="var(--color-signal)" />
+          <stop offset="0%" stop-color="var(--color-signal)" />
+          <stop offset="100%" stop-color="var(--color-accent)" />
         </linearGradient>
       </defs>
     )

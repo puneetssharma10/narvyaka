@@ -4,6 +4,7 @@ import Wordmark from '../components/Wordmark.astro'
 import Icon from '../components/Icon.astro'
 import AudioPlayer from '../components/AudioPlayer.astro'
 import PlaceholderNotice from '../components/PlaceholderNotice.astro'
+import RotatingShowcase from '../components/RotatingShowcase.astro'
 import { content, editable, t, list } from '../lib/content'
 import { siteConfig } from '../../site.config'
 
@@ -11,6 +12,28 @@ const home = content.home
 const example = home.exampleCapsule
 const problemParagraphs = list<string>('home.problem.paragraphs')
 const iconFor = { voice: 'voice', note: 'note', photo: 'photo', identity: 'identity' } as const
+
+// The showcase's slides are the four Wisdom Record parts plus the three
+// responsibility figures from /about — existing copy, not new writing.
+const figureIcon: Record<string, 'lock' | 'arrow' | 'quote'> = {
+  Vyasa: 'lock',
+  Narada: 'arrow',
+  Kakabhushundi: 'quote',
+}
+const showcaseItems = [
+  ...home.howItWorks.items.map((item) => ({
+    icon: iconFor[item.icon as keyof typeof iconFor] ?? ('note' as const),
+    eyebrow: 'One record, four parts',
+    title: item.title,
+    body: item.body,
+  })),
+  ...content.about.stage2.figures.map((figure) => ({
+    icon: figureIcon[figure.name] ?? ('quote' as const),
+    eyebrow: figure.responsibility,
+    title: figure.name,
+    body: figure.body,
+  })),
+]
 ---
 
 <Base title={siteConfig.name}>
@@ -18,9 +41,9 @@ const iconFor = { voice: 'voice', note: 'note', photo: 'photo', identity: 'ident
   <section class="relative overflow-hidden border-b border-hairline bg-surface">
     <!-- The faintest technical grid, masked so it fades before the copy. -->
     <div class="grid-field-light absolute inset-0" aria-hidden="true"></div>
-    <!-- Light signature: a single cobalt-to-Rosso sweep across the top edge. -->
+    <!-- Light signature: the logo's own brown-gold-to-blue sweep across the top edge. -->
     <div
-      class="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-accent via-signal to-transparent"
+      class="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-signal via-accent to-transparent"
       aria-hidden="true"
     >
     </div>
@@ -30,7 +53,7 @@ const iconFor = { voice: 'voice', note: 'note', photo: 'photo', identity: 'ident
         <div>
           <Wordmark size="xl" class="block" />
 
-          <h1 class="mt-8 max-w-[15ch]" {...editable('home.hero.tagline')}>
+          <h1 class="mt-8 max-w-[15ch]" data-type-target {...editable('home.hero.tagline')}>
             {t('home.hero.tagline')}
           </h1>
 
@@ -121,6 +144,17 @@ const iconFor = { voice: 'voice', note: 'note', photo: 'photo', identity: 'ident
     </div>
   </section>
 
+  <!-- ── A living spotlight through what's already true ─────────────────
+       The four Wisdom Record parts and the three responsibility figures,
+       cycling one at a time — existing copy from howItWorks and about,
+       not new writing. -->
+  <section class="section border-b border-hairline">
+    <div class="wrap-read reveal">
+      <span class="light-bar mb-7"></span>
+      <RotatingShowcase items={showcaseItems} />
+    </div>
+  </section>
+
   <!-- ── The problem ───────────────────────────────────────────────────── -->
   <section class="section border-b border-hairline">
     <div class="wrap-read reveal">
@@ -145,10 +179,13 @@ const iconFor = { voice: 'voice', note: 'note', photo: 'photo', identity: 'ident
         <p class="mt-5 text-muted" {...editable('home.status.body')}>{t('home.status.body')}</p>
       </div>
 
-      <dl class="mt-12 grid gap-px overflow-hidden rounded-[6px] border border-hairline bg-hairline sm:grid-cols-3">
+      <dl class="mt-12 grid gap-x-12 gap-y-10 sm:grid-cols-3">
         {
           home.status.metrics.map((metric, i) => (
-            <div class="reveal bg-surface p-7" style={`transition-delay:${i * 60}ms`}>
+            <div
+              class={`reveal ${i > 0 ? 'sm:border-l sm:border-hairline sm:pl-12' : ''}`}
+              style={`transition-delay:${i * 60}ms`}
+            >
               <dd class="m-0 flex items-baseline gap-1.5">
                 <span class="font-heading text-[3rem] font-semibold leading-none tracking-tight tnum">
                   {metric.value}
@@ -181,18 +218,14 @@ const iconFor = { voice: 'voice', note: 'note', photo: 'photo', identity: 'ident
         <h2 {...editable('home.ctas.heading')}>{t('home.ctas.heading')}</h2>
       </div>
 
-      <div class="mt-12 grid gap-5 md:grid-cols-3">
+      <div class="mt-12 grid gap-10 md:grid-cols-3 md:gap-x-12 md:gap-y-0">
         {
           home.ctas.items.map((item, i) => (
             <a
               href={item.href}
-              class="card reveal group relative flex flex-col overflow-hidden p-7 no-underline transition-colors hover:border-accent"
+              class={`reveal group relative flex flex-col border-t-2 border-hairline pt-6 no-underline transition-colors hover:border-accent ${i > 0 ? 'md:border-l md:pl-10' : ''}`}
               style={`transition-delay:${i * 60}ms`}
             >
-              <span
-                class="absolute inset-x-0 top-0 h-[3px] origin-left scale-x-0 bg-accent transition-transform duration-300 group-hover:scale-x-100"
-                aria-hidden="true"
-              />
               <span class="font-heading text-[0.8rem] tabular-nums text-accent">
                 {String(i + 1).padStart(2, '0')}
               </span>
@@ -285,3 +318,28 @@ const iconFor = { voice: 'voice', note: 'note', photo: 'photo', identity: 'ident
     </div>
   </section>
 </Base>
+
+<script>
+  // The hero tagline types itself in on load — reserving its final height
+  // first so nothing below it jumps as the text grows back in.
+  const el = document.querySelector<HTMLElement>('[data-type-target]')
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+  if (el && !reduceMotion) {
+    const full = el.textContent ?? ''
+    el.style.minHeight = `${el.offsetHeight}px`
+    el.textContent = ''
+    el.classList.add('type-cursor')
+
+    let i = 0
+    const timer = window.setInterval(() => {
+      i += 1
+      el.textContent = full.slice(0, i)
+      if (i >= full.length) {
+        window.clearInterval(timer)
+        el.classList.remove('type-cursor')
+        el.style.minHeight = ''
+      }
+    }, 38)
+  }
+</script>

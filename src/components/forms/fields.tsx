@@ -12,12 +12,11 @@ interface FieldProps {
   htmlFor?: string
 }
 
-export function Field({ label, hint, optional, error, children, htmlFor }: FieldProps) {
+export function Field({ label, hint, error, children, htmlFor }: FieldProps) {
   return (
     <div>
       <label className="label" htmlFor={htmlFor}>
         {label}
-        {optional && <span className="ml-2 font-normal text-muted">Optional</span>}
       </label>
       {hint && <p className="hint mb-2">{hint}</p>}
       {children}

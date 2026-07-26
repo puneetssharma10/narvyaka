@@ -35,6 +35,12 @@ const scale: Record<string, { text: string; mark: number; gap: string }> = {
 }
 
 const s = scale[size]
+
+// A custom logo's height is stored once, at `md` size — everywhere else scales
+// proportionally from it, using the same ratios as the built-in mark's sizes.
+// Without this, one flat height either looks tiny in the hero or oversized in
+// the nav; there's no single number that works in both places at once.
+const customHeight = Math.round((logo.height ?? 28) * (s.mark / scale.md.mark))
 ---
 
 <span
@@ -46,8 +52,8 @@ const s = scale[size]
       <img
         src={logo.src}
         alt={logo.alt}
-        height={logo.height}
-        style={`height:${logo.height}px;width:auto`}
+        height={customHeight}
+        style={`height:${customHeight}px;width:auto`}
         class="block"
         data-logo-img
       />

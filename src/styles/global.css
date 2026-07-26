@@ -7,13 +7,16 @@
 @import '@fontsource-variable/outfit/wght.css';
 @import '@fontsource-variable/inter/wght.css';
 @import '@fontsource-variable/public-sans/wght.css';
+@import '@fontsource-variable/fraunces/wght.css';
+@import '@fontsource-variable/fraunces/wght-italic.css';
 
 /* ───────────────────────────────────────────────────────────────────────────
    DESIGN TOKENS
 
-   Direction: precision-engineered, not warm-archival. The reference is the
-   finish of a high-end car — a near-black carbon, a bright cool white, and
-   two saturated signal colours used sparingly and with confidence.
+   Direction: taken from the real logomark — an elegant italic serif carrying
+   a gradient from warm brown-gold through blue to teal-cyan. Every hex below
+   was sampled directly from that file, not guessed: an editorial, considered
+   identity in place of the earlier "high-end car" cobalt-and-carbon one.
 
    These are emitted as real CSS custom properties on :root, and every Tailwind
    utility below references them via var(). That is what makes the Studio's
@@ -34,22 +37,24 @@
   --color-muted: #5a6270;
   --color-hairline: #e3e6ec;
 
-  /* Primary — electric cobalt. Buttons, links, the brand colour. */
-  --color-accent: #1b34e8;
-  --color-accent-hover: #0f21b0;
-  --color-accent-soft: #e9ecff;
+  /* Primary — the blue from the centre of the logo's gradient. */
+  --color-accent: #2b6cb0;
+  --color-accent-hover: #1e4e80;
+  --color-accent-soft: #e8f1fa;
 
-  /* Signal — Rosso. Emphasis only: never a whole surface. */
-  --color-signal: #e4002b;
-  --color-signal-soft: #ffe8ec;
+  /* Signal — the warm brown-gold from the logo's left side. Emphasis only. */
+  --color-signal: #8a5a22;
+  --color-signal-soft: #f5ede1;
 
   /* Status */
   --color-verified: #00a355; /* Verde */
   --color-caution: #f5b301; /* Giallo */
 
-  /* Type */
-  --font-wordmark: 'Space Grotesk Variable', 'Sora Variable', system-ui, sans-serif;
-  --font-heading: 'Sora Variable', 'Space Grotesk Variable', system-ui, sans-serif;
+  /* Type — Fraunces, the logo's own family: upright for headings, its
+     natural italic cut for the wordmark and pull-quotes. Inter stays for
+     body copy — a page of italic serif paragraphs is a strain to read. */
+  --font-wordmark: 'Fraunces Variable', 'Source Serif 4 Variable', Georgia, serif;
+  --font-heading: 'Fraunces Variable', 'Source Serif 4 Variable', Georgia, serif;
   --font-body: 'Inter Variable', 'Public Sans Variable', system-ui, sans-serif;
 
   /* Radius — Build Brief §2.3: soft, not sharp, not pill-shaped. */
@@ -433,7 +438,7 @@
     width: 44px;
     height: 3px;
     border-radius: 2px;
-    background: linear-gradient(90deg, var(--color-accent) 0%, var(--color-signal) 100%);
+    background: linear-gradient(90deg, var(--color-signal) 0%, var(--color-accent) 100%);
   }
 
   /* Technical grid, light: the faintest possible structure behind the hero.
@@ -445,6 +450,30 @@
     background-size: 72px 72px;
     -webkit-mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.5) 0%, transparent 78%);
     mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.5) 0%, transparent 78%);
+  }
+
+  /* The blinking caret at the end of the hero's typing animation. */
+  .type-cursor::after {
+    content: '';
+    display: inline-block;
+    width: 3px;
+    height: 0.85em;
+    margin-left: 0.06em;
+    background: var(--color-accent);
+    vertical-align: text-bottom;
+    animation: nv-caret-blink 0.9s steps(1) infinite;
+  }
+
+  @keyframes nv-caret-blink {
+    50% {
+      opacity: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .type-cursor::after {
+      animation: none;
+    }
   }
 
   /* Technical grid, used behind a dark surface. */
@@ -487,15 +516,14 @@
     }
   }
 
-  /* The wordmark: set like automotive badging — uppercase, widely tracked. */
+  /* The wordmark: the logo's own voice — an italic serif, set as a name,
+     not a badge. Used only where there is no uploaded logo file to show
+     instead (Wordmark.astro's fallback state). */
   .wordmark {
     font-family: var(--font-wordmark);
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.2em;
-    /* The tracking adds space after the final letter; pull it back so the
-       mark stays optically centred against anything beside it. */
-    margin-inline-end: -0.2em;
+    font-style: italic;
+    font-weight: 500;
+    letter-spacing: -0.01em;
   }
 
   .visually-hidden {

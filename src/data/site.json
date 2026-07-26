@@ -9,23 +9,23 @@
       "ink": "#0B0E14",
       "muted": "#5A6270",
       "hairline": "#E3E6EC",
-      "accent": "#1B34E8",
-      "accent-hover": "#0F21B0",
-      "accent-soft": "#E9ECFF",
-      "signal": "#E4002B",
-      "signal-soft": "#FFE8EC",
+      "accent": "#2B6CB0",
+      "accent-hover": "#1E4E80",
+      "accent-soft": "#E8F1FA",
+      "signal": "#8A5A22",
+      "signal-soft": "#F5EDE1",
       "verified": "#00A355",
       "caution": "#F5B301"
     },
     "fonts": {
-      "wordmark": "'Space Grotesk Variable', 'Sora Variable', system-ui, sans-serif",
-      "heading": "'Sora Variable', 'Space Grotesk Variable', system-ui, sans-serif",
+      "wordmark": "'Fraunces Variable', 'Source Serif 4 Variable', Georgia, serif",
+      "heading": "'Fraunces Variable', 'Source Serif 4 Variable', Georgia, serif",
       "body": "'Inter Variable', 'Public Sans Variable', system-ui, sans-serif"
     },
     "logo": {
-      "src": "",
+      "src": "/logo-mark.png",
       "alt": "Narvyaka",
-      "height": 30
+      "height": 28
     }
   },
   "nav": {
@@ -945,6 +945,81 @@
     "editModeOff": "Editing off",
     "exportLabel": "Export changes",
     "applyHint": "Then run: npm run studio:apply ~/Downloads/narvyaka-overrides.json"
+  },
+  "chatbot": {
+    "launcherLabel": "Chat",
+    "greetingEmoji": "👋",
+    "greetingWelcome": "Welcome to NARVYAKA",
+    "greetingTagline": "Because No Generation Should Start From Zero.",
+    "greetingPrompt": "How can I help you today?",
+    "backLabel": "Back to menu",
+    "options": [
+      {
+        "label": "About NARVYAKA",
+        "answer": "Narvyaka is a movement to preserve at least one meaningful lesson from every willing experienced person — the judgement earned through decades of living, not facts already written down.",
+        "linkLabel": "Read more",
+        "linkHref": "/about"
+      },
+      {
+        "label": "Register an Account",
+        "answer": "There's no public sign-up. Reading the archive needs no account at all. Volunteer and admin accounts are created only after an application is reviewed and approved — see \"Become a Volunteer\".",
+        "linkLabel": "Already approved? Sign in",
+        "linkHref": "/login"
+      },
+      {
+        "label": "Contribute Knowledge",
+        "answer": "Preserve one meaningful lesson in under an hour: your voice, a short written note, and a photograph if you want one. Nothing is published without your review.",
+        "linkLabel": "Start your record",
+        "linkHref": "/preserve"
+      },
+      {
+        "label": "Become a Volunteer",
+        "answer": "Two founding roles are open right now — Interviewer, and Writer & Archivist. Applications are read personally, one at a time, never scored automatically.",
+        "linkLabel": "See both openings",
+        "linkHref": "/volunteer"
+      },
+      {
+        "label": "Upload Documents",
+        "answer": "Photographs and audio are uploaded as part of making a Wisdom Record — there's no separate upload page. Start a record and you'll be asked for them at the right step.",
+        "linkLabel": "Start your record",
+        "linkHref": "/preserve"
+      },
+      {
+        "label": "Knowledge Review Process",
+        "answer": "Every record arrives marked \"pending review.\" A person reads it, confirms anything unclear with the contributor, and only then does it go anywhere — at the access level the contributor chose.",
+        "linkLabel": "How it works",
+        "linkHref": "/how-it-works"
+      },
+      {
+        "label": "Manage My Contributions",
+        "answer": "If you have a volunteer or admin account, sign in to see and edit the records you've submitted yourself.",
+        "linkLabel": "Sign in",
+        "linkHref": "/login"
+      },
+      {
+        "label": "Support NARVYAKA",
+        "answer": "There's no donation system yet. Right now, the most valuable support is time — preserving one record, or becoming a founding volunteer.",
+        "linkLabel": "See how to help",
+        "linkHref": "/volunteer"
+      },
+      {
+        "label": "Contact Us",
+        "answer": "Write to us directly and a person will reply.",
+        "linkLabel": "connect@narvyaka.com",
+        "linkHref": "mailto:connect@narvyaka.com"
+      },
+      {
+        "label": "FAQs: Review process",
+        "answer": "Who reads my record? A person, not a filter. Can I withdraw it later? Yes, at any time, before or after publication. How is uncertain information marked? Every record carries one of three honest labels: Documented, Contributor's Account, or Family Tradition — never presented as more certain than it is.",
+        "linkLabel": "Full detail",
+        "linkHref": "/how-it-works"
+      }
+    ],
+    "footerLinks": [
+      { "label": "Privacy", "href": "/privacy" },
+      { "label": "Copyright", "href": "/terms" },
+      { "label": "Community guidelines", "href": "/volunteer#pledge" }
+    ]
   },
   "categories": [
     "Craft & trade",

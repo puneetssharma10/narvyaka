@@ -1,9 +1,11 @@
 ---
 import '../styles/global.css'
-import fraunceItalicUrl from '@fontsource-variable/fraunces/files/fraunces-latin-full-italic.woff2?url'
+import frauncesNormalUrl from '@fontsource-variable/fraunces/files/fraunces-latin-wght-normal.woff2?url'
+import frauncesItalicUrl from '@fontsource-variable/fraunces/files/fraunces-latin-wght-italic.woff2?url'
 import Header from '../components/Header.astro'
 import Footer from '../components/Footer.astro'
 import StudioBoot from '../components/StudioBoot.astro'
+import Chatbot from '../components/Chatbot.astro'
 import { siteConfig, siteUrl, hasDomain } from '../../site.config'
 
 interface Props {
@@ -33,8 +35,9 @@ const canonical = hasDomain ? new URL(Astro.url.pathname, siteUrl).href : undefi
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
 
-    <!-- The wordmark is above the fold on every page; fetch its face immediately. -->
-    <link rel="preload" href={fraunceItalicUrl} as="font" type="font/woff2" crossorigin />
+    <!-- Headings and the wordmark are above the fold on every page. -->
+    <link rel="preload" href={frauncesNormalUrl} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={frauncesItalicUrl} as="font" type="font/woff2" crossorigin />
 
     {canonical && <link rel="canonical" href={canonical} />}
     {noindex && <meta name="robots" content="noindex, nofollow" />}
@@ -57,6 +60,7 @@ const canonical = hasDomain ? new URL(Astro.url.pathname, siteUrl).href : undefi
       <slot />
     </main>
     <Footer />
+    <Chatbot />
 
     <script>
       // Fade-in on scroll. 280ms, ease-out, no parallax (Build Brief §2.4).

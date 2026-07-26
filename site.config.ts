@@ -33,8 +33,15 @@ export const siteConfig = {
    */
   domain: 'narvyaka.pages.dev',
 
-  /** e.g. "hello@narvyaka.org" — leave "" until the mailbox exists. */
-  contactEmail: '',
+  /**
+   * e.g. "hello@narvyaka.org" — leave "" until the mailbox exists.
+   *
+   * Set, but not yet actually receiving mail: `domain` above is still the
+   * free pages.dev subdomain, so this address has nowhere to land until
+   * narvyaka.com is purchased and Cloudflare Email Routing is configured to
+   * forward it to a real inbox. See INTEGRATIONS.md § Email.
+   */
+  contactEmail: 'connect@narvyaka.com',
 
   /** e.g. "https://github.com/puneetssharma10/narvyaka" — leave "" for now. */
   social: {

@@ -90,6 +90,29 @@ so this is safe to do at any time.
 
 ---
 
+## Email — connect@narvyaka.com → your inbox
+
+`site.config.ts` now sets `contactEmail: 'connect@narvyaka.com'`, which turns
+on the "Write to us" mailto link in the footer and the chatbot's Contact Us
+answer. That address has nowhere to deliver to yet — email needs a real
+domain, which `domain` in the same file doesn't have (still the free
+`pages.dev` subdomain). Once you buy `narvyaka.com`:
+
+1. Add the domain to your Cloudflare account (Websites → Add a site) and
+   point its nameservers at Cloudflare, if you haven't already.
+2. Dashboard → your domain → **Email → Email Routing** → enable it.
+3. Add a routing rule: `connect@narvyaka.com` → **puneets.sharma10@gmail.com**
+   (or a "Catch-all" rule if you want every `@narvyaka.com` address to land
+   in the same inbox). Cloudflare adds the necessary MX/TXT records for you.
+4. Verify the forwarding address — Cloudflare emails a confirmation link to
+   the Gmail address the first time you add it as a destination.
+
+No code change is needed for any of this — it's entirely DNS and DNS-adjacent
+configuration in the Cloudflare dashboard, independent of `wrangler.toml` or
+Pages Functions.
+
+---
+
 ## 3. Bind them to the Pages project
 
 If you deploy with `npm run pages:deploy` or Git integration, `wrangler.toml`
