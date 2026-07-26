@@ -16,7 +16,7 @@ pages_build_output_dir = "dist"
 [[d1_databases]]
 binding = "DB"
 database_name = "narvyaka"
-database_id = "REPLACE_WITH_YOUR_D1_DATABASE_ID"
+database_id = "61caba10-efe5-42ee-878f-ad8043b3dfa5"
 
 # ── Object storage: Cloudflare R2 ─────────────────────────────────────────────
 # Create with:  npx wrangler r2 bucket create narvyaka-media
