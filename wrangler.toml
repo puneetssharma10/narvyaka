@@ -48,19 +48,7 @@ INTAKE_PAUSED = "0"
 #
 #   npx wrangler pages secret put <NAME>
 
-# ── Preview environment ───────────────────────────────────────────────────────
-# Pages gives every branch a preview deployment. Point it at separate stores so
-# test submissions never touch the real archive.
-[env.preview]
-[[env.preview.d1_databases]]
-binding = "DB"
-database_name = "narvyaka-preview"
-database_id = "REPLACE_WITH_YOUR_PREVIEW_D1_DATABASE_ID"
-
-[[env.preview.r2_buckets]]
-binding = "MEDIA"
-bucket_name = "narvyaka-media-preview"
-
-[env.preview.vars]
-PUBLIC_MEDIA_BASE_URL = ""
-INTAKE_PAUSED = "0"
+# No [env.preview] block for now — every deployment (production or a branch
+# preview) uses the single D1 database and R2 bucket configured above. Add a
+# separate preview environment later, once there's a second bucket/database
+# to point it at (see git history for the block this replaced).
