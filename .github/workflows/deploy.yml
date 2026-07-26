@@ -2,7 +2,7 @@ name: Build and deploy
 
 on:
   push:
-    branches: [main]
+    branches: [claude/narvyaka-phase-1-build-jssqzo]
   pull_request:
   workflow_dispatch:
 
@@ -63,7 +63,7 @@ jobs:
   deploy:
     name: Deploy to Cloudflare Pages
     needs: check
-    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    if: github.ref == 'refs/heads/claude/narvyaka-phase-1-build-jssqzo' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     environment:
       name: production
