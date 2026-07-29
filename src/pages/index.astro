@@ -33,23 +33,31 @@ const motion = content.motion
 
     <!-- Single column, top to bottom, on every screen size — the same flow
          mobile always had, now kept at every width instead of only switching
-         to a side-by-side split once the viewport widens. -->
+         to a side-by-side split once the viewport widens.
+
+         The measures below only ever widen at md/lg. A phone viewport is
+         narrower than even the smallest of them, so the mobile rendering is
+         untouched — the extra width is spent purely on giving a laptop more
+         words per line instead of a tall, narrow column of short lines. -->
     <div class="wrap relative section-lg">
-      <div class="mx-auto flex max-w-xl flex-col items-center text-center">
+      <div class="mx-auto flex max-w-xl flex-col items-center text-center md:max-w-2xl lg:max-w-3xl">
         <Wordmark size="lg" class="block" />
 
-        <h1 class="mt-8 max-w-[16ch]" data-type-target {...editable('home.hero.tagline')}>
+        <h1 class="mt-8 max-w-[16ch] md:max-w-[24ch]" data-type-target {...editable('home.hero.tagline')}>
           {t('home.hero.tagline')}
         </h1>
 
         <p
-          class="mt-8 max-w-[24ch] font-heading text-[clamp(1.3rem,2.6vw,1.75rem)] font-normal leading-[1.25] tracking-tight text-accent"
+          class="mt-8 max-w-[24ch] font-heading text-[clamp(1.3rem,2.6vw,1.75rem)] font-normal leading-[1.25] tracking-tight text-accent md:max-w-[36ch]"
           {...editable('home.hero.subhead')}
         >
           {t('home.hero.subhead')}
         </p>
 
-        <p class="mt-7 max-w-[52ch] text-[1.05rem] leading-[1.7] text-muted" {...editable('home.hero.intro')}>
+        <p
+          class="mt-7 max-w-[52ch] text-[1.05rem] leading-[1.7] text-muted md:max-w-[64ch]"
+          {...editable('home.hero.intro')}
+        >
           {t('home.hero.intro')}
         </p>
 

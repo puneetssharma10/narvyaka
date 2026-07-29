@@ -24,7 +24,9 @@ const roleNames = v.openings.map((opening) => opening.title)
 
   <!-- ── The two openings ──────────────────────────────────────────────── -->
   <section class="section border-b border-hairline">
-    <div class="wrap">
+    <!-- Stacked rather than a two-column split, but held to the reading
+         measure: full `wrap` width would run these lines past 120 characters. -->
+    <div class="wrap-read">
       <div class="max-w-[54ch]">
         <span class="light-bar mb-6"></span>
         <h2 {...editable('volunteer.rolesHeading')}>{t('volunteer.rolesHeading')}</h2>
