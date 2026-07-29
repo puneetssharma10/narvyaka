@@ -19,15 +19,17 @@ const motion = content.motion
 
 <Base title={siteConfig.name}>
   <!-- ── Hero ──────────────────────────────────────────────────────────── -->
-  <section class="relative overflow-hidden border-b border-hairline bg-surface">
+  <section class="relative overflow-hidden border-b border-hairline bg-surface" data-spotlight>
+    <!-- Two soft colour blobs, drifting slowly — the premium, "alive"
+         background layer. Idle motion only, never tied to scroll. -->
+    <div class="ambient-glow" aria-hidden="true"></div>
     <!-- The faintest technical grid, masked so it fades before the copy. -->
     <div class="grid-field-light absolute inset-0" aria-hidden="true"></div>
-    <!-- Light signature: the logo's own brown-gold-to-blue sweep across the top edge. -->
-    <div
-      class="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-signal via-accent to-transparent"
-      aria-hidden="true"
-    >
-    </div>
+    <!-- A soft highlight that follows the pointer on desktop. -->
+    <div class="hero-spotlight" aria-hidden="true"></div>
+    <!-- Light signature: the logo's own brown-gold-to-blue sweep, slowly
+         travelling across the top edge rather than sitting still. -->
+    <div class="light-signature absolute inset-x-0 top-0 h-[3px]" aria-hidden="true"></div>
 
     <!-- Single column, top to bottom, on every screen size — the same flow
          mobile always had, now kept at every width instead of only switching

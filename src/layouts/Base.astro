@@ -63,11 +63,12 @@ const canonical = hasDomain ? new URL(Astro.url.pathname, siteUrl).href : undefi
     <Chatbot />
 
     <script>
-      // Fade-in on scroll. 280ms, ease-out, no parallax (Build Brief §2.4).
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+      // Fade-in on scroll. 280ms, ease-out, no scroll-linked parallax.
       const targets = document.querySelectorAll('.reveal')
       if (targets.length) {
-        const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-        if (reduce || !('IntersectionObserver' in window)) {
+        if (reduceMotion || !('IntersectionObserver' in window)) {
           targets.forEach((el) => el.classList.add('is-visible'))
         } else {
           const observer = new IntersectionObserver(
@@ -82,6 +83,21 @@ const canonical = hasDomain ? new URL(Astro.url.pathname, siteUrl).href : undefi
           )
           targets.forEach((el) => observer.observe(el))
         }
+      }
+
+      // A soft pointer-following highlight on hero-style sections — desktop,
+      // fine-pointer only, and skipped entirely under reduced motion (the
+      // section still reads fine with .hero-spotlight simply inert).
+      if (!reduceMotion && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+        document.querySelectorAll<HTMLElement>('[data-spotlight]').forEach((host) => {
+          host.addEventListener('pointermove', (e) => {
+            const rect = host.getBoundingClientRect()
+            host.style.setProperty('--spot-x', `${e.clientX - rect.left}px`)
+            host.style.setProperty('--spot-y', `${e.clientY - rect.top}px`)
+            host.classList.add('has-spot')
+          })
+          host.addEventListener('pointerleave', () => host.classList.remove('has-spot'))
+        })
       }
     </script>
   </body>

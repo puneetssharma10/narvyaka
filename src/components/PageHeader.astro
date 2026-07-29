@@ -16,8 +16,11 @@ const { eyebrow, eyebrowPath, heading, headingPath, intro, introPath, width = 'r
 const wrapClass = width === 'read' ? 'wrap-read' : 'wrap'
 ---
 
-<header class="border-b border-hairline pb-12 pt-16 md:pb-16 md:pt-24">
-  <div class={wrapClass}>
+<header class="relative overflow-hidden border-b border-hairline pb-12 pt-16 md:pb-16 md:pt-24" data-spotlight>
+  <div class="ambient-glow" aria-hidden="true"></div>
+  <div class="grid-field-light absolute inset-0" aria-hidden="true"></div>
+  <div class="hero-spotlight" aria-hidden="true"></div>
+  <div class={`relative ${wrapClass}`}>
     {
       eyebrow && (
         <p

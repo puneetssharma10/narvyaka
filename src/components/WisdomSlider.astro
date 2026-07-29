@@ -67,7 +67,7 @@ const { items, basePath, class: className = '' } = Astro.props
   .nv-wisdom {
     aspect-ratio: 16 / 9;
     max-height: min(72vh, 620px);
-    border-radius: 6px;
+    border-radius: var(--radius-card);
     background: var(--color-carbon);
   }
 
@@ -89,6 +89,28 @@ const { items, basePath, class: className = '' } = Astro.props
   .nv-wisdom__image {
     position: absolute;
     inset: 0;
+    overflow: hidden;
+  }
+
+  /* A slow Ken Burns drift on whichever slide is showing — cinematic, and
+     imperceptible frame to frame. */
+  .nv-wisdom__image img {
+    animation: nv-kenburns 9s var(--ease-calm) forwards;
+  }
+
+  @keyframes nv-kenburns {
+    from {
+      transform: scale(1);
+    }
+    to {
+      transform: scale(1.07);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .nv-wisdom__image img {
+      animation: none;
+    }
   }
 
   .nv-wisdom__scrim {

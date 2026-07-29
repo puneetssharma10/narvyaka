@@ -196,6 +196,22 @@
     background: var(--color-surface);
     border: 1px solid var(--color-hairline);
     border-radius: var(--radius-card);
+    transition:
+      transform 220ms var(--ease-calm),
+      box-shadow 220ms var(--ease-calm),
+      border-color 220ms var(--ease-calm);
+  }
+
+  .card:hover {
+    transform: translateY(-3px);
+    border-color: color-mix(in srgb, var(--color-accent) 30%, var(--color-hairline));
+    box-shadow: 0 20px 36px -20px rgba(11, 14, 20, 0.18);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card:hover {
+      transform: none;
+    }
   }
 
   /* ── Dark carbon sections ────────────────────────────────────────────── */
@@ -286,6 +302,14 @@
   .btn-primary:hover:not(:disabled) {
     background: var(--color-accent-hover);
     border-color: var(--color-accent-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 10px 24px -12px color-mix(in srgb, var(--color-accent) 55%, transparent);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .btn-primary:hover:not(:disabled) {
+      transform: none;
+    }
   }
 
   .btn-secondary {
@@ -540,6 +564,160 @@
 
   .tnum {
     font-variant-numeric: tabular-nums;
+  }
+}
+
+/* ───────────────────────────────────────────────────────────────────────────
+   AMBIENT — slow background motion for a premium, high-end feel. Idle drift
+   and hover response only, never scroll-linked parallax. Every animation
+   here freezes under prefers-reduced-motion instead of simply speeding up.
+   ─────────────────────────────────────────────────────────────────────────── */
+@layer utilities {
+  /* Two soft, slowly drifting colour blobs behind hero-style sections. The
+     host element needs position:relative + overflow:hidden (both already
+     true of .relative.overflow-hidden sections). */
+  .ambient-glow {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .ambient-glow::before,
+  .ambient-glow::after {
+    content: '';
+    position: absolute;
+    width: 46vw;
+    height: 46vw;
+    max-width: 640px;
+    max-height: 640px;
+    border-radius: 50%;
+    filter: blur(64px);
+    opacity: 0.16;
+    animation: nv-drift 26s var(--ease-calm) infinite alternate;
+  }
+
+  .ambient-glow::before {
+    top: -14%;
+    left: -8%;
+    background: var(--color-accent);
+  }
+
+  .ambient-glow::after {
+    right: -10%;
+    bottom: -18%;
+    background: var(--color-signal);
+    animation-duration: 32s;
+    animation-delay: -6s;
+  }
+
+  @keyframes nv-drift {
+    0% {
+      transform: translate(0, 0) scale(1);
+    }
+    50% {
+      transform: translate(4%, 5%) scale(1.12);
+    }
+    100% {
+      transform: translate(-3%, -2%) scale(0.96);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ambient-glow::before,
+    .ambient-glow::after {
+      animation: none;
+    }
+  }
+
+  /* A soft radial highlight that follows the pointer — desktop, fine-pointer
+     only. Off by default; a script toggles --spot-x/--spot-y and .has-spot. */
+  .hero-spotlight {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 400ms var(--ease-calm);
+    background: radial-gradient(
+      420px circle at var(--spot-x, 50%) var(--spot-y, 20%),
+      color-mix(in srgb, var(--color-accent) 10%, transparent) 0%,
+      transparent 70%
+    );
+  }
+
+  .has-spot .hero-spotlight {
+    opacity: 1;
+  }
+
+  @media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) {
+    .hero-spotlight {
+      display: none;
+    }
+  }
+
+  /* Slow pan on the technical grid patterns — barely perceptible, reads as
+     a live schematic rather than a static print. */
+  .grid-field-light,
+  .grid-field {
+    animation: nv-grid-pan 50s linear infinite;
+  }
+
+  @keyframes nv-grid-pan {
+    from {
+      background-position: 0 0;
+    }
+    to {
+      background-position: 144px 144px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .grid-field-light,
+    .grid-field {
+      animation: none;
+    }
+  }
+
+  /* A slow light sweep along the signature top bar, instead of a static
+     gradient sitting still. */
+  .light-signature {
+    background: linear-gradient(90deg, var(--color-signal) 0%, var(--color-accent) 35%, transparent 60%, var(--color-signal) 100%);
+    background-size: 220% 100%;
+    animation: nv-sweep 9s ease-in-out infinite;
+  }
+
+  @keyframes nv-sweep {
+    0%,
+    100% {
+      background-position: 0% 0;
+    }
+    50% {
+      background-position: 100% 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .light-signature {
+      animation: none;
+      background-position: 0 0;
+    }
+  }
+
+  /* Lift on hover — cards and links that act as one large click target. */
+  .lift {
+    transition:
+      transform 220ms var(--ease-calm),
+      box-shadow 220ms var(--ease-calm);
+  }
+
+  .lift:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 32px -18px rgba(11, 14, 20, 0.22);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .lift:hover {
+      transform: none;
+    }
   }
 }
 
