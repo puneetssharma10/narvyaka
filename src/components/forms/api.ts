@@ -69,7 +69,14 @@ export async function uploadFile(
     }),
   })
   if (!presignResponse.ok) throw await readError(presignResponse)
-  const { uploadUrl, key } = (await presignResponse.json()) as { uploadUrl: string; key: string }
+  // `node` names which bucket the signature points at — it is passed back to
+  // /confirm so the size check runs against the bucket the file actually
+  // reached, which need not be this account's own.
+  const { uploadUrl, key, node } = (await presignResponse.json()) as {
+    uploadUrl: string
+    key: string
+    node?: string
+  }
 
   const putResponse = await fetch(uploadUrl, {
     method: 'PUT',
@@ -83,7 +90,7 @@ export async function uploadFile(
   const confirmResponse = await fetch('/api/uploads/confirm', {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ key, record_id: opts.recordId, kind: opts.kind, content_type: contentType }),
+    body: JSON.stringify({ key, record_id: opts.recordId, kind: opts.kind, content_type: contentType, node }),
   })
   if (!confirmResponse.ok) throw await readError(confirmResponse)
   return (await confirmResponse.json()) as UploadResult

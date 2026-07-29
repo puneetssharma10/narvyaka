@@ -45,6 +45,11 @@ INTAKE_PAUSED = "0"
 # R2_SECRET_ACCESS_KEY
 # R2_BUCKET_NAME       Required for uploads over ~100 MB (direct-to-R2 presigned
 #                      URLs). See INTEGRATIONS.md §7.
+# STORAGE_NODES        Optional. JSON array of extra buckets — in other accounts,
+#                      with other providers, in other countries — that this site
+#                      writes to and reads from over the S3 API. A binding like
+#                      MEDIA above can only ever see this account's own buckets;
+#                      this is how a partner archive joins. See INTEGRATIONS.md §8.
 #
 #   npx wrangler pages secret put <NAME>
 

@@ -1,4 +1,5 @@
-import { r2Credentials, presignPutUrl } from '../../_shared/r2-presign'
+import { presignUrl } from '../../_shared/s3-presign'
+import { pickWriteNode } from '../../_shared/storage-nodes'
 import {
   ALLOWED_UPLOAD_TYPES,
   BadJson,
@@ -22,16 +23,6 @@ import {
  * the upload lands, and removes anything over the limit.
  */
 export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
-  const creds = r2Credentials(env)
-  if (!creds) {
-    return fail(503, 'Direct uploads are not connected to object storage yet.', {
-      code: 'not_configured',
-      hint:
-        'Create an R2 API token (R2 → Manage R2 API Tokens → Object Read & Write, scoped to this bucket) ' +
-        'and set R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET_NAME as Pages secrets. See INTEGRATIONS.md.',
-    })
-  }
-
   const ip = clientIp(request)
   const limit = await rateLimit(env, `upload:${ip}`, { limit: 60, windowSeconds: 3600 })
   if (!limit.ok) {
@@ -82,10 +73,25 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     return fail(413, `That file is larger than the ${Math.round(MAX_UPLOAD_BYTES / 1024 / 1024)} MB limit.`)
   }
 
-  const key = `uploads/${recordId}/${crypto.randomUUID()}.${extension}`
-  const { url, expiresAt } = await presignPutUrl(creds, key)
+  // Which bucket this record's files live in. Decided from the record id, so
+  // every file in one submission lands together — see storage-nodes.ts.
+  const node = pickWriteNode(env, recordId)
+  if (!node) {
+    return fail(503, 'Direct uploads are not connected to object storage yet.', {
+      code: 'not_configured',
+      hint:
+        'Create an R2 API token (R2 → Manage R2 API Tokens → Object Read & Write, scoped to this bucket) ' +
+        'and set R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET_NAME as Pages secrets — ' +
+        'or configure STORAGE_NODES. See INTEGRATIONS.md.',
+    })
+  }
 
-  return json({ uploadUrl: url, key, expiresAt })
+  const key = `uploads/${recordId}/${crypto.randomUUID()}.${extension}`
+  const { url, expiresAt } = await presignUrl(node, key, 'PUT')
+
+  // The node id comes back so /api/uploads/confirm checks the same bucket the
+  // browser actually wrote to, rather than assuming the primary one.
+  return json({ uploadUrl: url, key, expiresAt, node: node.id })
 }
 
 function sanitiseId(value: string): string {

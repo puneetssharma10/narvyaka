@@ -1,56 +1,44 @@
-import type { Env } from './env'
+import type { StorageNode } from './storage-nodes'
 
 /**
- * Presigned R2 PUT URLs (AWS SigV4), signed with the platform's own WebCrypto.
+ * Presigned S3 URLs (AWS SigV4), signed with the platform's own WebCrypto.
  *
- * Why this exists: Cloudflare enforces a request-body-size ceiling on every
- * Worker/Pages Function invocation — 100 MB on Free/Pro, 200 MB on Business,
- * 500 MB only on Enterprise. Proxying a file's bytes through a Function (the
- * old /api/uploads path) means a 300 MB recording is rejected by the platform
- * itself before this code ever runs, no matter what MAX_UPLOAD_BYTES says.
+ * Why presigning exists at all: Cloudflare enforces a request-body-size
+ * ceiling on every Worker/Pages Function invocation — 100 MB on Free/Pro,
+ * 200 MB on Business, 500 MB only on Enterprise. Proxying a file's bytes
+ * through a Function (the old /api/uploads path) means a 300 MB recording is
+ * rejected by the platform itself before this code ever runs, no matter what
+ * MAX_UPLOAD_BYTES says. A presigned URL sidesteps that entirely: the browser
+ * PUTs the file straight to the bucket's own endpoint, and the Function only
+ * hands out a short-lived, single-object, single-method signature.
  *
- * A presigned URL sidesteps that entirely: the browser PUTs the file straight
- * to R2's own S3-compatible endpoint. The Function's job is only to hand out
- * a short-lived, single-object, single-method signature — the bytes never
- * pass through it.
+ * Why it is written against a generic S3 endpoint rather than R2 specifically:
+ * this is the only mechanism that can reach a bucket in an account this
+ * deployment does not own. A Cloudflare binding cannot; a signed request can.
+ * See storage-nodes.ts.
  */
 
-export interface R2Credentials {
-  accountId: string
-  accessKeyId: string
-  secretAccessKey: string
-  bucket: string
-}
+export type S3Method = 'PUT' | 'GET' | 'HEAD' | 'DELETE'
 
-export function r2Credentials(env: Env): R2Credentials | null {
-  const { R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET_NAME } = env
-  if (!R2_ACCOUNT_ID || !R2_ACCESS_KEY_ID || !R2_SECRET_ACCESS_KEY || !R2_BUCKET_NAME) return null
-  return {
-    accountId: R2_ACCOUNT_ID,
-    accessKeyId: R2_ACCESS_KEY_ID,
-    secretAccessKey: R2_SECRET_ACCESS_KEY,
-    bucket: R2_BUCKET_NAME,
-  }
-}
-
-export async function presignPutUrl(
-  creds: R2Credentials,
+export async function presignUrl(
+  node: StorageNode,
   key: string,
+  method: S3Method = 'PUT',
   expiresSeconds = 600,
 ): Promise<{ url: string; expiresAt: string }> {
-  const host = `${creds.accountId}.r2.cloudflarestorage.com`
+  const host = node.endpoint
   const now = new Date()
   const amzDate = toAmzDate(now)
   const dateStamp = amzDate.slice(0, 8)
-  const region = 'auto'
+  const region = node.region
   const service = 's3'
   const credentialScope = `${dateStamp}/${region}/${service}/aws4_request`
 
-  const canonicalUri = `/${encodeURIComponent(creds.bucket)}/${encodePathSegments(key)}`
+  const canonicalUri = `/${encodeURIComponent(node.bucket)}/${encodePathSegments(key)}`
 
   const queryParams: [string, string][] = [
     ['X-Amz-Algorithm', 'AWS4-HMAC-SHA256'],
-    ['X-Amz-Credential', `${creds.accessKeyId}/${credentialScope}`],
+    ['X-Amz-Credential', `${node.accessKeyId}/${credentialScope}`],
     ['X-Amz-Date', amzDate],
     ['X-Amz-Expires', String(expiresSeconds)],
     ['X-Amz-SignedHeaders', 'host'],
@@ -65,9 +53,14 @@ export async function presignPutUrl(
   const signedHeaders = 'host'
   const payloadHash = 'UNSIGNED-PAYLOAD'
 
-  const canonicalRequest = ['PUT', canonicalUri, canonicalQueryString, canonicalHeaders, signedHeaders, payloadHash].join(
-    '\n',
-  )
+  const canonicalRequest = [
+    method,
+    canonicalUri,
+    canonicalQueryString,
+    canonicalHeaders,
+    signedHeaders,
+    payloadHash,
+  ].join('\n')
 
   const stringToSign = [
     'AWS4-HMAC-SHA256',
@@ -76,7 +69,7 @@ export async function presignPutUrl(
     await sha256Hex(canonicalRequest),
   ].join('\n')
 
-  const signingKey = await deriveSigningKey(creds.secretAccessKey, dateStamp, region, service)
+  const signingKey = await deriveSigningKey(node.secretAccessKey, dateStamp, region, service)
   const signature = toHex(await hmac(signingKey, stringToSign))
 
   const url = `https://${host}${canonicalUri}?${canonicalQueryString}&X-Amz-Signature=${signature}`

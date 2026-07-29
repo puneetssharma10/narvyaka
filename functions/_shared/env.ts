@@ -39,6 +39,15 @@ export interface Env {
   R2_ACCESS_KEY_ID?: string
   R2_SECRET_ACCESS_KEY?: string
   R2_BUCKET_NAME?: string
+
+  /**
+   * Secret. A JSON array of storage nodes — buckets in *other* accounts, or
+   * with other providers, that this site writes to and reads from over the S3
+   * API. A Cloudflare binding can only ever see this account's own buckets;
+   * this is how a partner archive on the other side of the world joins in.
+   * Absent means "one bucket, as before". See functions/_shared/storage-nodes.ts.
+   */
+  STORAGE_NODES?: string
 }
 
 export const MAX_UPLOAD_BYTES = 300 * 1024 * 1024 // 300 MB per file
@@ -164,7 +173,10 @@ export async function rateLimit(
 }
 
 /** Where a stored object can be read from by a browser. */
-export function publicUrlFor(env: Env, key: string): string {
+export function publicUrlFor(env: Env, key: string, node?: { publicBaseUrl?: string } | null): string {
+  // A node with its own domain is served straight from it — no hop through
+  // this site, and no signature needed for something already public.
+  if (node?.publicBaseUrl) return `${node.publicBaseUrl.replace(/\/+$/, '')}/${key}`
   const base = env.PUBLIC_MEDIA_BASE_URL?.replace(/\/+$/, '')
   return base ? `${base}/${key}` : `/media/${key}`
 }

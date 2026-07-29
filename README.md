@@ -156,13 +156,15 @@ matching typographic placeholder.
 
 ## Scope: phase one
 
-Ten records. Two volunteers. That is the whole of the first phase, and the site
-says so plainly — on the homepage, and on `/volunteer`, which advertises
-exactly two openings (interviewer, writer & archivist) and lists the other
-roles as explicitly not open yet. The application form only offers the two.
+Ten records is the target for the first phase, and the homepage says so
+plainly. **Volunteering is deliberately not capped** — `/volunteer` advertises
+every role (interviewer, writer & archivist, translator, researcher,
+photographer, technologist, community organiser), and the application form
+offers all of them. A person who is right for this is worth more than a quota.
 
-Widening the scope means editing `volunteer.openings` and `home.status` in
-`src/data/site.json`.
+The roles come from one list, `volunteer.openings` in `src/data/site.json`, so
+the page and the form can never disagree about what is open. The record target
+lives in `home.status`.
 
 ---
 
