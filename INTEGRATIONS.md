@@ -330,7 +330,7 @@ One secret, `STORAGE_NODES`, holding a JSON array:
     "accessKeyId": "…",
     "secretAccessKey": "…",
     "publicBaseUrl": "https://media.partner.example",     // optional, reads go here
-    "writable": false                                     // a read-only mirror
+    "accepting": false          // default. true = also take NEW records
   }
 ]
 ```
@@ -344,21 +344,41 @@ npx wrangler d1 execute narvyaka --local  --file=./db/migrations/0002_storage_no
 The partner generates their own keys, scoped to their own bucket, and can
 revoke them at any time without touching anything here.
 
+### The primary bucket is guaranteed
+
+Your original bucket — the one bound as `MEDIA`, configured by the `R2_*`
+secrets — is protected by the code, not by convention:
+
+- **Its id, `primary`, is reserved.** A `STORAGE_NODES` entry that tries to
+  claim it is discarded outright. Without this, writes tagged `primary` would
+  be signed at the impostor's endpoint while reads for `primary` kept going
+  through the binding, and those files could never be read back.
+- **It is always present and always first** in the registry, whatever else is
+  configured.
+- **It always accepts new records**, and no flag can turn that off.
+- **A broken `STORAGE_NODES` cannot disconnect it.** Invalid JSON, a
+  non-array, an empty array, or entries that all fail validation each leave
+  the primary bucket serving and receiving exactly as before.
+
 ### How files are placed and found
 
+- **Attaching a bucket does not move your uploads.** `accepting` defaults to
+  **false**, so a new node joins for redundancy and reading only. New records
+  keep landing on the primary bucket until you explicitly set
+  `"accepting": true` on a node. A partner joining can never quietly divert
+  uploads away from you.
 - **Placement** is decided from the record id, so every file belonging to one
   submission lands in **one** bucket. That is deliberate: a contributor who
   withdraws must be satisfiable by deleting from a single place, not by
   chasing fragments across jurisdictions.
-- **Adding a node changes future records only.** Existing objects are found
-  through the node id stored beside them in `uploads.storage_node`, never by
-  recomputing placement — so nothing is orphaned when the registry changes.
+- **Changing the pool changes future records only.** Existing objects are
+  found through the node id stored beside them in `uploads.storage_node`,
+  never by recomputing placement — so nothing is orphaned, and turning a node
+  off never strands what is already on it.
 - **Reading** is unchanged from the outside. `/media/<key>` still works; if
   the object is on a remote node it redirects to that node's own domain, or
   to a short-lived signed URL if it has none. Links written before nodes
   existed keep resolving.
-- **`writable: false`** marks a mirror or a partner's read-only copy: it is
-  served from, never written to.
 
 ### Safety
 

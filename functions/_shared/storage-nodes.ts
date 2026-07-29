@@ -43,8 +43,16 @@ import type { Env } from './env'
  * nodes existed. Nothing needs configuring to keep working.
  */
 
-/** The id used for the bucket bound as `env.MEDIA`. Objects stored before the
- *  registry existed have no node recorded, and are read as this one. */
+/**
+ * The id used for the bucket bound as `env.MEDIA`. Objects stored before the
+ * registry existed have no node recorded, and are read as this one.
+ *
+ * THIS ID IS RESERVED. A STORAGE_NODES entry may not claim it — see
+ * parseNode(). If it could, writes tagged "primary" would be signed at the
+ * impostor's endpoint while reads for "primary" continued to go through the
+ * binding, and every file written that way would be stored somewhere it could
+ * never be read back from.
+ */
 export const PRIMARY_NODE_ID = 'primary'
 
 export interface StorageNode {
@@ -62,8 +70,15 @@ export interface StorageNode {
   /** A custom domain or CDN in front of this bucket, if it has one. Reads go
    *  straight there instead of being signed. */
   publicBaseUrl?: string
-  /** False for a mirror or a partner's read-only copy. Defaults to true. */
-  writable: boolean
+  /**
+   * Whether NEW records may be placed here. **Defaults to false**, so
+   * attaching a bucket does not silently start diverting uploads away from
+   * the primary one — a node joins for redundancy and reading first, and only
+   * takes new records when explicitly opted in.
+   *
+   * The primary bucket always accepts, and this flag cannot turn that off.
+   */
+  accepting: boolean
 }
 
 /**
@@ -99,6 +114,9 @@ function parseNode(raw: unknown): StorageNode | null {
   const secretAccessKey = String(n.secretAccessKey ?? '').trim()
 
   if (!isSafeId(id) || !isSafeEndpoint(endpoint)) return null
+  // The primary bucket's id cannot be taken. Configuration must not be able to
+  // point "primary" at anything other than the bound bucket.
+  if (id === PRIMARY_NODE_ID) return null
   if (!bucket || !accessKeyId || !secretAccessKey) return null
 
   let publicBaseUrl: string | undefined
@@ -119,7 +137,7 @@ function parseNode(raw: unknown): StorageNode | null {
     accessKeyId,
     secretAccessKey,
     publicBaseUrl,
-    writable: n.writable === undefined ? true : n.writable === true,
+    accepting: n.accepting === true,
   }
 }
 
@@ -148,23 +166,22 @@ export function storageNodes(env: Env): StorageNode[] {
     }
   }
 
-  // The original single-bucket configuration, still first-class. Only added
-  // if STORAGE_NODES did not already define a node under this id.
-  if (!seen.has(PRIMARY_NODE_ID)) {
-    const { R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET_NAME } = env
-    if (R2_ACCOUNT_ID && R2_ACCESS_KEY_ID && R2_SECRET_ACCESS_KEY && R2_BUCKET_NAME) {
-      nodes.unshift({
-        id: PRIMARY_NODE_ID,
-        label: 'Primary R2 bucket',
-        endpoint: `${R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
-        region: 'auto',
-        bucket: R2_BUCKET_NAME,
-        accessKeyId: R2_ACCESS_KEY_ID,
-        secretAccessKey: R2_SECRET_ACCESS_KEY,
-        publicBaseUrl: env.PUBLIC_MEDIA_BASE_URL?.replace(/\/+$/, '') || undefined,
-        writable: true,
-      })
-    }
+  // The original bucket, always first and always accepting. Nothing in
+  // STORAGE_NODES can displace it, rename it, or stop it taking new records —
+  // adding nodes extends the archive, it never migrates it.
+  const { R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET_NAME } = env
+  if (R2_ACCOUNT_ID && R2_ACCESS_KEY_ID && R2_SECRET_ACCESS_KEY && R2_BUCKET_NAME) {
+    nodes.unshift({
+      id: PRIMARY_NODE_ID,
+      label: 'Primary R2 bucket',
+      endpoint: `${R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+      region: 'auto',
+      bucket: R2_BUCKET_NAME,
+      accessKeyId: R2_ACCESS_KEY_ID,
+      secretAccessKey: R2_SECRET_ACCESS_KEY,
+      publicBaseUrl: env.PUBLIC_MEDIA_BASE_URL?.replace(/\/+$/, '') || undefined,
+      accepting: true,
+    })
   }
 
   return nodes
@@ -177,24 +194,30 @@ export function nodeById(env: Env, id: string): StorageNode | null {
 /**
  * Which node a given record's files belong on.
  *
- * Chosen by hashing the record id, so every file belonging to one submission
- * lands in one bucket. That is deliberate: a contributor who withdraws their
- * record must be satisfiable by deleting from a single place, not by chasing
- * fragments across several jurisdictions.
+ * The pool is the primary bucket plus any node that has explicitly opted in
+ * with `accepting: true`. Attaching a bucket without that flag adds somewhere
+ * to read from and mirror to, and changes nothing about where new records
+ * land — so a partner joining can never quietly divert uploads off the
+ * primary bucket.
  *
- * Adding a node changes the placement of *future* records only — existing
+ * Within the pool the node is chosen by hashing the record id, so every file
+ * belonging to one submission lands in one bucket. That is deliberate: a
+ * contributor who withdraws must be satisfiable by deleting from a single
+ * place, not by chasing fragments across several jurisdictions.
+ *
+ * Changing the pool changes the placement of *future* records only — existing
  * objects are found through the node id stored beside them, never by
  * recomputing this.
  */
 export function pickWriteNode(env: Env, recordId: string): StorageNode | null {
-  const writable = storageNodes(env).filter((node) => node.writable)
-  if (writable.length === 0) return null
-  if (writable.length === 1) return writable[0]
+  const pool = storageNodes(env).filter((node) => node.accepting || node.id === PRIMARY_NODE_ID)
+  if (pool.length === 0) return null
+  if (pool.length === 1) return pool[0]
 
   let hash = 2166136261
   for (let i = 0; i < recordId.length; i += 1) {
     hash ^= recordId.charCodeAt(i)
     hash = Math.imul(hash, 16777619)
   }
-  return writable[(hash >>> 0) % writable.length]
+  return pool[(hash >>> 0) % pool.length]
 }
