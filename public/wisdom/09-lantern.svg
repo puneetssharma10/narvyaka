@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" width="960" height="540" role="img" aria-label="A lantern with a small flame inside, representing memory kept alight">
+  <!-- Drawn placeholder. Replace via Studio -> click the picture, or drop a new file in public/wisdom/. -->
+  <rect width="960" height="540" fill="#F2F4FA"/>
+  <g stroke="#2B6CB0" stroke-opacity="0.07" stroke-width="1">
+    <path d="M0 90h960M0 180h960M0 270h960M0 360h960M0 450h960"/>
+    <path d="M120 0v540M240 0v540M360 0v540M480 0v540M600 0v540M720 0v540M840 0v540"/>
+  </g>
+  <g transform="translate(480,270)" stroke="#2B6CB0" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <path d="M-34 -70h68M-34 84h68" />
+    <path d="M-40 -70h80l-14 40v104l14 40h-80l14 -40v-104z" />
+    <path d="M0 -20c14 16 14 32 0 46c-14 -14 -14 -30 0 -46z" fill="#8A5A22" stroke="none" />
+    <path d="M-14 108h28" />
+  </g>
+  <g stroke="#8A5A22" stroke-opacity="0.25" stroke-width="2" fill="none">
+    <path d="M56 108V56h52M904 56h-52v52M904 432v52h-52M56 432v52h52"/>
+  </g>
+</svg>

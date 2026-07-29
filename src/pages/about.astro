@@ -1,11 +1,13 @@
 ---
 import Base from '../layouts/Base.astro'
 import PageHeader from '../components/PageHeader.astro'
+import MotionStrip from '../components/MotionStrip.astro'
 import { content, editable, t } from '../lib/content'
 
 const about = content.about
 const s1 = about.stage1
 const s2 = about.stage2
+const motion = content.motion
 
 const blocks = [
   { heading: s1.missionHeading, body: s1.mission, hp: 'about.stage1.missionHeading', bp: 'about.stage1.mission' },
@@ -106,4 +108,6 @@ const blocks = [
       </p>
     </div>
   </section>
+
+  <MotionStrip image={motion.image} alt={motion.alt} editPath="motion.image" />
 </Base>

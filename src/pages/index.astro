@@ -4,7 +4,8 @@ import Wordmark from '../components/Wordmark.astro'
 import Icon from '../components/Icon.astro'
 import AudioPlayer from '../components/AudioPlayer.astro'
 import PlaceholderNotice from '../components/PlaceholderNotice.astro'
-import RotatingShowcase from '../components/RotatingShowcase.astro'
+import WisdomSlider from '../components/WisdomSlider.astro'
+import MotionStrip from '../components/MotionStrip.astro'
 import { content, editable, t, list } from '../lib/content'
 import { siteConfig } from '../../site.config'
 
@@ -12,28 +13,8 @@ const home = content.home
 const example = home.exampleCapsule
 const problemParagraphs = list<string>('home.problem.paragraphs')
 const iconFor = { voice: 'voice', note: 'note', photo: 'photo', identity: 'identity' } as const
-
-// The showcase's slides are the four Wisdom Record parts plus the three
-// responsibility figures from /about — existing copy, not new writing.
-const figureIcon: Record<string, 'lock' | 'arrow' | 'quote'> = {
-  Vyasa: 'lock',
-  Narada: 'arrow',
-  Kakabhushundi: 'quote',
-}
-const showcaseItems = [
-  ...home.howItWorks.items.map((item) => ({
-    icon: iconFor[item.icon as keyof typeof iconFor] ?? ('note' as const),
-    eyebrow: 'One record, four parts',
-    title: item.title,
-    body: item.body,
-  })),
-  ...content.about.stage2.figures.map((figure) => ({
-    icon: figureIcon[figure.name] ?? ('quote' as const),
-    eyebrow: figure.responsibility,
-    title: figure.name,
-    body: figure.body,
-  })),
-]
+const wisdomSlides = home.wisdomSlider.slides
+const motion = content.motion
 ---
 
 <Base title={siteConfig.name}>
@@ -48,44 +29,46 @@ const showcaseItems = [
     >
     </div>
 
+    <!-- Single column, top to bottom, on every screen size — the same flow
+         mobile always had, now kept at every width instead of only switching
+         to a side-by-side split once the viewport widens. -->
     <div class="wrap relative section-lg">
-      <div class="grid items-center gap-16 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:gap-20">
-        <div>
-          <Wordmark size="xl" class="block" />
+      <div class="mx-auto flex max-w-xl flex-col items-center text-center">
+        <Wordmark size="lg" class="block" />
 
-          <h1 class="mt-8 max-w-[15ch]" data-type-target {...editable('home.hero.tagline')}>
-            {t('home.hero.tagline')}
-          </h1>
+        <h1 class="mt-8 max-w-[16ch]" data-type-target {...editable('home.hero.tagline')}>
+          {t('home.hero.tagline')}
+        </h1>
 
-          <p
-            class="mt-8 max-w-[24ch] font-heading text-[clamp(1.3rem,2.6vw,1.75rem)] font-normal leading-[1.25] tracking-tight text-accent"
-            {...editable('home.hero.subhead')}
+        <p
+          class="mt-8 max-w-[24ch] font-heading text-[clamp(1.3rem,2.6vw,1.75rem)] font-normal leading-[1.25] tracking-tight text-accent"
+          {...editable('home.hero.subhead')}
+        >
+          {t('home.hero.subhead')}
+        </p>
+
+        <p class="mt-7 max-w-[52ch] text-[1.05rem] leading-[1.7] text-muted" {...editable('home.hero.intro')}>
+          {t('home.hero.intro')}
+        </p>
+
+        <div class="mt-10 flex flex-wrap justify-center gap-3">
+          <a href={home.hero.primaryCta.href} class="btn btn-primary" {...editable('home.hero.primaryCta.label')}>
+            {home.hero.primaryCta.label}
+            <Icon name="arrow" size={16} />
+          </a>
+          <a
+            href={home.hero.secondaryCta.href}
+            class="btn btn-secondary"
+            {...editable('home.hero.secondaryCta.label')}
           >
-            {t('home.hero.subhead')}
-          </p>
-
-          <p class="mt-7 max-w-[52ch] text-[1.05rem] leading-[1.7] text-muted" {...editable('home.hero.intro')}>
-            {t('home.hero.intro')}
-          </p>
-
-          <div class="mt-10 flex flex-wrap gap-3">
-            <a href={home.hero.primaryCta.href} class="btn btn-primary" {...editable('home.hero.primaryCta.label')}>
-              {home.hero.primaryCta.label}
-              <Icon name="arrow" size={16} />
-            </a>
-            <a
-              href={home.hero.secondaryCta.href}
-              class="btn btn-secondary"
-              {...editable('home.hero.secondaryCta.label')}
-            >
-              {home.hero.secondaryCta.label}
-            </a>
-          </div>
+            {home.hero.secondaryCta.label}
+          </a>
         </div>
 
-        <!-- The embedded playable capsule. Clearly marked as an example until a
-             real recording exists — we do not invent a contributor. -->
-        <div class="card overflow-hidden shadow-[0_1px_2px_rgba(11,14,20,0.04),0_12px_32px_-12px_rgba(11,14,20,0.10)]">
+        <!-- The embedded playable capsule, stacked below the copy rather than
+             beside it. Clearly marked as an example until a real recording
+             exists — we do not invent a contributor. -->
+        <div class="card mt-14 w-full overflow-hidden text-left shadow-[0_1px_2px_rgba(11,14,20,0.04),0_12px_32px_-12px_rgba(11,14,20,0.10)]">
           <div class="flex items-center justify-between gap-3 border-b border-hairline px-5 py-3.5">
             <span
               class="rounded-[5px] bg-signal px-2 py-0.5 text-[0.7rem] font-semibold uppercase tracking-[0.12em] text-white"
@@ -144,14 +127,15 @@ const showcaseItems = [
     </div>
   </section>
 
-  <!-- ── A living spotlight through what's already true ─────────────────
-       The four Wisdom Record parts and the three responsibility figures,
-       cycling one at a time — existing copy from howItWorks and about,
-       not new writing. -->
+  <!-- ── Nine short thoughts on wisdom ────────────────────────────────────
+       A slow image carousel, deliberately free of any mythological or
+       religious reference since this is the first content after the hero.
+       Every picture is a plain Studio-editable image — click it, upload a
+       replacement — so the whole set can become real photographs later. -->
   <section class="section border-b border-hairline">
-    <div class="wrap-read reveal">
+    <div class="wrap reveal">
       <span class="light-bar mb-7"></span>
-      <RotatingShowcase items={showcaseItems} />
+      <WisdomSlider items={wisdomSlides} basePath="home.wisdomSlider.slides" />
     </div>
   </section>
 
@@ -317,6 +301,8 @@ const showcaseItems = [
       </figure>
     </div>
   </section>
+
+  <MotionStrip image={motion.image} alt={motion.alt} editPath="motion.image" />
 </Base>
 
 <script>

@@ -31,7 +31,7 @@ const roleNames = v.openings.map((opening) => opening.title)
         <p class="mt-5 text-muted" {...editable('volunteer.rolesIntro')}>{t('volunteer.rolesIntro')}</p>
       </div>
 
-      <div class="mt-12 grid gap-6 lg:grid-cols-2">
+      <div class="mt-12 grid gap-6">
         {
           v.openings.map((opening, i) => (
             <article class="card reveal flex flex-col p-7 md:p-9" style={`transition-delay:${i * 70}ms`}>
