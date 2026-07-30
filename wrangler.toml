@@ -59,12 +59,12 @@ INTAKE_PAUSED = "0"
 [env.preview]
 [[env.preview.d1_databases]]
 binding = "DB"
-database_name = "narvyaka-preview"
-database_id = "PASTE_ID_HERE"
+database_name = "narvyaka"
+database_id = "61caba10-efe5-42ee-878f-ad8043b3dfa5"
 
 [[env.preview.r2_buckets]]
 binding = "MEDIA"
-bucket_name = "narvyaka-media-preview"
+bucket_name = "narvyaka-media"
 
 [env.preview.vars]
 PUBLIC_MEDIA_BASE_URL = ""
