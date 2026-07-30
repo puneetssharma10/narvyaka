@@ -111,8 +111,7 @@
     "emailLabel": "Write to us"
   },
   "motion": {
-    "image": "/motion-figure.svg",
-    "alt": "A single figure walking forward"
+    "text": "Because No Generation Should Start From Zero."
   },
   "home": {
     "hero": {
@@ -240,7 +239,7 @@
       "photoAlt": "Portrait of the founder"
     },
     "wisdomSlider": {
-      "heading": "Nine short thoughts on wisdom",
+      "heading": "Short thoughts on wisdom",
       "slides": [
         { "image": "/wisdom/01-tree.svg", "quote": "Every story kept is a door left open for someone not yet born." },
         { "image": "/wisdom/02-path.svg", "quote": "Wisdom is not what we know. It is what we manage to pass on." },
@@ -250,7 +249,8 @@
         { "image": "/wisdom/06-compass.svg", "quote": "One honest sentence from someone who lived it is worth a shelf of theory." },
         { "image": "/wisdom/07-seed.svg", "quote": "Memory is fragile. A record is not." },
         { "image": "/wisdom/08-ripples.svg", "quote": "The best inheritance is not what we own — it is what we understood." },
-        { "image": "/wisdom/09-lantern.svg", "quote": "Listen once. Keep it forever." }
+        { "image": "/wisdom/09-lantern.svg", "quote": "Listen once. Keep it forever." },
+        { "image": "/wisdom/10-handshake.svg", "quote": "Every generation that teaches the next one is a generation that did not start from zero." }
       ]
     }
   },
@@ -863,14 +863,14 @@
     },
     "photos": {
       "heading": "Photographs",
-      "intro": "Up to five. A face, a place, a tool, a handwritten page. A record with no photographs is a complete record — this step can be skipped entirely.",
+      "intro": "Up to ten. A face, a place, a tool, a handwritten page. A record with no photographs is a complete record — this step can be skipped entirely.",
       "dropLabel": "Drag photographs here, or choose files",
       "dropHint": "JPEG, PNG, WebP or HEIC. Up to 300 MB each.",
       "captionLabel": "Who, what, or where",
       "captionPlaceholder": "One line, if you want one",
       "removeLabel": "Remove",
       "cropLabel": "Crop",
-      "maxReached": "That is five photographs — the maximum for one record.",
+      "maxReached": "That is ten photographs — the maximum for one record.",
       "tooLarge": "That file is over 300 MB. Try a smaller version.",
       "wrongType": "That file type isn't supported. Use JPEG, PNG or WebP."
     },

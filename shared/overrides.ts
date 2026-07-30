@@ -36,7 +36,7 @@ export const FONT_OPTIONS = [
     label: 'Space Grotesk',
     value: "'Space Grotesk Variable', system-ui, sans-serif",
     kind: 'sans',
-    note: 'The wordmark face. Technical and precise — reads like badging.',
+    note: 'Technical and precise — reads like badging.',
   },
   {
     label: 'Sora',
@@ -52,7 +52,7 @@ export const FONT_OPTIONS = [
   },
   {
     label: 'Inter',
-    value: "'Inter Variable', system-ui, sans-serif",
+    value: "'Inter Variable', 'Public Sans Variable', system-ui, sans-serif",
     kind: 'sans',
     note: 'The default body face. Neutral and clear at small sizes.',
   },
@@ -67,6 +67,66 @@ export const FONT_OPTIONS = [
     value: 'system-ui, -apple-system, Segoe UI, Roboto, sans-serif',
     kind: 'sans',
     note: 'Whatever the reader’s device uses. Fastest, least distinctive.',
+  },
+  {
+    label: 'Fraunces',
+    value: "'Fraunces Variable', 'Source Serif 4 Variable', Georgia, serif",
+    kind: 'serif',
+    note: 'The default heading and wordmark face — the logo’s own family.',
+  },
+  {
+    label: 'Playfair Display',
+    value: "'Playfair Display Variable', Georgia, serif",
+    kind: 'serif',
+    note: 'High-contrast, dramatic display serif — the most "designed" of the set.',
+  },
+  {
+    label: 'Lora',
+    value: "'Lora Variable', Georgia, serif",
+    kind: 'serif',
+    note: 'A warm, calm reading serif — book-like rather than decorative.',
+  },
+  {
+    label: 'Source Serif 4',
+    value: "'Source Serif 4 Variable', Georgia, serif",
+    kind: 'serif',
+    note: 'A literary, slightly formal serif built for long paragraphs.',
+  },
+  {
+    label: 'Caveat',
+    value: "'Caveat Variable', cursive",
+    kind: 'handwriting',
+    note: 'A natural, everyday handwriting — casual notebook feel. Use sparingly.',
+  },
+  {
+    label: 'Patrick Hand',
+    value: "'Patrick Hand', cursive",
+    kind: 'handwriting',
+    note: 'Rounded, marker-drawn print lettering — friendly and legible.',
+  },
+  {
+    label: 'Shadows Into Light',
+    value: "'Shadows Into Light', cursive",
+    kind: 'handwriting',
+    note: 'A light, quick pen stroke — like a hand-written margin note.',
+  },
+  {
+    label: 'Homemade Apple',
+    value: "'Homemade Apple', cursive",
+    kind: 'handwriting',
+    note: 'A thick, personal marker script. Very distinctive — best in small doses.',
+  },
+  {
+    label: 'Dancing Script',
+    value: "'Dancing Script Variable', cursive",
+    kind: 'script',
+    note: 'A flowing, joined-up script — warm and celebratory, not stiff.',
+  },
+  {
+    label: 'Great Vibes',
+    value: "'Great Vibes', cursive",
+    kind: 'script',
+    note: 'A formal calligraphic script — invitation or signature feel.',
   },
 ] as const
 

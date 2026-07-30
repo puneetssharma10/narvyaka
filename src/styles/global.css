@@ -9,6 +9,18 @@
 @import '@fontsource-variable/public-sans/wght.css';
 @import '@fontsource-variable/fraunces/wght.css';
 @import '@fontsource-variable/fraunces/wght-italic.css';
+@import '@fontsource-variable/lora/wght.css';
+@import '@fontsource-variable/source-serif-4/wght.css';
+@import '@fontsource-variable/playfair-display/wght.css';
+
+/* Artistic and handwritten faces — for anyone who wants the site to read
+   less like software and more like a kept notebook. */
+@import '@fontsource-variable/caveat/wght.css';
+@import '@fontsource-variable/dancing-script/wght.css';
+@import '@fontsource/patrick-hand/400.css';
+@import '@fontsource/shadows-into-light/400.css';
+@import '@fontsource/homemade-apple/400.css';
+@import '@fontsource/great-vibes/400.css';
 
 /* ───────────────────────────────────────────────────────────────────────────
    DESIGN TOKENS

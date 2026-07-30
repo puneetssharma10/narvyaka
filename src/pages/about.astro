@@ -1,7 +1,7 @@
 ---
 import Base from '../layouts/Base.astro'
 import PageHeader from '../components/PageHeader.astro'
-import MotionStrip from '../components/MotionStrip.astro'
+import MarqueeStrip from '../components/MarqueeStrip.astro'
 import { content, editable, t } from '../lib/content'
 
 const about = content.about
@@ -109,5 +109,5 @@ const blocks = [
     </div>
   </section>
 
-  <MotionStrip image={motion.image} alt={motion.alt} editPath="motion.image" />
+  <MarqueeStrip text={motion.text} editPath="motion.text" />
 </Base>

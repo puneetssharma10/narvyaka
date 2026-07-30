@@ -1,0 +1,106 @@
+---
+/**
+ * A quiet closing gesture: a single line of text drifting right to left,
+ * on an endless loop, at the foot of a page — the "keep going" note. It
+ * replaces the earlier small walking-figure animation with something more
+ * useful to edit: a message, not a picture.
+ *
+ * The text is an ordinary Studio-editable string (click it, type a
+ * replacement) so it can become a tagline, a call to action or an
+ * announcement without touching code. It is repeated many times so the
+ * strip is never empty, however short or long the message is; every visible
+ * copy shares the same `data-edit` path, so editing one instantly updates
+ * every other copy (see StudioBoot's applyContent).
+ *
+ * Respects prefers-reduced-motion: without it, a single centred copy of the
+ * line sits still — never a moving thing someone didn't ask for.
+ */
+interface Props {
+  text: string
+  editPath: string
+  class?: string
+}
+
+const { text, editPath, class: className = '' } = Astro.props
+
+// Repeated REPEATS times, then that whole run duplicated once more, so the
+// track can loop seamlessly by translating exactly -50% — the second half
+// is a pixel-identical copy of the first, so the seam is invisible.
+const REPEATS = 6
+const run = Array.from({ length: REPEATS })
+---
+
+<div class={`nv-marquee ${className}`} role="note">
+  <div class="nv-marquee__track" aria-hidden="true">
+    {
+      [...run, ...run].map(() => (
+        <span class="nv-marquee__item">
+          <span data-edit={editPath}>{text}</span>
+          <span class="nv-marquee__sep">✦</span>
+        </span>
+      ))
+    }
+  </div>
+  <p class="nv-marquee__sr visually-hidden" data-edit={editPath}>{text}</p>
+</div>
+
+<style>
+  .nv-marquee {
+    position: relative;
+    overflow: hidden;
+    border-top: 1px solid var(--color-hairline);
+    background: var(--color-carbon);
+    padding: 1.1rem 0;
+  }
+
+  .nv-marquee__track {
+    display: flex;
+    width: max-content;
+    animation: nv-scroll 32s linear infinite;
+  }
+
+  .nv-marquee__item {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+    font-family: var(--font-heading);
+    font-size: clamp(1rem, 2vw, 1.35rem);
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    color: #fff;
+    white-space: nowrap;
+    padding: 0 clamp(1rem, 3vw, 2rem);
+  }
+
+  .nv-marquee__sep {
+    margin-left: clamp(1rem, 3vw, 2rem);
+    color: var(--color-accent);
+    font-size: 0.8em;
+  }
+
+  @keyframes nv-scroll {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .nv-marquee {
+      display: flex;
+      justify-content: center;
+    }
+    .nv-marquee__track {
+      animation: none;
+      width: auto;
+    }
+    .nv-marquee__item:not(:first-child) {
+      display: none;
+    }
+    .nv-marquee__item:first-child .nv-marquee__sep {
+      display: none;
+    }
+  }
+</style>

@@ -5,7 +5,7 @@ import Icon from '../components/Icon.astro'
 import AudioPlayer from '../components/AudioPlayer.astro'
 import PlaceholderNotice from '../components/PlaceholderNotice.astro'
 import WisdomSlider from '../components/WisdomSlider.astro'
-import MotionStrip from '../components/MotionStrip.astro'
+import MarqueeStrip from '../components/MarqueeStrip.astro'
 import { content, editable, t, list } from '../lib/content'
 import { siteConfig } from '../../site.config'
 
@@ -137,11 +137,12 @@ const motion = content.motion
     </div>
   </section>
 
-  <!-- ── Nine short thoughts on wisdom ────────────────────────────────────
+  <!-- ── Short thoughts on wisdom ──────────────────────────────────────────
        A slow image carousel, deliberately free of any mythological or
        religious reference since this is the first content after the hero.
        Every picture is a plain Studio-editable image — click it, upload a
-       replacement — so the whole set can become real photographs later. -->
+       replacement — so the whole set can become real photographs (e.g. from
+       recorded interviews) without touching code. -->
   <section class="section border-b border-hairline">
     <div class="wrap reveal">
       <span class="light-bar mb-7"></span>
@@ -312,7 +313,7 @@ const motion = content.motion
     </div>
   </section>
 
-  <MotionStrip image={motion.image} alt={motion.alt} editPath="motion.image" />
+  <MarqueeStrip text={motion.text} editPath="motion.text" />
 </Base>
 
 <script>
