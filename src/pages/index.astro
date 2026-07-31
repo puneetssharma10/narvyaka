@@ -101,6 +101,8 @@ const motion = content.motion
             items={example.photos}
             basePath="home.exampleCapsule.photos"
             alt={example.photoCaption}
+            rotationSeconds={example.rotationSeconds}
+            timingPath="home.exampleCapsule.rotationSeconds"
             class="aspect-[4/3] w-full"
           />
 
@@ -142,7 +144,12 @@ const motion = content.motion
   <section class="section border-b border-hairline">
     <div class="wrap reveal">
       <span class="light-bar mb-7"></span>
-      <WisdomSlider items={wisdomSlides} basePath="home.wisdomSlider.slides" />
+      <WisdomSlider
+        items={wisdomSlides}
+        basePath="home.wisdomSlider.slides"
+        rotationSeconds={home.wisdomSlider.rotationSeconds}
+        timingPath="home.wisdomSlider.rotationSeconds"
+      />
     </div>
   </section>
 

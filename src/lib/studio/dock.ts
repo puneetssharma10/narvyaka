@@ -10,6 +10,9 @@ import {
   COLOR_TOKENS,
   FONT_OPTIONS,
   FONT_SLOTS,
+  MAX_ROTATION_SECONDS,
+  MIN_ROTATION_SECONDS,
+  clampRotationSeconds,
   parseOverrides,
   type ColorToken,
   type FontSlot,
@@ -71,6 +74,7 @@ class Dock {
         this.sectionType(),
         this.sectionLogo(),
         this.sectionImages(),
+        this.sectionTiming(),
         this.sectionPublish(),
       ]),
       h('div', { class: 'nv-dock__foot' }, [
@@ -337,6 +341,81 @@ class Dock {
       ]),
       list,
     ])
+  }
+
+  /**
+   * One slider per [data-timing] host found on the current page — the
+   * example capsule photos, the wisdom-thoughts slider, and anything else
+   * built the same way later. Deliberately not a fixed list: this section
+   * doesn't know what "capsule photos" or "wisdom slider" are, only that
+   * some element asked to have its rotation speed controlled.
+   */
+  private sectionTiming(): HTMLElement {
+    const hosts = new Map<string, { label: string; el: HTMLElement }>()
+    document.querySelectorAll<HTMLElement>('[data-timing]').forEach((el) => {
+      const path = el.getAttribute('data-timing')
+      if (!path || hosts.has(path)) return
+      hosts.set(path, { label: el.getAttribute('data-timing-label') || path, el })
+    })
+
+    if (hosts.size === 0) {
+      return this.section('Timing', false, [
+        h('p', { class: 'nv-sec__note' }, ['No auto-rotating galleries on this page.']),
+      ])
+    }
+
+    const children: Node[] = [
+      h('p', { class: 'nv-sec__note' }, [
+        'How long each picture stays before the next one crossfades in. Applies live as you drag — no reload.',
+      ]),
+    ]
+
+    for (const [path, { label, el }] of hosts) {
+      const currentMs = Number(el.dataset.intervalMs)
+      const initial = clampRotationSeconds(Number.isFinite(currentMs) && currentMs > 0 ? currentMs / 1000 : MIN_ROTATION_SECONDS)
+
+      const valueLabel = h('span', { style: 'font-size:11.5px;color:#6B675F' }, [`${initial.toFixed(1)}s`])
+
+      const slider = h('input', {
+        type: 'range',
+        min: String(MIN_ROTATION_SECONDS),
+        max: String(MAX_ROTATION_SECONDS),
+        step: '0.5',
+        value: String(initial),
+        style: 'width:100%;accent-color:var(--nv-accent)',
+        onInput: (e: Event) => {
+          const seconds = clampRotationSeconds((e.target as HTMLInputElement).value)
+          valueLabel.textContent = `${seconds.toFixed(1)}s`
+          this.store.setTiming(path, seconds)
+        },
+      }) as HTMLInputElement
+
+      children.push(
+        h('div', { style: 'margin-top:14px' }, [
+          h('div', { style: 'display:flex;justify-content:space-between;align-items:baseline;gap:8px' }, [
+            h('label', { class: 'nv-label', style: 'margin-bottom:0' }, [label]),
+            valueLabel,
+          ]),
+          slider,
+        ]),
+      )
+    }
+
+    children.push(
+      h(
+        'button',
+        {
+          class: 'nv-btn nv-btn--ghost nv-btn--wide',
+          style: 'margin-top:12px',
+          onClick: () => {
+            for (const path of hosts.keys()) this.store.clearTiming(path)
+          },
+        },
+        ['Reset both to default'],
+      ),
+    )
+
+    return this.section('Timing', false, children)
   }
 
   private sectionPublish(): HTMLElement {

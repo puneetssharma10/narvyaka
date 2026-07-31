@@ -19,13 +19,23 @@ interface Slide {
 interface Props {
   items: Slide[]
   basePath: string
+  /** Seconds each slide holds before crossfading to the next. Studio-editable
+   *  live via the Timing panel — see CapsulePhotoRotator for the mechanism. */
+  rotationSeconds: number
+  timingPath: string
   class?: string
 }
 
-const { items, basePath, class: className = '' } = Astro.props
+const { items, basePath, rotationSeconds, timingPath, class: className = '' } = Astro.props
 ---
 
-<div class={`nv-wisdom relative overflow-hidden ${className}`} data-wisdom-slider>
+<div
+  class={`nv-wisdom relative overflow-hidden ${className}`}
+  data-wisdom-slider
+  data-timing={timingPath}
+  data-timing-label="Wisdom-thoughts slider"
+  data-interval-ms={Math.round(rotationSeconds * 1000)}
+>
   {
     items.map((slide, i) => (
       <div class="nv-wisdom__slide" data-wisdom-slide aria-hidden={i === 0 ? 'false' : 'true'}>
@@ -254,9 +264,14 @@ const { items, basePath, class: className = '' } = Astro.props
       dots[current]?.setAttribute('data-on', '')
     }
 
+    function intervalMs() {
+      const ms = Number(root.dataset.intervalMs)
+      return Number.isFinite(ms) && ms > 0 ? ms : 5200
+    }
+
     function start() {
       if (reduceMotion) return
-      timer = window.setInterval(() => show(current + 1), 5200)
+      timer = window.setInterval(() => show(current + 1), intervalMs())
     }
 
     function stop() {
@@ -268,6 +283,12 @@ const { items, basePath, class: className = '' } = Astro.props
     root.addEventListener('mouseleave', start)
     root.addEventListener('focusin', stop)
     root.addEventListener('focusout', start)
+    // A Studio timing edit updates data-interval-ms and fires this so the
+    // running timer picks up the new speed immediately, not on next cycle.
+    root.addEventListener('nv:interval-changed', () => {
+      stop()
+      start()
+    })
 
     prevBtn?.addEventListener('click', () => {
       stop()

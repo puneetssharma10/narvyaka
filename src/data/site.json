@@ -130,6 +130,7 @@
       }
     },
     "exampleCapsule": {
+      "rotationSeconds": 7,
       "badge": "Example",
       "note": "This is an illustrative capsule showing the format. It is not a real contributor's record. It will be replaced by the first real Wisdom Record once one has been made.",
       "photos": [
@@ -251,6 +252,7 @@
       "photoAlt": "Portrait of the founder"
     },
     "wisdomSlider": {
+      "rotationSeconds": 5.2,
       "heading": "Ten short thoughts on wisdom",
       "slides": [
         { "image": "/wisdom/01-tree.svg", "quote": "Every story kept is a door left open for someone not yet born." },
