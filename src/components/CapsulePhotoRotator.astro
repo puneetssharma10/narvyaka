@@ -3,12 +3,15 @@
  * The example capsule's photo — a single 4:3 slot, now a set of images that
  * crossfade automatically instead of one static picture. Each frame is an
  * ordinary Studio-editable image (click it, upload a replacement), same as
- * every other photo on the site.
+ * every other photo on the site — plus a bulk "Upload all N" control so all
+ * ten can be replaced in one go instead of clicking through them one by one.
  *
- * Deliberately no quote overlay, no arrows: this sits inside a card that
- * already has its own badge, lesson and attribution below it. Adding more
- * chrome here would compete with that, not support it.
+ * Deliberately no quote overlay: this sits inside a card that already has
+ * its own badge, lesson and attribution below it. Arrows are kept minimal —
+ * small, on the image itself — for the same reason.
  */
+import Icon from './Icon.astro'
+
 interface Props {
   items: string[]
   basePath: string
@@ -41,13 +44,42 @@ const { items, basePath, alt, class: className = '' } = Astro.props
     ))
   }
 
+  <button
+    type="button"
+    class="nv-capsule-photo__bulk"
+    data-edit-image-group={basePath}
+    data-edit-image-group-count={items.length}
+    data-edit-aspect="4:3"
+  >
+    Upload all {items.length}
+  </button>
+
   {
     items.length > 1 && (
-      <div class="nv-capsule-photo__dots" data-capsule-photo-dots aria-hidden="true">
-        {items.map((_, i) => (
-          <span class="nv-capsule-photo__dot" data-index={i} />
-        ))}
-      </div>
+      <>
+        <button
+          type="button"
+          class="nv-capsule-photo__arrow nv-capsule-photo__arrow--prev"
+          data-capsule-photo-prev
+          aria-label="Previous photo"
+        >
+          <Icon name="arrow" size={15} class="rotate-180" />
+        </button>
+        <button
+          type="button"
+          class="nv-capsule-photo__arrow nv-capsule-photo__arrow--next"
+          data-capsule-photo-next
+          aria-label="Next photo"
+        >
+          <Icon name="arrow" size={15} />
+        </button>
+
+        <div class="nv-capsule-photo__dots" data-capsule-photo-dots aria-hidden="true">
+          {items.map((_, i) => (
+            <span class="nv-capsule-photo__dot" data-index={i} />
+          ))}
+        </div>
+      </>
     )
   }
 </div>
@@ -68,6 +100,40 @@ const { items, basePath, alt, class: className = '' } = Astro.props
   .nv-capsule-photo__slide[aria-hidden='false'] {
     z-index: 1;
     opacity: 1;
+  }
+
+  .nv-capsule-photo__bulk {
+    top: 0.6rem;
+    left: 0.6rem;
+  }
+
+  .nv-capsule-photo__arrow {
+    position: absolute;
+    top: 50%;
+    z-index: 3;
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(11, 14, 20, 0.4);
+    color: #fff;
+    transform: translateY(-50%);
+    transition: background-color 200ms ease;
+    cursor: pointer;
+  }
+
+  .nv-capsule-photo__arrow:hover {
+    background: rgba(11, 14, 20, 0.65);
+  }
+
+  .nv-capsule-photo__arrow--prev {
+    left: 0.6rem;
+  }
+
+  .nv-capsule-photo__arrow--next {
+    right: 0.6rem;
   }
 
   .nv-capsule-photo__dots {
@@ -103,11 +169,9 @@ const { items, basePath, alt, class: className = '' } = Astro.props
   document.querySelectorAll<HTMLElement>('[data-capsule-photo]').forEach((root) => {
     const slides = Array.from(root.querySelectorAll<HTMLElement>('[data-capsule-photo-slide]'))
     const dots = Array.from(root.querySelectorAll<HTMLElement>('.nv-capsule-photo__dot'))
+    const prevBtn = root.querySelector<HTMLButtonElement>('[data-capsule-photo-prev]')
+    const nextBtn = root.querySelector<HTMLButtonElement>('[data-capsule-photo-next]')
     if (slides.length < 2) return
-
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    dots[0]?.setAttribute('data-on', '')
-    if (reduceMotion) return
 
     let current = 0
     let timer: number
@@ -120,7 +184,12 @@ const { items, basePath, alt, class: className = '' } = Astro.props
       dots[current]?.setAttribute('data-on', '')
     }
 
+    dots[0]?.setAttribute('data-on', '')
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
     function start() {
+      if (reduceMotion) return
       timer = window.setInterval(() => show(current + 1), 4200)
     }
 
@@ -131,5 +200,23 @@ const { items, basePath, alt, class: className = '' } = Astro.props
     start()
     root.addEventListener('mouseenter', stop)
     root.addEventListener('mouseleave', start)
+
+    prevBtn?.addEventListener('click', () => {
+      stop()
+      show(current - 1)
+      start()
+    })
+    nextBtn?.addEventListener('click', () => {
+      stop()
+      show(current + 1)
+      start()
+    })
+    dots.forEach((dot, i) => {
+      dot.addEventListener('click', () => {
+        stop()
+        show(i)
+        start()
+      })
+    })
   })
 </script>
