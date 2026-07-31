@@ -782,6 +782,36 @@
   outline-offset: 3px;
 }
 
+/* "Upload all N" — a bulk file picker for a whole set of images (e.g. the
+   example capsule's ten photos). Same visibility rule as every other Studio
+   affordance: invisible and inert until the Studio is actually open. */
+[data-edit-image-group] {
+  display: none;
+}
+
+[data-studio-active] [data-edit-image-group] {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  position: absolute;
+  z-index: 6;
+  border: 1px solid color-mix(in srgb, #fff 30%, transparent);
+  border-radius: var(--radius-control);
+  background: var(--color-carbon);
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.4rem 0.7rem;
+  cursor: pointer;
+  opacity: 0.88;
+  transition: opacity 150ms var(--ease-calm);
+}
+
+[data-studio-active] [data-edit-image-group]:hover {
+  opacity: 1;
+}
+
 @media print {
   .no-print {
     display: none !important;

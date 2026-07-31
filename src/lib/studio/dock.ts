@@ -92,6 +92,7 @@ class Dock {
     )
 
     this.wireImageClicks()
+    this.wireImageGroupClicks()
     this.wireGlobalDrop()
     this.refreshCount()
   }
@@ -588,6 +589,122 @@ class Dock {
     // Ensure the cropper measures itself after the modal has been laid out.
     requestAnimationFrame(() => cropper.reset())
     void close
+  }
+
+  /**
+   * "Upload all N" — a single file picker for a whole set of images at once
+   * (e.g. the ten example-capsule photos), instead of clicking through them
+   * one at a time. Deliberately not interactive per image: with ten files at
+   * once there is no reasonable UI for cropping each in turn, so every file
+   * gets the same automatic centred crop at the slot's declared aspect,
+   * through the same Cropper class the single-image flow uses — mounted
+   * off-screen so it can measure real layout without ever being shown.
+   * Files beyond the slot count, or past the first N selected, are ignored;
+   * fewer files than slots just fills the first ones and leaves the rest as
+   * they were.
+   */
+  private wireImageGroupClicks() {
+    document.addEventListener(
+      'click',
+      (event) => {
+        const target = event.target as HTMLElement | null
+        const trigger = target?.closest<HTMLElement>('[data-edit-image-group]')
+        if (!trigger || this.root.contains(trigger)) return
+        event.preventDefault()
+        event.stopPropagation()
+        this.pickImagesForGroup(trigger)
+      },
+      true,
+    )
+  }
+
+  private pickImagesForGroup(trigger: HTMLElement) {
+    const base = trigger.getAttribute('data-edit-image-group')
+    const count = Number(trigger.getAttribute('data-edit-image-group-count') ?? '0')
+    if (!base || !Number.isFinite(count) || count < 1) return
+
+    const input = h('input', {
+      type: 'file',
+      accept: 'image/png,image/jpeg,image/webp,image/avif',
+      multiple: true,
+      style: 'display:none',
+    }) as HTMLInputElement
+
+    input.addEventListener('change', () => {
+      const files = Array.from(input.files ?? [])
+      input.remove()
+      if (files.length) void this.applyImageGroup(base, count, files, trigger.getAttribute('data-edit-aspect'))
+    })
+
+    document.body.appendChild(input)
+    input.click()
+  }
+
+  private async applyImageGroup(base: string, count: number, files: File[], aspectAttr: string | null) {
+    const aspect = parseAspect(aspectAttr)
+    const slots = Math.min(files.length, count)
+    let applied = 0
+    let rejected = 0
+
+    for (let i = 0; i < slots; i++) {
+      const file = files[i]
+      if (!fileIsImage(file)) {
+        rejected++
+        continue
+      }
+      if (file.size > MAX_UPLOAD_BYTES) {
+        rejected++
+        continue
+      }
+
+      try {
+        const url = await this.autoCrop(file, aspect)
+        const path = `${base}.${i}`
+        this.store.setImage(path, url)
+
+        // CSS.escape isn't guaranteed in every runtime this bundle targets,
+        // and a dotted-numeric path never contains characters that need it.
+        const holder = document.querySelector<HTMLElement>(`[data-edit-image="${path}"]`)
+        const img = holder?.querySelector('img')
+        if (img) {
+          img.src = url
+          img.removeAttribute('srcset')
+        }
+        applied++
+      } catch {
+        rejected++
+      }
+    }
+
+    if (files.length > count) {
+      this.say(`Only the first ${count} were used — that's how many slots there are.`, 'warn')
+    }
+    if (applied) {
+      this.say(`${applied} picture${applied === 1 ? '' : 's'} replaced. Export your changes to keep them.`, 'ok')
+    }
+    if (rejected) {
+      this.say(`${rejected} file${rejected === 1 ? '' : 's'} could not be used (wrong type or over 300 MB).`, 'warn')
+    }
+  }
+
+  /** Same crop/resize pipeline as the interactive cropper, run without a UI:
+   *  mounted off-screen (not display:none — it needs real layout to measure
+   *  against) so Cropper's own default centred framing does the work. */
+  private async autoCrop(file: File, aspect: number | null): Promise<string> {
+    const stage = h('div', {
+      style: `position:fixed;left:-9999px;top:0;width:800px;height:${Math.round(800 / (aspect ?? 1))}px;`,
+    })
+    document.body.appendChild(stage)
+    try {
+      const cropper = new Cropper(stage, { aspect, maxEdge: 1800, mimeType: 'image/jpeg', quality: 0.86 })
+      const dataUrl = await readAsDataUrl(file)
+      await cropper.load(dataUrl)
+      const blob = await cropper.toBlob()
+      cropper.destroy()
+      return blobToDataUrl(blob)
+    } finally {
+      stage.remove()
+    }
   }
 
   private async acceptLogo(file: File) {
