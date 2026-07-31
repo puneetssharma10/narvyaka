@@ -251,7 +251,7 @@
       "photoAlt": "Portrait of the founder"
     },
     "wisdomSlider": {
-      "heading": "Nine short thoughts on wisdom",
+      "heading": "Ten short thoughts on wisdom",
       "slides": [
         { "image": "/wisdom/01-tree.svg", "quote": "Every story kept is a door left open for someone not yet born." },
         { "image": "/wisdom/02-path.svg", "quote": "Wisdom is not what we know. It is what we manage to pass on." },
@@ -261,7 +261,8 @@
         { "image": "/wisdom/06-compass.svg", "quote": "One honest sentence from someone who lived it is worth a shelf of theory." },
         { "image": "/wisdom/07-seed.svg", "quote": "Memory is fragile. A record is not." },
         { "image": "/wisdom/08-ripples.svg", "quote": "The best inheritance is not what we own — it is what we understood." },
-        { "image": "/wisdom/09-lantern.svg", "quote": "Listen once. Keep it forever." }
+        { "image": "/wisdom/09-lantern.svg", "quote": "Listen once. Keep it forever." },
+        { "image": "/wisdom/10-hourglass.svg", "quote": "Time takes the person. It should not have to take the lesson too." }
       ]
     }
   },

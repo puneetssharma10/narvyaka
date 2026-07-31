@@ -623,6 +623,12 @@ class Dock {
     const count = Number(trigger.getAttribute('data-edit-image-group-count') ?? '0')
     if (!base || !Number.isFinite(count) || count < 1) return
 
+    // Appended after the index in each computed path — '' for a flat array of
+    // image strings (home.exampleCapsule.photos.3), '.image' for an array of
+    // { image, quote } objects (home.wisdomSlider.slides.3.image). Keeps this
+    // mechanism usable against either data shape without assuming one.
+    const suffix = trigger.getAttribute('data-edit-image-group-suffix') ?? ''
+
     const input = h('input', {
       type: 'file',
       accept: 'image/png,image/jpeg,image/webp,image/avif',
@@ -633,14 +639,20 @@ class Dock {
     input.addEventListener('change', () => {
       const files = Array.from(input.files ?? [])
       input.remove()
-      if (files.length) void this.applyImageGroup(base, count, files, trigger.getAttribute('data-edit-aspect'))
+      if (files.length) void this.applyImageGroup(base, suffix, count, files, trigger.getAttribute('data-edit-aspect'))
     })
 
     document.body.appendChild(input)
     input.click()
   }
 
-  private async applyImageGroup(base: string, count: number, files: File[], aspectAttr: string | null) {
+  private async applyImageGroup(
+    base: string,
+    suffix: string,
+    count: number,
+    files: File[],
+    aspectAttr: string | null,
+  ) {
     const aspect = parseAspect(aspectAttr)
     const slots = Math.min(files.length, count)
     let applied = 0
@@ -659,7 +671,7 @@ class Dock {
 
       try {
         const url = await this.autoCrop(file, aspect)
-        const path = `${base}.${i}`
+        const path = `${base}.${i}${suffix}`
         this.store.setImage(path, url)
 
         // CSS.escape isn't guaranteed in every runtime this bundle targets,

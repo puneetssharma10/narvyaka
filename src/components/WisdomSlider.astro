@@ -58,6 +58,17 @@ const { items, basePath, class: className = '' } = Astro.props
     <Icon name="arrow" size={18} />
   </button>
 
+  <button
+    type="button"
+    class="nv-wisdom__bulk"
+    data-edit-image-group={basePath}
+    data-edit-image-group-count={items.length}
+    data-edit-image-group-suffix=".image"
+    data-edit-aspect="16:9"
+  >
+    Upload all {items.length}
+  </button>
+
   <div class="nv-wisdom__dots" data-wisdom-dots aria-hidden="true">
     {items.map((_, i) => <span class="nv-wisdom__dot" data-index={i} />)}
   </div>
@@ -164,6 +175,21 @@ const { items, basePath, class: className = '' } = Astro.props
 
   .nv-wisdom__arrow--next {
     right: 1rem;
+  }
+
+  /* Overrides the generic [data-edit-image-group] look (global.css) with
+     something visible against this slider's own dark carbon background —
+     the default dark-on-dark pairing would otherwise disappear here. */
+  .nv-wisdom__bulk {
+    top: 1rem;
+    left: 1rem;
+    background: rgba(255, 255, 255, 0.92) !important;
+    color: var(--color-carbon) !important;
+    border-color: transparent !important;
+  }
+
+  .nv-wisdom__bulk:hover {
+    background: #fff !important;
   }
 
   .nv-wisdom__dots {
