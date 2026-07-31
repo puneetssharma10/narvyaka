@@ -16,13 +16,24 @@ interface Props {
   items: string[]
   basePath: string
   alt: string
+  /** Seconds each slide holds before crossfading to the next. Studio-editable
+   *  live via the Timing panel, through the data-timing/data-interval-ms
+   *  attributes below — see StudioBoot.astro's applyTiming. */
+  rotationSeconds: number
+  timingPath: string
   class?: string
 }
 
-const { items, basePath, alt, class: className = '' } = Astro.props
+const { items, basePath, alt, rotationSeconds, timingPath, class: className = '' } = Astro.props
 ---
 
-<div class={`nv-capsule-photo relative overflow-hidden ${className}`} data-capsule-photo>
+<div
+  class={`nv-capsule-photo relative overflow-hidden ${className}`}
+  data-capsule-photo
+  data-timing={timingPath}
+  data-timing-label="Example capsule photos"
+  data-interval-ms={Math.round(rotationSeconds * 1000)}
+>
   {
     items.map((src, i) => (
       <div
@@ -188,9 +199,14 @@ const { items, basePath, alt, class: className = '' } = Astro.props
 
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
+    function intervalMs() {
+      const ms = Number(root.dataset.intervalMs)
+      return Number.isFinite(ms) && ms > 0 ? ms : 7000
+    }
+
     function start() {
       if (reduceMotion) return
-      timer = window.setInterval(() => show(current + 1), 7000)
+      timer = window.setInterval(() => show(current + 1), intervalMs())
     }
 
     function stop() {
@@ -200,6 +216,12 @@ const { items, basePath, alt, class: className = '' } = Astro.props
     start()
     root.addEventListener('mouseenter', stop)
     root.addEventListener('mouseleave', start)
+    // A Studio timing edit updates data-interval-ms and fires this so the
+    // running timer picks up the new speed immediately, not on next cycle.
+    root.addEventListener('nv:interval-changed', () => {
+      stop()
+      start()
+    })
 
     prevBtn?.addEventListener('click', () => {
       stop()

@@ -8,6 +8,7 @@
 import {
   OVERRIDES_STORAGE_KEY,
   OVERRIDES_VERSION,
+  clampRotationSeconds,
   countOverrides,
   emptyOverrides,
   parseOverrides,
@@ -23,6 +24,7 @@ declare global {
       KEY: string
       applyTheme: (o: StudioOverrides) => void
       applyContent: (o: StudioOverrides) => void
+      applyTiming: (o: StudioOverrides) => void
       current: StudioOverrides | null
     }
   }
@@ -103,6 +105,16 @@ class StudioStore {
     this.commit({ reload: true })
   }
 
+  setTiming(path: string, seconds: number) {
+    this.state.timing[path] = clampRotationSeconds(seconds)
+    this.commit()
+  }
+
+  clearTiming(path: string) {
+    delete this.state.timing[path]
+    this.commit({ reload: true })
+  }
+
   replaceAll(next: StudioOverrides) {
     this.state = next
     this.commit({ reload: true })
@@ -137,6 +149,7 @@ class StudioStore {
 
     window.__narvyaka?.applyTheme(this.state)
     window.__narvyaka?.applyContent(this.state)
+    window.__narvyaka?.applyTiming(this.state)
     this.listeners.forEach((fn) => fn(this.state))
   }
 

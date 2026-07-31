@@ -158,6 +158,21 @@ export interface StudioOverrides {
   text: Record<string, string>
   /** Dotted path into src/data/site.json → replacement image src. */
   images: Record<string, string>
+  /** Dotted path into src/data/site.json → seconds between slides, for an
+   *  auto-rotating gallery (the example capsule photos, the wisdom slider). */
+  timing: Record<string, number>
+}
+
+/** Slower than this and a rotation reads as broken, not deliberate; faster
+ *  and nobody can actually read what changed. Shared by validation and by
+ *  the Studio's range input, so the two can never disagree. */
+export const MIN_ROTATION_SECONDS = 2
+export const MAX_ROTATION_SECONDS = 20
+
+export function clampRotationSeconds(v: unknown): number {
+  const n = typeof v === 'number' ? v : Number(v)
+  if (!Number.isFinite(n)) return MIN_ROTATION_SECONDS
+  return Math.min(MAX_ROTATION_SECONDS, Math.max(MIN_ROTATION_SECONDS, Math.round(n * 2) / 2))
 }
 
 export function emptyOverrides(): StudioOverrides {
@@ -167,6 +182,7 @@ export function emptyOverrides(): StudioOverrides {
     theme: { colors: {}, fonts: {} },
     text: {},
     images: {},
+    timing: {},
   }
 }
 
@@ -177,7 +193,8 @@ export function isEmptyOverrides(o: StudioOverrides | null | undefined): boolean
     Object.keys(o.theme?.fonts ?? {}).length === 0 &&
     !o.theme?.logo?.src &&
     Object.keys(o.text ?? {}).length === 0 &&
-    Object.keys(o.images ?? {}).length === 0
+    Object.keys(o.images ?? {}).length === 0 &&
+    Object.keys(o.timing ?? {}).length === 0
   )
 }
 
@@ -188,7 +205,8 @@ export function countOverrides(o: StudioOverrides | null | undefined): number {
     Object.keys(o.theme?.fonts ?? {}).length +
     (o.theme?.logo?.src ? 1 : 0) +
     Object.keys(o.text ?? {}).length +
-    Object.keys(o.images ?? {}).length
+    Object.keys(o.images ?? {}).length +
+    Object.keys(o.timing ?? {}).length
   )
 }
 
@@ -218,6 +236,11 @@ export function parseOverrides(input: unknown): StudioOverrides | null {
       if (typeof v === 'string' && isSafeImageSrc(v)) images[k] = v
     }
 
+    const timing: Record<string, number> = {}
+    for (const [k, v] of Object.entries(raw.timing ?? {})) {
+      if (typeof v === 'number' && Number.isFinite(v)) timing[k] = clampRotationSeconds(v)
+    }
+
     const logoSrc = raw.theme?.logo?.src
     const logo: LogoOverride | undefined =
       typeof logoSrc === 'string' && isSafeImageSrc(logoSrc)
@@ -234,6 +257,7 @@ export function parseOverrides(input: unknown): StudioOverrides | null {
       theme: { colors, fonts, ...(logo ? { logo } : {}) },
       text,
       images,
+      timing,
     }
   } catch {
     return null

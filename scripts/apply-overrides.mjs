@@ -9,6 +9,7 @@
  *   theme.logo    →  public/uploads/logo.<ext>  +  src/data/site.json
  *   text.*        →  src/data/site.json  (by dotted path)
  *   images.*      →  public/uploads/<name>.<ext>  +  src/data/site.json
+ *   timing.*      →  src/data/site.json  (by dotted path, seconds per slide)
  *
  * Inlined data URIs are written out as real files, so the repository never
  * carries a megabyte of base64 and the browser gets a cacheable asset.
@@ -194,6 +195,21 @@ for (const [path, value] of Object.entries(overrides.images ?? {})) {
     applied.push(`image ${path} → ${src}`)
   } else {
     skipped.push(`image ${path}: no such key in src/data/site.json`)
+  }
+}
+
+/* ── Timing ───────────────────────────────────────────────────────────────── */
+
+for (const [path, value] of Object.entries(overrides.timing ?? {})) {
+  const seconds = Number(value)
+  if (!Number.isFinite(seconds)) {
+    skipped.push(`timing ${path}: "${value}" is not a number`)
+    continue
+  }
+  if (setPath(site, path, seconds)) {
+    applied.push(`timing ${path} → ${seconds}s`)
+  } else {
+    skipped.push(`timing ${path}: no such key in src/data/site.json`)
   }
 }
 
