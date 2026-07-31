@@ -131,7 +131,18 @@
     "exampleCapsule": {
       "badge": "Example",
       "note": "This is an illustrative capsule showing the format. It is not a real contributor's record. It will be replaced by the first real Wisdom Record once one has been made.",
-      "photo": "",
+      "photos": [
+        "/capsule/01.svg",
+        "/capsule/02.svg",
+        "/capsule/03.svg",
+        "/capsule/04.svg",
+        "/capsule/05.svg",
+        "/capsule/06.svg",
+        "/capsule/07.svg",
+        "/capsule/08.svg",
+        "/capsule/09.svg",
+        "/capsule/10.svg"
+      ],
       "photoCaption": "Placeholder — a real contributor photograph goes here.",
       "lesson": "Ask the question while the person is still in the room. There is no later.",
       "attribution": "Founder's own account",

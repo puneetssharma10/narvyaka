@@ -1,0 +1,135 @@
+---
+/**
+ * The example capsule's photo — a single 4:3 slot, now a set of images that
+ * crossfade automatically instead of one static picture. Each frame is an
+ * ordinary Studio-editable image (click it, upload a replacement), same as
+ * every other photo on the site.
+ *
+ * Deliberately no quote overlay, no arrows: this sits inside a card that
+ * already has its own badge, lesson and attribution below it. Adding more
+ * chrome here would compete with that, not support it.
+ */
+interface Props {
+  items: string[]
+  basePath: string
+  alt: string
+  class?: string
+}
+
+const { items, basePath, alt, class: className = '' } = Astro.props
+---
+
+<div class={`nv-capsule-photo relative overflow-hidden ${className}`} data-capsule-photo>
+  {
+    items.map((src, i) => (
+      <div
+        class="nv-capsule-photo__slide"
+        data-capsule-photo-slide
+        aria-hidden={i === 0 ? 'false' : 'true'}
+        data-edit-image={`${basePath}.${i}`}
+        data-edit-aspect="4:3"
+      >
+        <img
+          src={src}
+          alt={i === 0 ? alt : ''}
+          class="h-full w-full object-cover"
+          width="640"
+          height="480"
+          loading={i === 0 ? 'eager' : 'lazy'}
+        />
+      </div>
+    ))
+  }
+
+  {
+    items.length > 1 && (
+      <div class="nv-capsule-photo__dots" data-capsule-photo-dots aria-hidden="true">
+        {items.map((_, i) => (
+          <span class="nv-capsule-photo__dot" data-index={i} />
+        ))}
+      </div>
+    )
+  }
+</div>
+
+<style>
+  .nv-capsule-photo {
+    background: var(--color-accent-soft);
+  }
+
+  .nv-capsule-photo__slide {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    opacity: 0;
+    transition: opacity 620ms ease;
+  }
+
+  .nv-capsule-photo__slide[aria-hidden='false'] {
+    z-index: 1;
+    opacity: 1;
+  }
+
+  .nv-capsule-photo__dots {
+    position: absolute;
+    right: 0.75rem;
+    bottom: 0.75rem;
+    z-index: 2;
+    display: flex;
+    gap: 0.35rem;
+  }
+
+  .nv-capsule-photo__dot {
+    display: block;
+    width: 14px;
+    height: 3px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.55);
+    box-shadow: 0 0 0 1px rgba(11, 14, 20, 0.12);
+  }
+
+  .nv-capsule-photo__dot[data-on] {
+    background: #fff;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .nv-capsule-photo__slide {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-capsule-photo]').forEach((root) => {
+    const slides = Array.from(root.querySelectorAll<HTMLElement>('[data-capsule-photo-slide]'))
+    const dots = Array.from(root.querySelectorAll<HTMLElement>('.nv-capsule-photo__dot'))
+    if (slides.length < 2) return
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    dots[0]?.setAttribute('data-on', '')
+    if (reduceMotion) return
+
+    let current = 0
+    let timer: number
+
+    function show(next: number) {
+      slides[current].setAttribute('aria-hidden', 'true')
+      dots[current]?.removeAttribute('data-on')
+      current = (next + slides.length) % slides.length
+      slides[current].setAttribute('aria-hidden', 'false')
+      dots[current]?.setAttribute('data-on', '')
+    }
+
+    function start() {
+      timer = window.setInterval(() => show(current + 1), 4200)
+    }
+
+    function stop() {
+      window.clearInterval(timer)
+    }
+
+    start()
+    root.addEventListener('mouseenter', stop)
+    root.addEventListener('mouseleave', start)
+  })
+</script>
