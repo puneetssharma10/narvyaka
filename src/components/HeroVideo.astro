@@ -37,10 +37,11 @@ interface Props {
 const { src, srcTwo, editPath, editPathTwo, transitionSeconds } = Astro.props
 ---
 
-<!-- Full screen on tablet/desktop, a shorter full-width band on phones —
-     a full-viewport video before any content reads as dominant rather than
-     dramatic on a small screen, and it means less to scroll past to reach
-     the headline. sm: is the same 640px cutoff already used elsewhere for
+<!-- Full screen, cropped-to-fill on tablet/desktop; on phones, a landscape
+     (16:9) band sized to the video's own shape instead — full width, height
+     following from that, so the *complete* frame is always visible with
+     nothing cut off the sides or top/bottom (object-contain below, not
+     object-cover). sm: is the same 640px cutoff already used elsewhere for
      "mobile vs. not" (e.g. the wisdom slider's arrows).
 
      100vh alone would run 69px past the actual viewport: the header is
@@ -52,11 +53,10 @@ const { src, srcTwo, editPath, editPathTwo, transitionSeconds } = Astro.props
      dvh, not vh: a plain 100vh on a phone is measured against the tallest
      the viewport ever gets (address bar hidden), so with the address bar
      showing — the normal state on scroll — the section actually runs
-     taller than what's visible, which is likely a real part of what "way
-     too big" was describing, not just the full-screen height choice
-     itself. dvh tracks the address bar's current state instead. -->
+     taller than what's visible. dvh tracks the address bar's current
+     state instead. -->
 <section
-  class="relative h-[65dvh] min-h-[280px] w-full overflow-hidden border-b border-hairline sm:h-[calc(100dvh-69px)] sm:min-h-[420px]"
+  class="relative aspect-video h-auto w-full overflow-hidden border-b border-hairline sm:aspect-auto sm:h-[calc(100dvh-69px)] sm:min-h-[420px]"
   data-hero-loop
   data-timing="home.hero.transitionSeconds"
   data-timing-label="Hero video transition"
@@ -69,7 +69,7 @@ const { src, srcTwo, editPath, editPathTwo, transitionSeconds } = Astro.props
 
   <div class="nv-hero-video__slot" data-hero-slot="0" data-edit-video={editPath}>
     <video
-      class="absolute inset-0 h-full w-full object-cover"
+      class="absolute inset-0 h-full w-full object-contain sm:object-cover"
       muted
       loop
       playsinline
@@ -80,7 +80,7 @@ const { src, srcTwo, editPath, editPathTwo, transitionSeconds } = Astro.props
 
   <div class="nv-hero-video__slot nv-hero-video__slot--two" data-hero-slot="1" data-edit-video={editPathTwo}>
     <video
-      class="absolute inset-0 h-full w-full object-cover"
+      class="absolute inset-0 h-full w-full object-contain sm:object-cover"
       muted
       playsinline
       preload="auto"
@@ -115,6 +115,13 @@ const { src, srcTwo, editPath, editPathTwo, transitionSeconds } = Astro.props
     inset: 0;
     z-index: 1;
     opacity: 1;
+    /* object-contain (mobile) shows the complete, uncropped frame, which
+       means bars wherever the source isn't exactly 16:9 — a solid backing
+       instead of leaving that transparent (showing the grid pattern behind
+       it through the gap, which read as broken rather than intentional).
+       Never visible on tablet/desktop, where object-cover always fills
+       the box completely. */
+    background: var(--color-carbon);
     /* Set by the script below from the same value the crossfade timing
        itself uses (data-interval-ms), so the visual fade and the actual
        overlap window can never drift out of sync with each other. */
