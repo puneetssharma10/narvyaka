@@ -21,10 +21,16 @@ interface Props {
    *  attributes below — see StudioBoot.astro's applyTiming. */
   rotationSeconds: number
   timingPath: string
+  /** When set, a small studio-only button offers switching this whole slot
+   *  to a single video instead — see CapsuleVideo.astro. This is the only
+   *  way to *start* using a video: the video element itself doesn't exist
+   *  in the page until one is already set, so without this control there
+   *  would be nothing to click to begin. */
+  videoEditPath?: string
   class?: string
 }
 
-const { items, basePath, alt, rotationSeconds, timingPath, class: className = '' } = Astro.props
+const { items, basePath, alt, rotationSeconds, timingPath, videoEditPath, class: className = '' } = Astro.props
 ---
 
 <div
@@ -64,6 +70,14 @@ const { items, basePath, alt, rotationSeconds, timingPath, class: className = ''
   >
     Upload all {items.length}
   </button>
+
+  {
+    videoEditPath && (
+      <button type="button" class="nv-capsule-photo__video-btn" data-edit-video={videoEditPath}>
+        Use a video instead
+      </button>
+    )
+  }
 
   {
     items.length > 1 && (
@@ -116,6 +130,29 @@ const { items, basePath, alt, rotationSeconds, timingPath, class: className = ''
   .nv-capsule-photo__bulk {
     top: 0.6rem;
     left: 0.6rem;
+  }
+
+  /* The studio-only display:none/inline-flex toggle for this button lives in
+     global.css, not here. An Astro scoped <style> block silently rewrites a
+     *leading* ancestor attribute selector like [data-studio-active] to also
+     require the component's own data-astro-cid — which <html> never has —
+     so a rule written as "[data-studio-active] .nv-capsule-photo__video-btn"
+     right here would never match anything. Position/colour only in scope. */
+  .nv-capsule-photo__video-btn {
+    top: 0.6rem;
+    right: 0.6rem;
+  }
+
+  /* Suppresses the generic "Replace video" hover tooltip that
+     [data-edit-video] gets elsewhere (global.css) — this button already has
+     its own label, and the tooltip is centred absolutely, so left alone it
+     would render directly on top of that text. */
+  .nv-capsule-photo__video-btn::after {
+    /* !important because this and the rule it overrides (global.css's
+       [data-studio-active] [data-edit-video]::after) carry equal
+       specificity — without it, which one wins depends on build-order
+       luck rather than intent. */
+    content: none !important;
   }
 
   .nv-capsule-photo__arrow {

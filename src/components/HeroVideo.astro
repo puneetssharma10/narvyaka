@@ -1,0 +1,92 @@
+---
+/**
+ * The very first thing on the page: a full-viewport looping video, no text
+ * over it — the wordmark, headline and everything else that used to share
+ * this space now lives in its own section right below, reached by scrolling
+ * (or clicking the hint at the bottom).
+ *
+ * The <video> tag is always rendered, even with no src set — unlike the
+ * capsule's photo/video toggle, there's no second component being swapped
+ * out here, so there's no first-upload "no live preview yet" limitation:
+ * the element always exists for the Studio to target, from the very first
+ * upload onward.
+ *
+ * Falls back to the same light technical grid the hero always had, so an
+ * empty slot before a real video is uploaded doesn't read as broken —
+ * and it stays visible through a video with transparency, for what that's
+ * worth on an autoplaying background clip.
+ */
+interface Props {
+  src: string
+  editPath: string
+}
+
+const { src, editPath } = Astro.props
+---
+
+<!-- 100vh alone would run 69px past the actual viewport: the header is
+     sticky (Header.astro, h-[68px] + a 1px border), which still occupies
+     real layout space above this section rather than floating over it.
+     Sized against what's actually left, so this section plus the header
+     together fill exactly one screen — not one screen plus a header. -->
+<section
+  class="relative h-[calc(100vh-69px)] min-h-[420px] w-full overflow-hidden border-b border-hairline"
+  data-edit-video={editPath}
+>
+  <div class="grid-field-light absolute inset-0" aria-hidden="true"></div>
+
+  <video
+    class="absolute inset-0 h-full w-full object-cover"
+    autoplay
+    muted
+    loop
+    playsinline
+    preload="auto"
+    {...src ? { src } : {}}
+  />
+
+  <a href="#after-hero-video" class="nv-hero-video__hint" aria-label="Scroll down">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+      <path d="M12 4v15M5 12l7 7 7-7" stroke-linecap="round" stroke-linejoin="round" />
+    </svg>
+  </a>
+</section>
+
+<style>
+  .nv-hero-video__hint {
+    position: absolute;
+    inset-inline: 0;
+    bottom: 1.75rem;
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    margin-inline: auto;
+    width: 40px;
+    height: 40px;
+    border-radius: 999px;
+    /* A solid backing, not just a drop-shadow on a white icon — the empty
+       state before any video is uploaded is the light technical grid, and
+       white-on-near-white was invisible there. This reads clearly over
+       both that fallback and an actual video, whatever its own colours. */
+    background: rgba(11, 14, 20, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+    animation: nv-hero-hint-bounce 2.2s ease-in-out infinite;
+  }
+
+  @keyframes nv-hero-hint-bounce {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(6px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .nv-hero-video__hint {
+      animation: none;
+    }
+  }
+</style>

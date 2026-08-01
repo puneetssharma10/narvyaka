@@ -7,6 +7,8 @@ import PlaceholderNotice from '../components/PlaceholderNotice.astro'
 import WisdomSlider from '../components/WisdomSlider.astro'
 import MarqueeStrip from '../components/MarqueeStrip.astro'
 import CapsulePhotoRotator from '../components/CapsulePhotoRotator.astro'
+import CapsuleVideo from '../components/CapsuleVideo.astro'
+import HeroVideo from '../components/HeroVideo.astro'
 import { content, editable, t, list } from '../lib/content'
 import { siteConfig } from '../../site.config'
 
@@ -19,8 +21,15 @@ const motion = content.motion
 ---
 
 <Base title={siteConfig.name}>
-  <!-- ── Hero ──────────────────────────────────────────────────────────── -->
-  <section class="relative overflow-hidden border-b border-hairline bg-surface" data-spotlight>
+  <!-- ── Full-screen video, first thing on the page, no text over it ────── -->
+  <HeroVideo src={home.hero.video} editPath="home.hero.video" />
+
+  <!-- ── Wordmark, headline, intro, CTAs and the example capsule ─────────
+       Everything that used to share the hero with the video now lives here,
+       the first thing reached by scrolling (or the hint at the video's
+       bottom edge). Same content, same order as before — only the video
+       above it is new. -->
+  <section id="after-hero-video" class="relative overflow-hidden border-b border-hairline bg-surface" data-spotlight>
     <!-- Two soft colour blobs, drifting slowly — the premium, "alive"
          background layer. Idle motion only, never tied to scroll. -->
     <div class="ambient-glow" aria-hidden="true"></div>
@@ -97,14 +106,21 @@ const motion = content.motion
             </span>
           </div>
 
-          <CapsulePhotoRotator
-            items={example.photos}
-            basePath="home.exampleCapsule.photos"
-            alt={example.photoCaption}
-            rotationSeconds={example.rotationSeconds}
-            timingPath="home.exampleCapsule.rotationSeconds"
-            class="aspect-[4/3] w-full"
-          />
+          {
+            example.video ? (
+              <CapsuleVideo src={example.video} editPath="home.exampleCapsule.video" class="aspect-[4/3] w-full" />
+            ) : (
+              <CapsulePhotoRotator
+                items={example.photos}
+                basePath="home.exampleCapsule.photos"
+                alt={example.photoCaption}
+                rotationSeconds={example.rotationSeconds}
+                timingPath="home.exampleCapsule.rotationSeconds"
+                videoEditPath="home.exampleCapsule.video"
+                class="aspect-[4/3] w-full"
+              />
+            )
+          }
 
           <div class="space-y-5 p-6">
             <blockquote

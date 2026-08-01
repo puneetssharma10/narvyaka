@@ -27,6 +27,13 @@ const STORAGE_OPEN = 'narvyaka.studio.open'
 const STORAGE_TOKEN = 'narvyaka.studio.token'
 const EXPORT_FILENAME = 'narvyaka-overrides.json'
 
+// Video is stored inline as base64, same as a photo — but unlike a photo it
+// is never re-encoded down first, so this cap is far stricter than
+// MAX_UPLOAD_BYTES (300 MB, meant for a file the Cropper is about to shrink).
+// 6 MB keeps a stored video comfortably under isSafeImageSrc's 8M-character
+// ceiling once base64 inflates it by ~4/3.
+const MAX_VIDEO_UPLOAD_BYTES = 6 * 1024 * 1024
+
 let mounted = false
 
 export function mountStudio() {
@@ -97,6 +104,7 @@ class Dock {
 
     this.wireImageClicks()
     this.wireImageGroupClicks()
+    this.wireVideoClicks()
     this.wireGlobalDrop()
     this.refreshCount()
   }
@@ -591,6 +599,92 @@ class Dock {
     input.click()
   }
 
+  /**
+   * The one video slot (the example capsule photo area, when a video has
+   * been set in place of the rotating photos). Same override field as
+   * images — home.exampleCapsule.video is just another path in `images` —
+   * so it gets clear/revert, export and studio:apply for free, but the
+   * upload flow itself is separate: no cropper, and a much stricter size
+   * cap, since nothing here ever gets re-encoded down.
+   */
+  private wireVideoClicks() {
+    document.addEventListener(
+      'click',
+      (event) => {
+        const target = event.target as HTMLElement | null
+        const holder = target?.closest<HTMLElement>('[data-edit-video]')
+        if (!holder || this.root.contains(holder)) return
+        event.preventDefault()
+        event.stopPropagation()
+        this.pickVideoFor(holder)
+      },
+      true,
+    )
+  }
+
+  private pickVideoFor(holder: HTMLElement) {
+    const input = h('input', {
+      type: 'file',
+      accept: 'video/mp4,video/webm',
+      style: 'display:none',
+    }) as HTMLInputElement
+
+    input.addEventListener('change', () => {
+      const file = input.files?.[0]
+      input.remove()
+      if (file) void this.applyVideo(holder, file)
+    })
+
+    document.body.appendChild(input)
+    input.click()
+  }
+
+  private async applyVideo(holder: HTMLElement, file: File) {
+    const path = holder.getAttribute('data-edit-video')
+    if (!path) return
+
+    if (!/^video\/(mp4|webm)$/.test(file.type)) {
+      this.say('That file type is not supported. Use MP4 or WebM.', 'warn')
+      return
+    }
+    if (file.size > MAX_VIDEO_UPLOAD_BYTES) {
+      this.say(
+        `That file is ${formatBytes(file.size)} — video is stored inline rather than re-encoded, so the limit is ${formatBytes(MAX_VIDEO_UPLOAD_BYTES)}. Compress it and try again.`,
+        'warn',
+      )
+      return
+    }
+
+    try {
+      const url = await readAsDataUrl(file)
+      this.store.setImage(path, url)
+
+      // The trigger is a real <video> when one is already showing (clicking
+      // the video itself to replace it), but the very first time — clicked
+      // from the "Use a video instead" button on the photo rotator — there
+      // is no <video> element on the page yet, because index.astro only
+      // renders one once site.json's video field is non-empty. The override
+      // is still saved correctly either way; only the *live preview* differs.
+      const video = holder.querySelector('video')
+      if (video) {
+        video.src = url
+        video.load()
+        void video.play().catch(() => {
+          /* autoplay can be refused before a user gesture — the video is
+             still correctly set and will play once one occurs */
+        })
+        this.say(`Video replaced (${formatBytes(file.size)}). Export your changes to keep it.`, 'ok')
+      } else {
+        this.say(
+          `Video saved (${formatBytes(file.size)}). This slot switches to it only after you export and run npm run studio:apply — there's nothing to preview live here yet.`,
+          'ok',
+        )
+      }
+    } catch {
+      this.say('That video could not be read.', 'warn')
+    }
+  }
+
   private async openCropper(holder: HTMLElement, file: File) {
     const path = holder.getAttribute('data-edit-image')
     if (!path) return
@@ -872,11 +966,15 @@ class Dock {
 
       const target = e.target as HTMLElement | null
       const imageHolder = target?.closest<HTMLElement>('[data-edit-image]')
+      const videoHolder = target?.closest<HTMLElement>('[data-edit-video]')
       const logoSlot = target?.closest<HTMLElement>('[data-logo-slot]')
 
       if (imageHolder && !this.root.contains(imageHolder)) {
         e.preventDefault()
         void this.openCropper(imageHolder, file)
+      } else if (videoHolder && !this.root.contains(videoHolder)) {
+        e.preventDefault()
+        void this.applyVideo(videoHolder, file)
       } else if (logoSlot) {
         e.preventDefault()
         void this.acceptLogo(file)

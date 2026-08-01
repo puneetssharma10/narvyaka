@@ -756,11 +756,13 @@
   background: color-mix(in srgb, var(--color-accent) 5%, transparent);
 }
 
-[data-studio-active] [data-edit-image] {
+[data-studio-active] [data-edit-image],
+[data-studio-active] [data-edit-video] {
   position: relative;
 }
 
-[data-studio-active] [data-edit-image]::after {
+[data-studio-active] [data-edit-image]::after,
+[data-studio-active] [data-edit-video]::after {
   content: 'Replace image';
   position: absolute;
   inset-inline-start: 50%;
@@ -778,30 +780,45 @@
   z-index: 5;
 }
 
-[data-studio-active] [data-edit-image]:hover::after {
+[data-studio-active] [data-edit-video]::after {
+  content: 'Replace video';
+}
+
+[data-studio-active] [data-edit-image]:hover::after,
+[data-studio-active] [data-edit-video]:hover::after {
   opacity: 1;
 }
 
-[data-studio-active] [data-edit-image]:hover {
+[data-studio-active] [data-edit-image]:hover,
+[data-studio-active] [data-edit-video]:hover {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
   cursor: pointer;
 }
 
 [data-studio-dropping] [data-edit-image],
+[data-studio-dropping] [data-edit-video],
 [data-studio-dropping] [data-logo-slot] {
   outline: 2px dashed var(--color-accent);
   outline-offset: 3px;
 }
 
-/* "Upload all N" — a bulk file picker for a whole set of images (e.g. the
-   example capsule's ten photos). Same visibility rule as every other Studio
-   affordance: invisible and inert until the Studio is actually open. */
-[data-edit-image-group] {
+/* "Upload all N" (a bulk file picker for a whole set of images) and "Use a
+   video instead" (switches the example capsule to a single video — see
+   CapsulePhotoRotator) share this look and this gating: invisible and inert
+   until the Studio is actually open, same as every other Studio affordance.
+   Deliberately kept here rather than in either component's own scoped
+   <style>: an Astro scoped block silently rewrites a *leading* ancestor
+   attribute selector like [data-studio-active] to also require that
+   component's own data-astro-cid, which <html> never has — so the same rule
+   written inside the component would never match anything. */
+[data-edit-image-group],
+.nv-capsule-photo__video-btn {
   display: none;
 }
 
-[data-studio-active] [data-edit-image-group] {
+[data-studio-active] [data-edit-image-group],
+[data-studio-active] .nv-capsule-photo__video-btn {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
@@ -820,7 +837,8 @@
   transition: opacity 150ms var(--ease-calm);
 }
 
-[data-studio-active] [data-edit-image-group]:hover {
+[data-studio-active] [data-edit-image-group]:hover,
+[data-studio-active] .nv-capsule-photo__video-btn:hover {
   opacity: 1;
 }
 
