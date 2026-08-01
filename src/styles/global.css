@@ -66,7 +66,7 @@
      natural italic cut for the wordmark and pull-quotes. Inter stays for
      body copy — a page of italic serif paragraphs is a strain to read. */
   --font-wordmark: 'Fraunces Variable', 'Source Serif 4 Variable', Georgia, serif;
-  --font-heading: 'Fraunces Variable', 'Source Serif 4 Variable', Georgia, serif;
+  --font-heading: 'Caveat Variable', cursive;
   --font-body: 'Inter Variable', 'Public Sans Variable', system-ui, sans-serif;
 
   /* Radius — Build Brief §2.3: soft, not sharp, not pill-shaped. */

@@ -19,7 +19,7 @@
     },
     "fonts": {
       "wordmark": "'Fraunces Variable', 'Source Serif 4 Variable', Georgia, serif",
-      "heading": "'Fraunces Variable', 'Source Serif 4 Variable', Georgia, serif",
+      "heading": "'Caveat Variable', cursive",
       "body": "'Inter Variable', 'Public Sans Variable', system-ui, sans-serif"
     },
     "logo": {
@@ -115,8 +115,8 @@
   },
   "home": {
     "hero": {
-      "video": "",
-      "videoTwo": "",
+      "video": "/uploads/home-hero-video.mp4",
+      "videoTwo": "/uploads/home-hero-videotwo.mp4",
       "wordmark": "Narvyaka",
       "tagline": "Because No Generation Should Start From Zero.",
       "subhead": "What knowledge should outlive you?",
@@ -257,17 +257,50 @@
       "rotationSeconds": 5.2,
       "heading": "Eleven short thoughts on wisdom",
       "slides": [
-        { "image": "/wisdom/01-tree.svg", "quote": "Every story kept is a door left open for someone not yet born." },
-        { "image": "/wisdom/02-path.svg", "quote": "Wisdom is not what we know. It is what we manage to pass on." },
-        { "image": "/wisdom/03-hands.svg", "quote": "A voice recorded once can still be heard a hundred years from now." },
-        { "image": "/wisdom/04-book.svg", "quote": "The smallest lesson, kept, can outlast the largest fortune, spent." },
-        { "image": "/wisdom/05-sunrise.svg", "quote": "What we forget to write down, our children learn the hard way instead." },
-        { "image": "/wisdom/06-compass.svg", "quote": "One honest sentence from someone who lived it is worth a shelf of theory." },
-        { "image": "/wisdom/07-seed.svg", "quote": "Memory is fragile. A record is not." },
-        { "image": "/wisdom/08-ripples.svg", "quote": "The best inheritance is not what we own — it is what we understood." },
-        { "image": "/wisdom/09-lantern.svg", "quote": "Listen once. Keep it forever." },
-        { "image": "/wisdom/10-handshake.svg", "quote": "Every generation that teaches the next one is a generation that did not start from zero." },
-        { "image": "/wisdom/11-hourglass.svg", "quote": "Time takes the person. It should not have to take the lesson too." }
+        {
+          "image": "/wisdom/01-tree.svg",
+          "quote": "Every story kept is a door left open for someone not yet born."
+        },
+        {
+          "image": "/wisdom/02-path.svg",
+          "quote": "Wisdom is not what we know. It is what we manage to pass on."
+        },
+        {
+          "image": "/wisdom/03-hands.svg",
+          "quote": "A voice recorded once can still be heard a hundred years from now."
+        },
+        {
+          "image": "/wisdom/04-book.svg",
+          "quote": "The smallest lesson, kept, can outlast the largest fortune, spent."
+        },
+        {
+          "image": "/wisdom/05-sunrise.svg",
+          "quote": "What we forget to write down, our children learn the hard way instead."
+        },
+        {
+          "image": "/wisdom/06-compass.svg",
+          "quote": "One honest sentence from someone who lived it is worth a shelf of theory."
+        },
+        {
+          "image": "/wisdom/07-seed.svg",
+          "quote": "Memory is fragile. A record is not."
+        },
+        {
+          "image": "/wisdom/08-ripples.svg",
+          "quote": "The best inheritance is not what we own — it is what we understood."
+        },
+        {
+          "image": "/wisdom/09-lantern.svg",
+          "quote": "Listen once. Keep it forever."
+        },
+        {
+          "image": "/wisdom/10-handshake.svg",
+          "quote": "Every generation that teaches the next one is a generation that did not start from zero."
+        },
+        {
+          "image": "/wisdom/11-hourglass.svg",
+          "quote": "Time takes the person. It should not have to take the lesson too."
+        }
       ]
     }
   },
@@ -1056,9 +1089,18 @@
       }
     ],
     "footerLinks": [
-      { "label": "Privacy", "href": "/privacy" },
-      { "label": "Copyright", "href": "/terms" },
-      { "label": "Community guidelines", "href": "/volunteer#pledge" }
+      {
+        "label": "Privacy",
+        "href": "/privacy"
+      },
+      {
+        "label": "Copyright",
+        "href": "/terms"
+      },
+      {
+        "label": "Community guidelines",
+        "href": "/volunteer#pledge"
+      }
     ]
   },
   "categories": [
