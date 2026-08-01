@@ -8,12 +8,18 @@ interface UserRow {
 }
 
 /**
- * PATCH /api/admin/users/:id — body: { action: 'revoke' | 'reactivate' }
+ * PATCH /api/admin/users/:id
+ * body: { action: 'revoke' | 'reactivate' | 'grant_download' | 'revoke_download' }
  *
  * Boundary (Founding Vision decision): an admin may revoke or reactivate a
  * volunteer, and nothing else — not another admin, not the super_admin.
  * Only the super_admin can act on an admin account, and no one can revoke
  * their own session out from under themselves.
+ *
+ * Download permission is narrower still: only the super_admin grants or
+ * revokes it (an admin cannot, even for a volunteer they can otherwise
+ * revoke outright), and only a volunteer can hold it at all — there is no
+ * concept yet of a reader downloading anything.
  */
 export const onRequestPatch: PagesFunction<Env> = async ({ request, env, params }) => {
   const missing = requireBindings(env, ['DB'])
@@ -45,8 +51,21 @@ export const onRequestPatch: PagesFunction<Env> = async ({ request, env, params 
   }
 
   const { action } = (body ?? {}) as { action?: string }
-  if (action !== 'revoke' && action !== 'reactivate') {
-    return fail(400, "action must be 'revoke' or 'reactivate'.")
+  const validActions = ['revoke', 'reactivate', 'grant_download', 'revoke_download']
+  if (!action || !validActions.includes(action)) {
+    return fail(400, `action must be one of: ${validActions.join(', ')}.`)
+  }
+
+  if (action === 'grant_download' || action === 'revoke_download') {
+    if (session!.role !== 'super_admin') {
+      return fail(403, 'Only the super_admin can grant or revoke download permission.')
+    }
+    if (target.role !== 'volunteer') {
+      return fail(400, 'Download permission only applies to a volunteer account.')
+    }
+    const canDownload = action === 'grant_download' ? 1 : 0
+    await env.DB!.prepare(`UPDATE users SET can_download = ?1 WHERE id = ?2`).bind(canDownload, id).run()
+    return json({ ok: true, canDownload: canDownload === 1 })
   }
 
   const status = action === 'revoke' ? 'revoked' : 'active'

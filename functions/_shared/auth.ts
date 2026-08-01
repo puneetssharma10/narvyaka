@@ -27,6 +27,9 @@ export interface SessionUser {
   email: string
   role: Role
   mustChangePassword: boolean
+  /** Only ever true for a volunteer — granted/revoked by the super_admin.
+   *  See functions/api/admin/users/[id].ts. */
+  canDownload: boolean
 }
 
 const SESSION_COOKIE = 'nv_session'
@@ -121,16 +124,29 @@ export async function getSession(env: Env, request: Request): Promise<SessionUse
 
   const tokenHash = await sha256Hex(token)
   const row = await env.DB.prepare(
-    `SELECT u.id, u.email, u.role, u.status, u.must_change_password
+    `SELECT u.id, u.email, u.role, u.status, u.must_change_password, u.can_download
      FROM sessions s JOIN users u ON u.id = s.user_id
      WHERE s.token_hash = ?1 AND s.expires_at > ?2`,
   )
     .bind(tokenHash, new Date().toISOString())
-    .first<{ id: string; email: string; role: Role; status: string; must_change_password: number }>()
+    .first<{
+      id: string
+      email: string
+      role: Role
+      status: string
+      must_change_password: number
+      can_download: number
+    }>()
 
   if (!row || row.status !== 'active') return null
 
-  return { id: row.id, email: row.email, role: row.role, mustChangePassword: row.must_change_password === 1 }
+  return {
+    id: row.id,
+    email: row.email,
+    role: row.role,
+    mustChangePassword: row.must_change_password === 1,
+    canDownload: row.can_download === 1,
+  }
 }
 
 /** Every protected route starts with this. Returns a ready 401/403, or null if allowed. */

@@ -21,7 +21,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
   if (denied) return denied
 
   const rows = await env.DB!.prepare(
-    `SELECT id, email, role, status, created_at, last_login_at FROM users ORDER BY created_at DESC`,
+    `SELECT id, email, role, status, can_download, created_at, last_login_at FROM users ORDER BY created_at DESC`,
   ).all()
 
   return json({ users: rows.results ?? [] })

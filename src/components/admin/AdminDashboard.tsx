@@ -36,6 +36,7 @@ interface UserRow {
   email: string
   role: Role
   status: string
+  can_download: number
   created_at: string
   last_login_at: string | null
 }
@@ -389,6 +390,18 @@ function Accounts({ me, onCreated }: { me: Me; onCreated: (cred: { email: string
     void load()
   }
 
+  async function toggleDownload(row: UserRow) {
+    setBusyId(row.id)
+    const action = row.can_download ? 'revoke_download' : 'grant_download'
+    const { ok, data } = await api<{ error?: string }>(`/api/admin/users/${row.id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ action }),
+    })
+    setBusyId(null)
+    if (!ok) setError((data as { error?: string }).error ?? 'Could not change download permission.')
+    void load()
+  }
+
   async function createAdmin(e: React.FormEvent) {
     e.preventDefault()
     setError(null)
@@ -432,14 +445,26 @@ function Accounts({ me, onCreated }: { me: Me; onCreated: (cred: { email: string
                 <p className="m-0 font-medium">{row.email}</p>
                 <p className="m-0 text-[0.85rem] text-muted">
                   {row.role.replace('_', ' ')} · {row.status}
+                  {row.role === 'volunteer' && row.can_download ? ' · can download' : ''}
                   {row.last_login_at ? ` · last seen ${new Date(row.last_login_at).toLocaleDateString()}` : ''}
                 </p>
               </div>
-              {canAct && (
-                <button className="btn btn-quiet" disabled={busyId === row.id} onClick={() => void toggle(row)}>
-                  {row.status === 'active' ? 'Revoke' : 'Reactivate'}
-                </button>
-              )}
+              <div className="flex gap-2">
+                {me.role === 'super_admin' && row.role === 'volunteer' && (
+                  <button
+                    className="btn btn-quiet"
+                    disabled={busyId === row.id}
+                    onClick={() => void toggleDownload(row)}
+                  >
+                    {row.can_download ? 'Revoke download' : 'Grant download'}
+                  </button>
+                )}
+                {canAct && (
+                  <button className="btn btn-quiet" disabled={busyId === row.id} onClick={() => void toggle(row)}>
+                    {row.status === 'active' ? 'Revoke' : 'Reactivate'}
+                  </button>
+                )}
+              </div>
             </div>
           )
         })}

@@ -138,6 +138,10 @@ CREATE TABLE IF NOT EXISTS users (
   role            TEXT NOT NULL,
   status          TEXT NOT NULL DEFAULT 'active',
   must_change_password INTEGER NOT NULL DEFAULT 0,  -- set on admin-issued temp passwords
+  -- Only ever meaningful for role = 'volunteer'. Granted/revoked by the
+  -- super_admin alone (functions/api/admin/users/[id].ts) — an admin can
+  -- revoke a volunteer's whole account but not this specifically.
+  can_download    INTEGER NOT NULL DEFAULT 0,
   created_at      TEXT NOT NULL,
   created_by      TEXT,                   -- user id that approved/created this account
   last_login_at   TEXT,
