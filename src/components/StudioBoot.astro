@@ -35,7 +35,9 @@
     function safeSrc(v) {
       return (
         typeof v === 'string' &&
-        (/^data:image\/(png|jpeg|jpg|webp|gif|avif|svg\+xml);base64,[A-Za-z0-9+/=\s]+$/i.test(v) ||
+        (/^data:(image\/(png|jpeg|jpg|webp|gif|avif|svg\+xml)|video\/(mp4|webm));base64,[A-Za-z0-9+/=\s]+$/i.test(
+          v,
+        ) ||
           /^\/[^\s"'<>\\]*$/.test(v) ||
           /^https:\/\/[^\s"'<>\\]+$/i.test(v))
       )
@@ -69,12 +71,21 @@
       var images = o.images || {}
       for (var ipath in images) {
         if (!safeSrc(images[ipath])) continue
-        var holders = document.querySelectorAll('[data-edit-image="' + cssEscape(ipath) + '"]')
+        // The same override field covers photos and the one capsule video —
+        // both are looked up by the same dotted path, just under a
+        // different attribute name depending on which element it is.
+        var holders = document.querySelectorAll(
+          '[data-edit-image="' + cssEscape(ipath) + '"], [data-edit-video="' + cssEscape(ipath) + '"]',
+        )
         for (var j = 0; j < holders.length; j++) {
           var img = holders[j].querySelector('img')
+          var vid = holders[j].querySelector('video')
           if (img) {
             img.src = images[ipath]
             img.removeAttribute('srcset')
+          } else if (vid) {
+            vid.src = images[ipath]
+            vid.load()
           }
         }
       }

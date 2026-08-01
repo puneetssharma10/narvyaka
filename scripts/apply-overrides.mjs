@@ -9,6 +9,7 @@
  *   theme.logo    →  public/uploads/logo.<ext>  +  src/data/site.json
  *   text.*        →  src/data/site.json  (by dotted path)
  *   images.*      →  public/uploads/<name>.<ext>  +  src/data/site.json
+ *                    (also covers the one capsule video — same field, same path)
  *   timing.*      →  src/data/site.json  (by dotted path, seconds per slide)
  *
  * Inlined data URIs are written out as real files, so the repository never
@@ -93,6 +94,10 @@ const EXT_BY_MIME = {
   'image/gif': 'gif',
   'image/avif': 'avif',
   'image/svg+xml': 'svg',
+  // The one capsule video shares the images.* override field and this same
+  // materialise() path — it's a different mime, not a different mechanism.
+  'video/mp4': 'mp4',
+  'video/webm': 'webm',
 }
 
 /** Writes a data: URI out as a real file under public/uploads and returns its site path. */

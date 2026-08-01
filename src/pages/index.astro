@@ -7,6 +7,7 @@ import PlaceholderNotice from '../components/PlaceholderNotice.astro'
 import WisdomSlider from '../components/WisdomSlider.astro'
 import MotionStrip from '../components/MotionStrip.astro'
 import CapsulePhotoRotator from '../components/CapsulePhotoRotator.astro'
+import CapsuleVideo from '../components/CapsuleVideo.astro'
 import { content, editable, t, list } from '../lib/content'
 import { siteConfig } from '../../site.config'
 
@@ -97,14 +98,21 @@ const motion = content.motion
             </span>
           </div>
 
-          <CapsulePhotoRotator
-            items={example.photos}
-            basePath="home.exampleCapsule.photos"
-            alt={example.photoCaption}
-            rotationSeconds={example.rotationSeconds}
-            timingPath="home.exampleCapsule.rotationSeconds"
-            class="aspect-[4/3] w-full"
-          />
+          {
+            example.video ? (
+              <CapsuleVideo src={example.video} editPath="home.exampleCapsule.video" class="aspect-[4/3] w-full" />
+            ) : (
+              <CapsulePhotoRotator
+                items={example.photos}
+                basePath="home.exampleCapsule.photos"
+                alt={example.photoCaption}
+                rotationSeconds={example.rotationSeconds}
+                timingPath="home.exampleCapsule.rotationSeconds"
+                videoEditPath="home.exampleCapsule.video"
+                class="aspect-[4/3] w-full"
+              />
+            )
+          }
 
           <div class="space-y-5 p-6">
             <blockquote

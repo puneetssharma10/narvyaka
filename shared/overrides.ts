@@ -224,18 +224,24 @@ export function isSafeCssValue(v: string): boolean {
 }
 
 /**
- * Only same-origin paths and inline image data — never javascript:, and never
- * a remote host that could serve something other than an image.
+ * Only same-origin paths and inline image/video data — never javascript:, and
+ * never a remote host that could serve something other than media.
  *
  * SVG is allowed because a logomark should stay vector. It is only ever
  * rendered through <img src>, which is a passive context: scripts and external
  * references inside an SVG do not execute there. The Studio additionally
  * refuses any SVG containing a <script> before it gets this far.
+ *
+ * Video shares this same override field and validator rather than a separate
+ * one — it is stored and applied identically (a same-origin path, an https
+ * URL, or inline data), just rendered through <video src> instead of <img
+ * src>, which is exactly as passive a context as <img>.
  */
 export function isSafeImageSrc(v: string): boolean {
   if (v === '') return true
   if (v.length > 8_000_000) return false
-  if (/^data:image\/(png|jpeg|jpg|webp|gif|avif|svg\+xml);base64,[A-Za-z0-9+/=\s]+$/i.test(v)) return true
+  if (/^data:(image\/(png|jpeg|jpg|webp|gif|avif|svg\+xml)|video\/(mp4|webm));base64,[A-Za-z0-9+/=\s]+$/i.test(v))
+    return true
   if (/^\/[^\s"'<>\\]*$/.test(v)) return true // same-origin absolute path
   if (/^https:\/\/[^\s"'<>\\]+$/i.test(v)) return true // object storage URL
   return false
