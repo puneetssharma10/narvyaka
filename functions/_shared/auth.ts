@@ -69,7 +69,7 @@ async function pbkdf2(password: string, salt: Uint8Array, iterations: number): P
 /** Rejects passwords too weak to bother hashing — checked before hashPassword. */
 export function passwordIssues(password: string): string[] {
   const issues: string[] = []
-  if (password.length < 10) issues.push('Use at least 10 characters.')
+  if (password.length < 6) issues.push('Use at least 6 characters.')
   if (password.length > 200) issues.push('That password is unreasonably long.')
   return issues
 }
