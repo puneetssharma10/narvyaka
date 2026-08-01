@@ -105,14 +105,28 @@ export interface StudioOverrides {
 
 /** Slower than this and a rotation reads as broken, not deliberate; faster
  *  and nobody can actually read what changed. Shared by validation and by
- *  the Studio's range input, so the two can never disagree. */
+ *  the Studio's range input, so the two can never disagree. This is the
+ *  default range for a [data-timing] host that doesn't declare its own
+ *  (data-timing-min/-max) — a plain photo/slide rotator, in practice. */
 export const MIN_ROTATION_SECONDS = 2
 export const MAX_ROTATION_SECONDS = 20
 
-export function clampRotationSeconds(v: unknown): number {
+/** The floor/ceiling every [data-timing] value is sanity-checked against
+ *  server-side, regardless of which specific control produced it — wider
+ *  than MIN/MAX_ROTATION_SECONDS on purpose, since a per-host slider (the
+ *  hero video crossfade, e.g., which wants ~0.2–2.5s) can have its own,
+ *  narrower range without this generic check clamping it back up. */
+export const TIMING_FLOOR_SECONDS = 0.2
+export const TIMING_CEILING_SECONDS = 20
+
+export function clampRotationSeconds(
+  v: unknown,
+  min: number = MIN_ROTATION_SECONDS,
+  max: number = MAX_ROTATION_SECONDS,
+): number {
   const n = typeof v === 'number' ? v : Number(v)
-  if (!Number.isFinite(n)) return MIN_ROTATION_SECONDS
-  return Math.min(MAX_ROTATION_SECONDS, Math.max(MIN_ROTATION_SECONDS, Math.round(n * 2) / 2))
+  if (!Number.isFinite(n)) return min
+  return Math.min(max, Math.max(min, n))
 }
 
 export function emptyOverrides(): StudioOverrides {
@@ -178,7 +192,8 @@ export function parseOverrides(input: unknown): StudioOverrides | null {
 
     const timing: Record<string, number> = {}
     for (const [k, v] of Object.entries(raw.timing ?? {})) {
-      if (typeof v === 'number' && Number.isFinite(v)) timing[k] = clampRotationSeconds(v)
+      if (typeof v === 'number' && Number.isFinite(v))
+        timing[k] = clampRotationSeconds(v, TIMING_FLOOR_SECONDS, TIMING_CEILING_SECONDS)
     }
 
     const logoSrc = raw.theme?.logo?.src

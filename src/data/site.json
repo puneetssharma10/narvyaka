@@ -118,6 +118,7 @@
     "hero": {
       "video": "",
       "videoTwo": "",
+      "transitionSeconds": 0.8,
       "wordmark": "Narvyaka",
       "tagline": "Because No Generation Should Start From Zero.",
       "subhead": "What knowledge should outlive you?",

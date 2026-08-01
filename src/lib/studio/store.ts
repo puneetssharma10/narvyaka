@@ -8,6 +8,8 @@
 import {
   OVERRIDES_STORAGE_KEY,
   OVERRIDES_VERSION,
+  TIMING_CEILING_SECONDS,
+  TIMING_FLOOR_SECONDS,
   clampRotationSeconds,
   countOverrides,
   emptyOverrides,
@@ -106,7 +108,11 @@ class StudioStore {
   }
 
   setTiming(path: string, seconds: number) {
-    this.state.timing[path] = clampRotationSeconds(seconds)
+    // A generic sanity clamp, not the range any particular slider shows —
+    // dock.ts already clamps to that control's own (possibly narrower)
+    // min/max before calling this, so this floor/ceiling just has to be
+    // wide enough to never re-tighten a value a real slider produced.
+    this.state.timing[path] = clampRotationSeconds(seconds, TIMING_FLOOR_SECONDS, TIMING_CEILING_SECONDS)
     this.commit()
   }
 
