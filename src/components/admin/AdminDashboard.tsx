@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-type Role = 'super_admin' | 'admin' | 'volunteer'
+type Role = 'super_admin' | 'admin' | 'volunteer' | 'user'
 interface Me {
   id: string
   email: string
@@ -36,6 +36,7 @@ interface UserRow {
   email: string
   role: Role
   status: string
+  country: string | null
   created_at: string
   last_login_at: string | null
 }
@@ -368,6 +369,7 @@ function SubmissionQueue() {
 function Accounts({ me, onCreated }: { me: Me; onCreated: (cred: { email: string; password: string }) => void }) {
   const [rows, setRows] = useState<UserRow[] | null>(null)
   const [newEmail, setNewEmail] = useState('')
+  const [newCountry, setNewCountry] = useState('')
   const [busyId, setBusyId] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
@@ -394,11 +396,23 @@ function Accounts({ me, onCreated }: { me: Me; onCreated: (cred: { email: string
     setError(null)
     const { ok, data } = await api<{ email?: string; tempPassword?: string; error?: string }>('/api/admin/users', {
       method: 'POST',
-      body: JSON.stringify({ email: newEmail }),
+      body: JSON.stringify({ email: newEmail, country: newCountry }),
     })
     if (!ok) return setError(data.error ?? 'Could not create that account.')
     if (data.email && data.tempPassword) onCreated({ email: data.email, password: data.tempPassword })
     setNewEmail('')
+    setNewCountry('')
+    void load()
+  }
+
+  async function setCountry(row: UserRow, country: string) {
+    setBusyId(row.id)
+    const { ok, data } = await api<{ error?: string }>(`/api/admin/users/${row.id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ country }),
+    })
+    setBusyId(null)
+    if (!ok) setError((data as { error?: string }).error ?? 'Could not update that account\'s country.')
     void load()
   }
 
@@ -416,6 +430,16 @@ function Accounts({ me, onCreated }: { me: Me; onCreated: (cred: { email: string
               onChange={(e) => setNewEmail(e.target.value)}
             />
           </label>
+          <label className="grid gap-2">
+            <span className="label">Country scope (optional)</span>
+            <input
+              type="text"
+              placeholder="Leave blank for unscoped/global"
+              className="field"
+              value={newCountry}
+              onChange={(e) => setNewCountry(e.target.value)}
+            />
+          </label>
           <button className="btn btn-primary">Create admin account</button>
         </form>
       )}
@@ -426,20 +450,36 @@ function Accounts({ me, onCreated }: { me: Me; onCreated: (cred: { email: string
       <div className="grid gap-3">
         {rows?.map((row) => {
           const canAct = me.role === 'super_admin' ? row.id !== me.id : row.role === 'volunteer'
+          const canEditCountry = me.role === 'super_admin' && row.role === 'admin'
           return (
             <div key={row.id} className="card flex flex-wrap items-center justify-between gap-3 p-5">
               <div>
                 <p className="m-0 font-medium">{row.email}</p>
                 <p className="m-0 text-[0.85rem] text-muted">
                   {row.role.replace('_', ' ')} · {row.status}
+                  {row.role === 'admin' ? ` · ${row.country ? row.country : 'unscoped (global)'}` : ''}
                   {row.last_login_at ? ` · last seen ${new Date(row.last_login_at).toLocaleDateString()}` : ''}
                 </p>
               </div>
-              {canAct && (
-                <button className="btn btn-quiet" disabled={busyId === row.id} onClick={() => void toggle(row)}>
-                  {row.status === 'active' ? 'Revoke' : 'Reactivate'}
-                </button>
-              )}
+              <div className="flex items-center gap-2">
+                {canEditCountry && (
+                  <input
+                    type="text"
+                    placeholder="Country (blank = global)"
+                    className="field max-w-[14rem]"
+                    defaultValue={row.country ?? ''}
+                    disabled={busyId === row.id}
+                    onBlur={(e) => {
+                      if (e.target.value !== (row.country ?? '')) void setCountry(row, e.target.value)
+                    }}
+                  />
+                )}
+                {canAct && (
+                  <button className="btn btn-quiet" disabled={busyId === row.id} onClick={() => void toggle(row)}>
+                    {row.status === 'active' ? 'Revoke' : 'Reactivate'}
+                  </button>
+                )}
+              </div>
             </div>
           )
         })}

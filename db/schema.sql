@@ -23,6 +23,10 @@ CREATE TABLE IF NOT EXISTS submissions (
   contributor_name        TEXT,
   display_as_anonymous    INTEGER NOT NULL DEFAULT 0,
   contributor_location    TEXT,
+  -- Normalized copy of contributor_location, used to match an admin's
+  -- country scope (see users.country below). Separate column because the
+  -- free-text location isn't reliably comparable as-is.
+  country                 TEXT,
   contributor_profession  TEXT,
   record_language         TEXT,
   contact                 TEXT,                              -- never published
@@ -59,6 +63,7 @@ CREATE TABLE IF NOT EXISTS submissions (
 CREATE INDEX IF NOT EXISTS idx_submissions_status ON submissions (status, submitted_at DESC);
 CREATE INDEX IF NOT EXISTS idx_submissions_access ON submissions (access_level);
 CREATE INDEX IF NOT EXISTS idx_submissions_exception ON submissions (age_confirmed_30_plus, status);
+CREATE INDEX IF NOT EXISTS idx_submissions_country ON submissions (country);
 
 -- ── Founding volunteers ────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS volunteers (
@@ -118,16 +123,24 @@ CREATE TABLE IF NOT EXISTS rate_limits (
 CREATE INDEX IF NOT EXISTS idx_rate_limits_window ON rate_limits (window_start);
 
 -- ── Accounts ───────────────────────────────────────────────────────────────
--- Four tiers. Only three ever get a row here — a reader is just a visitor,
--- nothing to store.
+-- Four tiers. All four get a row here as of the `user` role — a plain reader
+-- who hasn't signed up is still just a visitor, nothing to store.
 --
 --   super_admin   You. Site content (the Studio), creating/revoking admins,
---                 everything an admin can do.
---   admin         Reviews and edits any record, approves/revokes volunteer
+--                 everything an admin can do. Always global — country never
+--                 restricts a super_admin.
+--   admin         Reviews and edits records, approves/revokes volunteer
 --                 accounts. Cannot touch the Studio and cannot create another
 --                 admin — that boundary is deliberate, see CONTENT_STATUS.md.
+--                 If `country` is set, scoped to submissions whose `country`
+--                 matches (case-insensitive); NULL/empty means unscoped
+--                 (sees everything, like a super_admin).
 --   volunteer     Can create records and edit only the records they own
 --                 (submissions.owner_user_id = their own id). Nothing else.
+--   user          Self-signup, no admin approval. Read-only: no submission-
+--                 editing rights at all, but must be signed in to read a
+--                 full record past its public teaser — see
+--                 functions/api/capsule/[id].ts.
 --
 -- Passwords are salted PBKDF2-SHA256, hashed in the Worker with WebCrypto —
 -- never anything reversible, never plaintext, never logged.
@@ -141,12 +154,14 @@ CREATE TABLE IF NOT EXISTS users (
   created_at      TEXT NOT NULL,
   created_by      TEXT,                   -- user id that approved/created this account
   last_login_at   TEXT,
+  country         TEXT,                   -- admin's scope; NULL = unscoped/global
 
-  CHECK (role IN ('super_admin', 'admin', 'volunteer')),
+  CHECK (role IN ('super_admin', 'admin', 'volunteer', 'user')),
   CHECK (status IN ('active', 'revoked'))
 );
 
 CREATE INDEX IF NOT EXISTS idx_users_role ON users (role, status);
+CREATE INDEX IF NOT EXISTS idx_users_country ON users (country);
 
 -- Server-side sessions, so revoking access is immediate — no waiting for a
 -- JWT to expire. The cookie holds a random token; only its hash lives here,

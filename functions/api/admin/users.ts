@@ -21,7 +21,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
   if (denied) return denied
 
   const rows = await env.DB!.prepare(
-    `SELECT id, email, role, status, created_at, last_login_at FROM users ORDER BY created_at DESC`,
+    `SELECT id, email, role, status, country, created_at, last_login_at FROM users ORDER BY created_at DESC`,
   ).all()
 
   return json({ users: rows.results ?? [] })
@@ -52,9 +52,10 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     throw error
   }
 
-  const { email } = (body ?? {}) as { email?: string }
+  const { email, country } = (body ?? {}) as { email?: string; country?: string }
   const loginEmail = (email ?? '').trim().toLowerCase()
   if (!loginEmail.includes('@')) return fail(400, 'A valid email is required.')
+  const scopedCountry = typeof country === 'string' && country.trim() ? country.trim() : null
 
   const already = await env.DB!.prepare(`SELECT id FROM users WHERE email = ?1`).bind(loginEmail).first()
   if (already) return fail(409, 'An account already exists with that email.', { code: 'email_taken' })
@@ -65,10 +66,10 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
   const now = new Date().toISOString()
 
   await env.DB!.prepare(
-    `INSERT INTO users (id, email, password_hash, role, status, must_change_password, created_at, created_by)
-     VALUES (?1, ?2, ?3, 'admin', 'active', 1, ?4, ?5)`,
+    `INSERT INTO users (id, email, password_hash, role, status, must_change_password, created_at, created_by, country)
+     VALUES (?1, ?2, ?3, 'admin', 'active', 1, ?4, ?5, ?6)`,
   )
-    .bind(userId, loginEmail, passwordHash, now, session!.id)
+    .bind(userId, loginEmail, passwordHash, now, session!.id, scopedCountry)
     .run()
 
   return json({ ok: true, email: loginEmail, tempPassword }, 201)

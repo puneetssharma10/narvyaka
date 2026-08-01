@@ -4,7 +4,7 @@ import {
   VERIFICATION_STATUSES,
   type WisdomRecord,
 } from '../../../shared/record-schema'
-import { getSession } from '../../_shared/auth'
+import { canAccessCountry, getSession, type SessionUser } from '../../_shared/auth'
 import { BadJson, PayloadTooLarge, fail, json, readJson, requireBindings, type Env } from '../../_shared/env'
 
 interface SubmissionRow {
@@ -12,18 +12,21 @@ interface SubmissionRow {
   status: string
   object_key: string
   owner_user_id: string | null
+  country: string | null
   payload_json: string
 }
 
-function canView(session: { id: string; role: string } | null, row: SubmissionRow): boolean {
+function canView(session: SessionUser | null, row: SubmissionRow): boolean {
   if (!session) return false
-  if (session.role === 'admin' || session.role === 'super_admin') return true
+  if (session.role === 'super_admin') return true
+  if (session.role === 'admin') return canAccessCountry(session, row.country)
   return row.owner_user_id === session.id
 }
 
-function canEditContent(session: { id: string; role: string } | null, row: SubmissionRow): boolean {
+function canEditContent(session: SessionUser | null, row: SubmissionRow): boolean {
   if (!session) return false
-  if (session.role === 'admin' || session.role === 'super_admin') return true
+  if (session.role === 'super_admin') return true
+  if (session.role === 'admin') return canAccessCountry(session, row.country)
   // A volunteer owns the content only up to publication — after that, a
   // change to what's live goes through a reviewer, same as everything else.
   return row.owner_user_id === session.id && row.status !== 'published' && row.status !== 'withdrawn'

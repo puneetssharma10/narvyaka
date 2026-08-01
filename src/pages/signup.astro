@@ -1,0 +1,22 @@
+---
+import Base from '../layouts/Base.astro'
+import PageHeader from '../components/PageHeader.astro'
+import SignupForm from '../components/admin/SignupForm'
+---
+
+<Base title="Create an account" noindex>
+  <PageHeader
+    eyebrow="Narvyaka"
+    heading="Create a free account"
+    intro="A free account lets you read full Wisdom Records. No approval needed — this is separate from volunteer and admin accounts, which stay invitation-only."
+  />
+
+  <section class="section">
+    <div class="wrap-read">
+      <SignupForm client:load />
+      <p class="mt-6 text-[0.92rem] text-muted">
+        Already have an account? <a href="/login">Sign in</a> instead.
+      </p>
+    </div>
+  </section>
+</Base>

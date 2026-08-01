@@ -24,21 +24,181 @@ const copy = content.capsule
 
 const name = displayName(capsule, copy.anonymousName)
 const context = contextLine(capsule)
-const note = capsule.note
-
-// The Wisdom Note, in the order a reader needs it: what happened, what was
-// done, what came of it, what they would change.
-const noteSections = [
-  { label: 'What happened', body: note.what_happened },
-  { label: 'What they did, and why', body: note.what_they_did },
-  { label: 'What worked, what failed', body: note.what_worked_failed },
-  { label: 'What they would do differently', body: note.what_differently },
-].filter((section) => section.body)
-
-const generations = capsule.family_learning_note.generations.filter((g) => g.what_they_knew || g.relation)
 ---
 
-<Base title={capsule.key_lesson.slice(0, 70)} description={note.central_prompt.slice(0, 200)}>
+<script type="module" define:vars={{ capsuleId: capsule.id }}>
+  // Runs client-side: the sections below are baked into the page hidden, and
+  // only unlocked for a signed-in account (any role) — see
+  // functions/api/capsule/[id].ts for the server-side gate this mirrors.
+  async function unlockFullRecord() {
+    const wrap = document.querySelector('[data-full-record]')
+    const gate = document.querySelector('[data-signin-gate]')
+    if (!wrap || !gate) return
+
+    let me
+    try {
+      const meRes = await fetch('/api/auth/me')
+      me = (await meRes.json())?.user ?? null
+    } catch (error) {
+      console.warn('[narvyaka] could not check sign-in state', error)
+      return
+    }
+
+    if (!me) {
+      const next = encodeURIComponent(window.location.pathname)
+      const signIn = gate.querySelector('[data-gate-signin]')
+      const signUp = gate.querySelector('[data-gate-signup]')
+      if (signIn) signIn.href = `/login?next=${next}`
+      if (signUp) signUp.href = '/signup'
+      gate.hidden = false
+      return
+    }
+
+    try {
+      const res = await fetch(`/api/capsule/${encodeURIComponent(capsuleId)}`)
+      if (!res.ok) throw new Error(`capsule fetch failed: ${res.status}`)
+      const { record } = await res.json()
+      populate(wrap, record)
+      wrap.hidden = false
+    } catch (error) {
+      // No matching D1 row (e.g. the /capsule/example placeholder) — leave
+      // the teaser as the whole page; nothing broken, nothing thrown.
+      console.warn('[narvyaka] could not load full record', error)
+    }
+  }
+
+  function text(el, value) {
+    if (el) el.textContent = value ?? ''
+  }
+
+  function populate(wrap, record) {
+    const w = record.wisdom_record || {}
+
+    const centralPromptSlot = wrap.querySelector('[data-slot="central-prompt"]')
+    if (centralPromptSlot) {
+      if (w.central_prompt_text) {
+        centralPromptSlot.textContent = w.central_prompt_text
+        centralPromptSlot.hidden = false
+      } else {
+        centralPromptSlot.hidden = true
+      }
+    }
+
+    const audioSlot = wrap.querySelector('[data-slot="audio"]')
+    if (audioSlot) {
+      const audio = document.createElement('audio')
+      audio.controls = true
+      audio.style.width = '100%'
+      if (w.central_prompt_audio_url) {
+        audio.src = w.central_prompt_audio_url
+        audioSlot.replaceChildren(audio)
+      } else {
+        audioSlot.textContent = 'No recording for this record yet.'
+      }
+    }
+
+    const photosSlot = wrap.querySelector('[data-slot="photos"]')
+    if (photosSlot) {
+      photosSlot.replaceChildren()
+      for (const photo of Array.isArray(record.photos) ? record.photos : []) {
+        const figure = document.createElement('figure')
+        figure.className = 'm-0'
+        const img = document.createElement('img')
+        img.src = photo.url
+        img.alt = photo.caption ?? ''
+        img.loading = 'lazy'
+        img.className = 'w-full rounded-[12px] border border-hairline'
+        figure.appendChild(img)
+        if (photo.caption) {
+          const caption = document.createElement('figcaption')
+          caption.className = 'mt-2 text-[0.88rem] text-muted'
+          caption.textContent = photo.caption
+          figure.appendChild(caption)
+        }
+        photosSlot.appendChild(figure)
+      }
+    }
+
+    const noteSlot = wrap.querySelector('[data-slot="note"]')
+    if (noteSlot) {
+      const sections = [
+        { label: 'What happened', body: w.what_happened },
+        { label: 'What they did, and why', body: w.what_they_did },
+        { label: 'What worked, what failed', body: w.what_worked_failed },
+        { label: 'What they would do differently', body: w.what_differently },
+      ].filter((s) => s.body)
+      noteSlot.replaceChildren()
+      for (const section of sections) {
+        const div = document.createElement('div')
+        const h3 = document.createElement('h3')
+        h3.className = 'text-[0.8rem] font-semibold uppercase tracking-[0.1em] text-muted'
+        h3.textContent = section.label
+        const p = document.createElement('p')
+        p.className = 'mt-2 leading-[1.75] text-ink/90'
+        p.textContent = section.body
+        div.appendChild(h3)
+        div.appendChild(p)
+        noteSlot.appendChild(div)
+      }
+    }
+
+    const notApplicableSection = wrap.querySelector('[data-slot="not-applicable"]')
+    if (notApplicableSection) {
+      if (w.when_not_applicable) {
+        text(notApplicableSection.querySelector('p'), w.when_not_applicable)
+        notApplicableSection.hidden = false
+      } else {
+        notApplicableSection.hidden = true
+      }
+    }
+
+    const whoCanConfirmSection = wrap.querySelector('[data-slot="who-can-confirm"]')
+    if (whoCanConfirmSection) {
+      if (w.who_can_confirm) {
+        text(whoCanConfirmSection.querySelector('p'), w.who_can_confirm)
+        whoCanConfirmSection.hidden = false
+      } else {
+        whoCanConfirmSection.hidden = true
+      }
+    }
+
+    const lineageSection = wrap.querySelector('[data-slot="lineage"]')
+    if (lineageSection) {
+      const fln = record.family_learning_note || {}
+      const generations = (fln.generations || []).filter((g) => g.what_they_knew || g.relation)
+      if (fln.summary || generations.length > 0) {
+        text(lineageSection.querySelector('[data-lineage-summary]'), fln.summary)
+        const list = lineageSection.querySelector('[data-lineage-list]')
+        if (list) {
+          list.replaceChildren()
+          for (const g of generations) {
+            const li = document.createElement('li')
+            li.className = 'border-l border-hairline pl-4'
+            const p1 = document.createElement('p')
+            p1.className = 'm-0 text-[0.88rem] font-medium text-ink'
+            p1.textContent = [g.name, g.relation].filter(Boolean).join(' · ') + (g.place ? ` — ${g.place}` : '')
+            li.appendChild(p1)
+            if (g.what_they_knew) {
+              const p2 = document.createElement('p')
+              p2.className = 'm-0 mt-1 text-[0.93rem] leading-[1.65] text-muted'
+              p2.textContent = g.what_they_knew
+              li.appendChild(p2)
+            }
+            list.appendChild(li)
+          }
+          list.hidden = generations.length === 0
+        }
+        lineageSection.hidden = false
+      } else {
+        lineageSection.hidden = true
+      }
+    }
+  }
+
+  unlockFullRecord()
+</script>
+
+<Base title={capsule.key_lesson.slice(0, 70)} description={capsule.key_lesson.slice(0, 200)}>
   <article>
     <header class="border-b border-hairline pb-10 pt-10 md:pb-14 md:pt-14">
       <div class="wrap-read">
@@ -78,109 +238,71 @@ const generations = capsule.family_learning_note.generations.filter((g) => g.wha
       </div>
     </header>
 
-    <div class="wrap-read section grid gap-14">
-      <!-- The recording is the record. It comes first. -->
-      <section>
-        <h2 class="visually-hidden">Recording</h2>
-        <AudioPlayer
-          src={capsule.audio_url ?? ''}
-          missingLabel={copy.audioMissingLabel}
-          label={copy.listenLabel}
-        />
-      </section>
-
-      {
-        capsule.photos.length > 0 && (
-          <section class="grid gap-4">
-            <h2 class="visually-hidden">Photographs</h2>
-            {capsule.photos.map((photo) => (
-              <figure class="m-0">
-                <img
-                  src={photo.url}
-                  alt={photo.caption ?? ''}
-                  loading="lazy"
-                  class="w-full rounded-[12px] border border-hairline"
-                />
-                {photo.caption && <figcaption class="mt-2 text-[0.88rem] text-muted">{photo.caption}</figcaption>}
-              </figure>
-            ))}
-          </section>
-        )
-      }
-
-      <section>
-        <h2 class="font-heading text-[1.4rem]">{copy.noteHeading}</h2>
-
-        {
-          note.central_prompt && (
-            <p class="mt-5 border-l-2 border-accent/30 pl-5 font-heading text-[1.2rem] leading-[1.65]">
-              {note.central_prompt}
-            </p>
-          )
-        }
-
-        <div class="mt-9 grid gap-8">
-          {
-            noteSections.map((section) => (
-              <div>
-                <h3 class="text-[0.8rem] font-semibold uppercase tracking-[0.1em] text-muted">{section.label}</h3>
-                <p class="mt-2 leading-[1.75] text-ink/90">{section.body}</p>
-              </div>
-            ))
-          }
-        </div>
-      </section>
-
-      {
-        note.when_not_applicable && (
-          <section class="card p-6">
-            <h2 class="font-heading text-[1.2rem]">{copy.notApplicableHeading}</h2>
-            <p class="mt-2 leading-[1.75] text-ink/90">{note.when_not_applicable}</p>
-          </section>
-        )
-      }
-
-      {
-        note.who_can_confirm && (
-          <section>
-            <h2 class="font-heading text-[1.2rem]">{copy.confirmHeading}</h2>
-            <p class="mt-2 leading-[1.75] text-ink/90">{note.who_can_confirm}</p>
-          </section>
-        )
-      }
-
+    <div class="wrap-read section grid gap-14" data-capsule-id={capsule.id}>
       <!--
-        The Family & Learning Note. Master Reference Part IV: it is part of the
-        record, not a feature of its own — so it sits last, at a smaller size,
-        with no navigation of its own.
+        Teaser only past this point for a signed-out visitor. The rest of the
+        record is baked into the page but kept hidden, and only a client-side
+        request (as any signed-in role, including a plain self-signup `user`
+        account) unlocks it — see functions/api/capsule/[id].ts.
       -->
-      {
-        (capsule.family_learning_note.summary || generations.length > 0) && (
-          <section class="border-t border-hairline pt-10">
-            <h2 class="font-heading text-[1.15rem] text-muted">{copy.lineageHeading}</h2>
+      <div data-signin-gate hidden class="card p-7">
+        <p class="m-0 font-medium">Sign in to read the full record.</p>
+        <p class="m-0 mt-2 text-[0.92rem] text-muted">
+          The recording, photographs, and the rest of the Wisdom Note are for signed-in readers only.
+        </p>
+        <div class="mt-5 flex flex-wrap gap-3">
+          <a data-gate-signin href="/login" class="btn btn-primary">Sign in</a>
+          <a data-gate-signup href="/signup" class="btn btn-secondary">Create a free account instead</a>
+        </div>
+      </div>
 
-            {capsule.family_learning_note.summary && (
-              <p class="mt-3 text-[0.98rem] leading-[1.7] text-ink/85">{capsule.family_learning_note.summary}</p>
-            )}
+      <div data-full-record hidden>
+        <!-- The recording is the record. It comes first. -->
+        <section>
+          <h2 class="visually-hidden">Recording</h2>
+          <div data-slot="audio">
+            <AudioPlayer
+              src={capsule.audio_url ?? ''}
+              missingLabel={copy.audioMissingLabel}
+              label={copy.listenLabel}
+            />
+          </div>
+        </section>
 
-            {generations.length > 0 && (
-              <ul class="mt-6 grid list-none gap-4 p-0">
-                {generations.map((generation) => (
-                  <li class="border-l border-hairline pl-4">
-                    <p class="m-0 text-[0.88rem] font-medium text-ink">
-                      {[generation.name, generation.relation].filter(Boolean).join(' · ')}
-                      {generation.place && <span class="font-normal text-muted"> — {generation.place}</span>}
-                    </p>
-                    {generation.what_they_knew && (
-                      <p class="m-0 mt-1 text-[0.93rem] leading-[1.65] text-muted">{generation.what_they_knew}</p>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </section>
-        )
-      }
+        <section class="mt-14 grid gap-4">
+          <h2 class="visually-hidden">Photographs</h2>
+          <div data-slot="photos" class="grid gap-4"></div>
+        </section>
+
+        <section class="mt-14">
+          <h2 class="font-heading text-[1.4rem]">{copy.noteHeading}</h2>
+
+          <p data-slot="central-prompt" class="mt-5 border-l-2 border-accent/30 pl-5 font-heading text-[1.2rem] leading-[1.65]" hidden></p>
+
+          <div data-slot="note" class="mt-9 grid gap-8"></div>
+        </section>
+
+        <section data-slot="not-applicable" class="mt-14 card p-6" hidden>
+          <h2 class="font-heading text-[1.2rem]">{copy.notApplicableHeading}</h2>
+          <p class="mt-2 leading-[1.75] text-ink/90"></p>
+        </section>
+
+        <section data-slot="who-can-confirm" class="mt-14" hidden>
+          <h2 class="font-heading text-[1.2rem]">{copy.confirmHeading}</h2>
+          <p class="mt-2 leading-[1.75] text-ink/90"></p>
+        </section>
+
+        <!--
+          The Family & Learning Note. Master Reference Part IV: it is part of the
+          record, not a feature of its own — so it sits last, at a smaller size,
+          with no navigation of its own.
+        -->
+        <section data-slot="lineage" class="mt-14 border-t border-hairline pt-10" hidden>
+          <h2 class="font-heading text-[1.15rem] text-muted">{copy.lineageHeading}</h2>
+          <p data-lineage-summary class="mt-3 text-[0.98rem] leading-[1.7] text-ink/85"></p>
+          <ul data-lineage-list class="mt-6 grid list-none gap-4 p-0"></ul>
+        </section>
+      </div>
     </div>
 
     <footer class="border-t border-hairline">
