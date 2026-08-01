@@ -37,13 +37,26 @@ interface Props {
 const { src, srcTwo, editPath, editPathTwo, transitionSeconds } = Astro.props
 ---
 
-<!-- 100vh alone would run 69px past the actual viewport: the header is
+<!-- Full screen on tablet/desktop, a shorter full-width band on phones —
+     a full-viewport video before any content reads as dominant rather than
+     dramatic on a small screen, and it means less to scroll past to reach
+     the headline. sm: is the same 640px cutoff already used elsewhere for
+     "mobile vs. not" (e.g. the wisdom slider's arrows).
+
+     100vh alone would run 69px past the actual viewport: the header is
      sticky (Header.astro, h-[68px] + a 1px border), which still occupies
      real layout space above this section rather than floating over it.
      Sized against what's actually left, so this section plus the header
-     together fill exactly one screen — not one screen plus a header. -->
+     together fill exactly one screen — not one screen plus a header.
+
+     dvh, not vh: a plain 100vh on a phone is measured against the tallest
+     the viewport ever gets (address bar hidden), so with the address bar
+     showing — the normal state on scroll — the section actually runs
+     taller than what's visible, which is likely a real part of what "way
+     too big" was describing, not just the full-screen height choice
+     itself. dvh tracks the address bar's current state instead. -->
 <section
-  class="relative h-[calc(100vh-69px)] min-h-[420px] w-full overflow-hidden border-b border-hairline"
+  class="relative h-[65dvh] min-h-[280px] w-full overflow-hidden border-b border-hairline sm:h-[calc(100dvh-69px)] sm:min-h-[420px]"
   data-hero-loop
   data-timing="home.hero.transitionSeconds"
   data-timing-label="Hero video transition"
