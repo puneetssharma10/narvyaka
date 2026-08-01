@@ -4,7 +4,7 @@ import {
   VERIFICATION_STATUSES,
   type WisdomRecord,
 } from '../../../shared/record-schema'
-import { getSession } from '../../_shared/auth'
+import { getSession, type SessionUser } from '../../_shared/auth'
 import { BadJson, PayloadTooLarge, fail, json, readJson, requireBindings, type Env } from '../../_shared/env'
 
 interface SubmissionRow {
@@ -12,18 +12,30 @@ interface SubmissionRow {
   status: string
   object_key: string
   owner_user_id: string | null
+  contributor_country: string | null
   payload_json: string
 }
 
-function canView(session: { id: string; role: string } | null, row: SubmissionRow): boolean {
+/** super_admin: every record, unconditionally. admin: only a record whose
+ *  contributor_country matches their own, or has none set (see
+ *  db/schema.sql's note on users.country for why an unset country isn't
+ *  treated as "hidden from everyone"). */
+function isReviewerFor(session: SessionUser | null, row: SubmissionRow): boolean {
   if (!session) return false
-  if (session.role === 'admin' || session.role === 'super_admin') return true
+  if (session.role === 'super_admin') return true
+  if (session.role !== 'admin') return false
+  return !row.contributor_country || row.contributor_country === session.country
+}
+
+function canView(session: SessionUser | null, row: SubmissionRow): boolean {
+  if (!session) return false
+  if (isReviewerFor(session, row)) return true
   return row.owner_user_id === session.id
 }
 
-function canEditContent(session: { id: string; role: string } | null, row: SubmissionRow): boolean {
+function canEditContent(session: SessionUser | null, row: SubmissionRow): boolean {
   if (!session) return false
-  if (session.role === 'admin' || session.role === 'super_admin') return true
+  if (isReviewerFor(session, row)) return true
   // A volunteer owns the content only up to publication — after that, a
   // change to what's live goes through a reviewer, same as everything else.
   return row.owner_user_id === session.id && row.status !== 'published' && row.status !== 'withdrawn'
@@ -68,7 +80,7 @@ export const onRequestPatch: PagesFunction<Env> = async ({ request, env, params 
   const row = await env.DB!.prepare(`SELECT * FROM submissions WHERE id = ?1`).bind(id).first<SubmissionRow>()
   if (!row) return fail(404, 'No such record.')
 
-  const isReviewer = session?.role === 'admin' || session?.role === 'super_admin'
+  const isReviewer = isReviewerFor(session, row)
   if (!canEditContent(session, row) && !isReviewer) {
     return fail(403, "Your account doesn't have access to edit this record.")
   }
@@ -135,17 +147,18 @@ export const onRequestPatch: PagesFunction<Env> = async ({ request, env, params 
     await env.DB!.prepare(
       `UPDATE submissions SET
          status = ?1, contributor_name = ?2, display_as_anonymous = ?3, contributor_location = ?4,
-         contributor_profession = ?5, record_language = ?6, contact = ?7, age_confirmed_30_plus = ?8,
-         exception_reason = ?9, key_lesson = ?10, access_level = ?11, release_date = ?12,
-         verification_status = ?13, photo_count = ?14, payload_json = ?15,
-         reviewed_by = ?16, reviewed_at = ?17, review_notes = ?18
-       WHERE id = ?19`,
+         contributor_country = ?5, contributor_profession = ?6, record_language = ?7, contact = ?8,
+         age_confirmed_30_plus = ?9, exception_reason = ?10, key_lesson = ?11, access_level = ?12,
+         release_date = ?13, verification_status = ?14, photo_count = ?15, payload_json = ?16,
+         reviewed_by = ?17, reviewed_at = ?18, review_notes = ?19
+       WHERE id = ?20`,
     )
       .bind(
         record.status,
         record.contributor.name,
         record.contributor.display_as_anonymous ? 1 : 0,
         record.contributor.location,
+        record.contributor.country || null,
         record.contributor.profession,
         record.contributor.record_language,
         record.contributor.contact,

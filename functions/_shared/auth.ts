@@ -30,6 +30,10 @@ export interface SessionUser {
   /** Only ever true for a volunteer — granted/revoked by the super_admin.
    *  See functions/api/admin/users/[id].ts. */
   canDownload: boolean
+  /** Only ever set for an admin — which country's records they can read
+   *  and write. null means unscoped: every record (super_admin, always;
+   *  an admin, only until assigned one). */
+  country: string | null
 }
 
 const SESSION_COOKIE = 'nv_session'
@@ -124,7 +128,7 @@ export async function getSession(env: Env, request: Request): Promise<SessionUse
 
   const tokenHash = await sha256Hex(token)
   const row = await env.DB.prepare(
-    `SELECT u.id, u.email, u.role, u.status, u.must_change_password, u.can_download
+    `SELECT u.id, u.email, u.role, u.status, u.must_change_password, u.can_download, u.country
      FROM sessions s JOIN users u ON u.id = s.user_id
      WHERE s.token_hash = ?1 AND s.expires_at > ?2`,
   )
@@ -136,6 +140,7 @@ export async function getSession(env: Env, request: Request): Promise<SessionUse
       status: string
       must_change_password: number
       can_download: number
+      country: string | null
     }>()
 
   if (!row || row.status !== 'active') return null
@@ -146,6 +151,7 @@ export async function getSession(env: Env, request: Request): Promise<SessionUse
     role: row.role,
     mustChangePassword: row.must_change_password === 1,
     canDownload: row.can_download === 1,
+    country: row.country,
   }
 }
 
