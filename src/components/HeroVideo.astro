@@ -15,29 +15,55 @@
  * target — not the video area itself, since only one slot is ever visible
  * or interactive at a time and the other would otherwise be unreachable
  * (most importantly: unreachable *before it has a video yet*, which is
- * exactly when someone needs to click it). A script below hands off from
- * one to the other on 'ended' and loops forever; with only one slot filled
- * it just loops that one natively; with neither filled the light technical
- * grid shows through, same as before.
+ * exactly when someone needs to click it).
+ *
+ * The hand-off between them is a real overlapping crossfade, not a hard
+ * cut with an opacity flag on it: the outgoing video keeps playing for the
+ * whole fade instead of freezing the instant the swap starts (a frozen
+ * frame fading out under motion reads as a stutter, not a dissolve), and
+ * how long that overlap lasts is Studio-adjustable via the Timing panel
+ * (data-timing below) exactly like a photo rotator's rotation speed is —
+ * same mechanism, repurposed: the number it stores means "fade seconds"
+ * here instead of "seconds between rotations."
  */
 interface Props {
   src: string
   srcTwo: string
   editPath: string
   editPathTwo: string
+  transitionSeconds: number
 }
 
-const { src, srcTwo, editPath, editPathTwo } = Astro.props
+const { src, srcTwo, editPath, editPathTwo, transitionSeconds } = Astro.props
 ---
 
-<!-- 100vh alone would run 69px past the actual viewport: the header is
+<!-- Full screen on tablet/desktop, a shorter full-width band on phones —
+     a full-viewport video before any content reads as dominant rather than
+     dramatic on a small screen, and it means less to scroll past to reach
+     the headline. sm: is the same 640px cutoff already used elsewhere for
+     "mobile vs. not" (e.g. the wisdom slider's arrows).
+
+     100vh alone would run 69px past the actual viewport: the header is
      sticky (Header.astro, h-[68px] + a 1px border), which still occupies
      real layout space above this section rather than floating over it.
      Sized against what's actually left, so this section plus the header
-     together fill exactly one screen — not one screen plus a header. -->
+     together fill exactly one screen — not one screen plus a header.
+
+     dvh, not vh: a plain 100vh on a phone is measured against the tallest
+     the viewport ever gets (address bar hidden), so with the address bar
+     showing — the normal state on scroll — the section actually runs
+     taller than what's visible, which is likely a real part of what "way
+     too big" was describing, not just the full-screen height choice
+     itself. dvh tracks the address bar's current state instead. -->
 <section
-  class="relative h-[calc(100vh-69px)] min-h-[420px] w-full overflow-hidden border-b border-hairline"
+  class="relative h-[65dvh] min-h-[280px] w-full overflow-hidden border-b border-hairline sm:h-[calc(100dvh-69px)] sm:min-h-[420px]"
   data-hero-loop
+  data-timing="home.hero.transitionSeconds"
+  data-timing-label="Hero video transition"
+  data-timing-min="0.2"
+  data-timing-max="2.5"
+  data-timing-step="0.1"
+  data-interval-ms={Math.round(transitionSeconds * 1000)}
 >
   <div class="grid-field-light absolute inset-0" aria-hidden="true"></div>
 
@@ -89,7 +115,10 @@ const { src, srcTwo, editPath, editPathTwo } = Astro.props
     inset: 0;
     z-index: 1;
     opacity: 1;
-    transition: opacity 480ms ease;
+    /* Set by the script below from the same value the crossfade timing
+       itself uses (data-interval-ms), so the visual fade and the actual
+       overlap window can never drift out of sync with each other. */
+    transition: opacity var(--nv-hero-fade-ms, 800ms) ease;
   }
 
   /* Starts hidden and click-through — the sequencing script below promotes
@@ -191,34 +220,90 @@ const { src, srcTwo, editPath, editPathTwo } = Astro.props
 </style>
 
 <script>
-  type Slot = { el: HTMLElement; video: HTMLVideoElement }
-
   document.querySelectorAll<HTMLElement>('[data-hero-loop]').forEach((section) => {
-    const slotEls = Array.from(section.querySelectorAll<HTMLElement>('[data-hero-slot]'))
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    const wired = new WeakSet<HTMLVideoElement>()
-    let current = 0
+    const els = Array.from(section.querySelectorAll<HTMLElement>('[data-hero-slot]'))
+    const slotOne = els.find((el) => el.dataset.heroSlot === '0')
+    const slotTwo = els.find((el) => el.dataset.heroSlot === '1')
+    const videoOne = slotOne?.querySelector('video')
+    const videoTwo = slotTwo?.querySelector('video')
+    if (!slotOne || !slotTwo || !videoOne || !videoTwo) return
 
-    function liveSlots(): Slot[] {
-      return slotEls
-        .map((el) => ({ el, video: el.querySelector('video') }))
-        .filter((slot): slot is Slot => !!slot.video && !!slot.video.getAttribute('src'))
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    let current: 'one' | 'two' = 'one'
+    let crossfading = false
+    let wiredOne = false
+    let wiredTwo = false
+    let fadeSeconds = 0.8
+
+    function readFadeSeconds(): number {
+      const ms = Number(section.dataset.intervalMs)
+      return Number.isFinite(ms) && ms > 0 ? ms / 1000 : 0.8
     }
 
-    function show(slots: Slot[], index: number) {
-      slots.forEach((slot, i) => {
-        if (i === index) {
-          slot.el.setAttribute('data-hero-active', '')
-          slot.el.removeAttribute('data-hero-inactive')
-        } else {
-          slot.el.setAttribute('data-hero-inactive', '')
-          slot.el.removeAttribute('data-hero-active')
-          slot.video.pause()
-        }
-      })
-      const video = slots[index].video
+    // Keeps the CSS opacity transition's own duration equal to the actual
+    // overlap window below — if these drift apart, the picture visibly
+    // finishes fading before (or after) the outgoing video actually stops,
+    // which reads as a stutter again, just a smaller one.
+    function syncFadeDuration() {
+      fadeSeconds = readFadeSeconds()
+      section.style.setProperty('--nv-hero-fade-ms', `${Math.round(fadeSeconds * 1000)}ms`)
+    }
+
+    function filled(video: HTMLVideoElement) {
+      return !!video.getAttribute('src')
+    }
+
+    function activate(el: HTMLElement, video: HTMLVideoElement) {
+      el.setAttribute('data-hero-active', '')
+      el.removeAttribute('data-hero-inactive')
       video.currentTime = 0
       if (!reduceMotion) void video.play().catch(() => {})
+    }
+
+    function deactivate(el: HTMLElement) {
+      el.setAttribute('data-hero-inactive', '')
+      el.removeAttribute('data-hero-active')
+    }
+
+    // A real overlapping crossfade: the outgoing video keeps playing for
+    // the whole window instead of freezing the instant the swap starts —
+    // both play at once while opacity blends between them, then whichever
+    // is now hidden gets paused and rewound once the fade finishes.
+    function crossTo(next: 'one' | 'two') {
+      if (crossfading || !filled(videoOne!) || !filled(videoTwo!)) return
+      crossfading = true
+      const outEl = current === 'one' ? slotOne! : slotTwo!
+      const outVideo = current === 'one' ? videoOne! : videoTwo!
+      const inEl = next === 'one' ? slotOne! : slotTwo!
+      const inVideo = next === 'one' ? videoOne! : videoTwo!
+
+      activate(inEl, inVideo)
+      deactivate(outEl)
+      current = next
+
+      window.setTimeout(() => {
+        outVideo.pause()
+        outVideo.currentTime = 0
+        crossfading = false
+      }, fadeSeconds * 1000)
+    }
+
+    function wire(video: HTMLVideoElement, self: 'one' | 'two') {
+      const maybeCrossTo = () => {
+        if (crossfading || current !== self) return
+        if (!filled(videoOne!) || !filled(videoTwo!)) return
+        crossTo(self === 'one' ? 'two' : 'one')
+      }
+      // Starts the fade *before* the clip actually ends — a fixed lead of
+      // fadeSeconds, so the overlap window lands entirely within playback
+      // instead of after it (there'd be nothing left to overlap with).
+      video.addEventListener('timeupdate', () => {
+        const dur = video.duration
+        if (Number.isFinite(dur) && dur > 0 && dur - video.currentTime <= fadeSeconds) maybeCrossTo()
+      })
+      // Safety net — a very short clip or a stalled timeupdate stream could
+      // reach the real end before the check above ever fires.
+      video.addEventListener('ended', maybeCrossTo)
     }
 
     // Whichever slot(s) have a src *right now* — called on first run and
@@ -229,43 +314,36 @@ const { src, srcTwo, editPath, editPathTwo } = Astro.props
     // (not code-applied) version would see this run before that injection
     // happens and, without the observer below, never notice either video.
     function refresh() {
-      const slots = liveSlots()
-      if (slots.length === 0) return
+      const oneReady = filled(videoOne!)
+      const twoReady = filled(videoTwo!)
+      if (!oneReady && !twoReady) return
 
-      // .loop has to be re-derived on every call, not just the first: the
-      // two source-change events for a fresh two-video load don't land in
-      // the same tick, so the first refresh() can easily see only one slot
-      // and set loop=true — which would then never get corrected, and the
-      // video would silently loop forever instead of ever firing 'ended'.
-      // The listener itself only needs attaching once, since its own body
-      // re-reads the slot count fresh each time it actually fires.
-      slots.forEach((slot) => {
-        slot.video.loop = slots.length === 1
-        if (wired.has(slot.video)) return
-        wired.add(slot.video)
-        slot.video.addEventListener('ended', () => {
-          const now = liveSlots()
-          if (now.length < 2) return
-          current = (current + 1) % now.length
-          show(now, current)
-        })
-      })
+      if (oneReady && !wiredOne) {
+        wiredOne = true
+        wire(videoOne!, 'one')
+      }
+      if (twoReady && !wiredTwo) {
+        wiredTwo = true
+        wire(videoTwo!, 'two')
+      }
 
-      // Don't restart something already playing just because the *other*
-      // slot's src changed (e.g. uploading video 2 while video 1 is on
-      // screen shouldn't interrupt video 1) — only pick a starting slot the
-      // first time anything becomes available.
-      if (!slots.some((s) => s.el.hasAttribute('data-hero-active'))) {
-        current = 0
-        show(slots, 0)
+      // Native loop only makes sense with a single video — with two, the
+      // crossfade logic above owns the hand-off instead.
+      videoOne!.loop = oneReady && !twoReady
+      videoTwo!.loop = twoReady && !oneReady
+
+      if (!slotOne!.hasAttribute('data-hero-active') && !slotTwo!.hasAttribute('data-hero-active')) {
+        current = oneReady ? 'one' : 'two'
+        activate(current === 'one' ? slotOne! : slotTwo!, current === 'one' ? videoOne! : videoTwo!)
+        deactivate(current === 'one' ? slotTwo! : slotOne!)
       }
     }
 
-    slotEls.forEach((el) => {
-      const video = el.querySelector('video')
-      if (!video) return
-      new MutationObserver(refresh).observe(video, { attributes: true, attributeFilter: ['src'] })
-    })
+    syncFadeDuration()
+    section.addEventListener('nv:interval-changed', syncFadeDuration)
+
+    new MutationObserver(refresh).observe(videoOne, { attributes: true, attributeFilter: ['src'] })
+    new MutationObserver(refresh).observe(videoTwo, { attributes: true, attributeFilter: ['src'] })
 
     refresh()
   })

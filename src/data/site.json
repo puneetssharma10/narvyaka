@@ -117,6 +117,7 @@
     "hero": {
       "video": "/uploads/home-hero-video.mp4",
       "videoTwo": "/uploads/home-hero-videotwo.mp4",
+      "transitionSeconds": 0.8,
       "wordmark": "Narvyaka",
       "tagline": "Because No Generation Should Start From Zero.",
       "subhead": "What knowledge should outlive you?",

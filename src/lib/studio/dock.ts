@@ -359,11 +359,23 @@ class Dock {
    * some element asked to have its rotation speed controlled.
    */
   private sectionTiming(): HTMLElement {
-    const hosts = new Map<string, { label: string; el: HTMLElement }>()
+    const hosts = new Map<string, { label: string; el: HTMLElement; min: number; max: number; step: number }>()
     document.querySelectorAll<HTMLElement>('[data-timing]').forEach((el) => {
       const path = el.getAttribute('data-timing')
       if (!path || hosts.has(path)) return
-      hosts.set(path, { label: el.getAttribute('data-timing-label') || path, el })
+      // A host can declare its own narrower range (the hero video's
+      // crossfade wants ~0.2–2.5s, nothing like a photo rotator's 2–20s) —
+      // absent that, it gets the same range every rotator has always used.
+      const min = Number(el.dataset.timingMin)
+      const max = Number(el.dataset.timingMax)
+      const step = Number(el.dataset.timingStep)
+      hosts.set(path, {
+        label: el.getAttribute('data-timing-label') || path,
+        el,
+        min: Number.isFinite(min) ? min : MIN_ROTATION_SECONDS,
+        max: Number.isFinite(max) ? max : MAX_ROTATION_SECONDS,
+        step: Number.isFinite(step) && step > 0 ? step : 0.5,
+      })
     })
 
     if (hosts.size === 0) {
@@ -374,25 +386,25 @@ class Dock {
 
     const children: Node[] = [
       h('p', { class: 'nv-sec__note' }, [
-        'How long each picture stays before the next one crossfades in. Applies live as you drag — no reload.',
+        'How long each picture (or, for a video crossfade, the fade itself) takes before the next one takes over. Applies live as you drag — no reload.',
       ]),
     ]
 
-    for (const [path, { label, el }] of hosts) {
+    for (const [path, { label, el, min, max, step }] of hosts) {
       const currentMs = Number(el.dataset.intervalMs)
-      const initial = clampRotationSeconds(Number.isFinite(currentMs) && currentMs > 0 ? currentMs / 1000 : MIN_ROTATION_SECONDS)
+      const initial = clampRotationSeconds(Number.isFinite(currentMs) && currentMs > 0 ? currentMs / 1000 : min, min, max)
 
       const valueLabel = h('span', { style: 'font-size:11.5px;color:#6B675F' }, [`${initial.toFixed(1)}s`])
 
       const slider = h('input', {
         type: 'range',
-        min: String(MIN_ROTATION_SECONDS),
-        max: String(MAX_ROTATION_SECONDS),
-        step: '0.5',
+        min: String(min),
+        max: String(max),
+        step: String(step),
         value: String(initial),
         style: 'width:100%;accent-color:var(--nv-accent)',
         onInput: (e: Event) => {
-          const seconds = clampRotationSeconds((e.target as HTMLInputElement).value)
+          const seconds = clampRotationSeconds((e.target as HTMLInputElement).value, min, max)
           valueLabel.textContent = `${seconds.toFixed(1)}s`
           this.store.setTiming(path, seconds)
         },
@@ -419,7 +431,7 @@ class Dock {
             for (const path of hosts.keys()) this.store.clearTiming(path)
           },
         },
-        ['Reset both to default'],
+        [hosts.size === 1 ? 'Reset to default' : `Reset all ${hosts.size} to default`],
       ),
     )
 
@@ -430,7 +442,7 @@ class Dock {
     const token = h('input', {
       class: 'nv-input',
       type: 'password',
-      placeholder: 'Studio token (see INTEGRATIONS.md)',
+      placeholder: 'Studio token — only needed if not signed in',
       value: localStorage.getItem(STORAGE_TOKEN) ?? '',
       onChange: (e: Event) => localStorage.setItem(STORAGE_TOKEN, (e.target as HTMLInputElement).value),
     }) as HTMLInputElement
@@ -448,9 +460,9 @@ class Dock {
 
     return this.section('Save & publish', false, [
       h('p', { class: 'nv-sec__note' }, [
-        'Publish sends everything above straight to the live site — every visitor sees it immediately, nothing to run.',
+        'Publish sends everything above straight to the live site — every visitor sees it immediately, nothing to run. If you’re signed in as the admin, that alone is enough — just click. The token below is only a fallback for publishing while signed out.',
       ]),
-      h('label', { class: 'nv-label' }, ['Studio token']),
+      h('label', { class: 'nv-label' }, ['Studio token (optional)']),
       token,
       h('button', { class: 'nv-btn nv-btn--primary nv-btn--wide', onClick: () => void this.publish() }, [
         'Publish to server',
@@ -1066,17 +1078,23 @@ class Dock {
   }
 
   private async publish() {
+    // A signed-in super_admin needs no token at all — the server accepts
+    // that session by itself (functions/api/studio.ts's canPublish checks
+    // it first, the token second). This used to hard-block here whenever no
+    // token happened to be saved in *this* browser, even for someone
+    // already logged in, for whom the request would otherwise have just
+    // worked. Send whatever's available and let the server (which actually
+    // knows whether either one is valid) be the one to say no.
     const token = localStorage.getItem(STORAGE_TOKEN) ?? ''
-    if (!token) {
-      this.say('Publishing needs the Studio token. See INTEGRATIONS.md for where to set it.', 'warn')
-      return
-    }
 
     this.say('Publishing…', 'info')
     try {
       const response = await fetch('/api/studio', {
         method: 'POST',
-        headers: { 'content-type': 'application/json', 'x-studio-token': token },
+        headers: {
+          'content-type': 'application/json',
+          ...(token ? { 'x-studio-token': token } : {}),
+        },
         body: this.store.export(),
       })
 
