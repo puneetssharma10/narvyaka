@@ -656,7 +656,9 @@ class Dock {
     }
 
     try {
-      const url = await readAsDataUrl(file)
+      const url = await readAsDataUrl(file, (fraction) => {
+        this.say(`Reading video… ${Math.round(fraction * 100)}%`, 'info')
+      })
       this.store.setImage(path, url)
 
       // The trigger is a real <video> when one is already showing (clicking
@@ -667,13 +669,35 @@ class Dock {
       // is still saved correctly either way; only the *live preview* differs.
       const video = holder.querySelector('video')
       if (video) {
+        this.say('Loading video…', 'info')
+        // Wait to hear back from the element itself before calling this a
+        // success: a rejected play() alone can't tell a harmless autoplay
+        // block (file is fine, will play on the first user gesture) apart
+        // from a genuine decode failure (wrong codec, corrupt file — will
+        // never play, ever). The 'error' event only fires for the latter,
+        // so it — not play()'s rejection — decides which message to show.
+        const settle = (playable: boolean) => {
+          video.removeEventListener('loadeddata', onLoaded)
+          video.removeEventListener('error', onError)
+          if (playable) {
+            void video.play().catch(() => {
+              /* autoplay can be refused before a user gesture — the video is
+                 still correctly set and will play once one occurs */
+            })
+            this.say(`Video replaced (${formatBytes(file.size)}). Export your changes to keep it.`, 'ok')
+          } else {
+            this.say(
+              'That file saved, but this browser could not play it back — the codec is probably unsupported (H.264 MP4 or VP9 WebM both work) or the file is corrupt. Try re-exporting it and upload again.',
+              'warn',
+            )
+          }
+        }
+        const onLoaded = () => settle(true)
+        const onError = () => settle(false)
+        video.addEventListener('loadeddata', onLoaded, { once: true })
+        video.addEventListener('error', onError, { once: true })
         video.src = url
         video.load()
-        void video.play().catch(() => {
-          /* autoplay can be refused before a user gesture — the video is
-             still correctly set and will play once one occurs */
-        })
-        this.say(`Video replaced (${formatBytes(file.size)}). Export your changes to keep it.`, 'ok')
       } else {
         this.say(
           `Video saved (${formatBytes(file.size)}). This slot switches to it only after you export and run npm run studio:apply — there's nothing to preview live here yet.`,

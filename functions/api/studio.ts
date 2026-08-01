@@ -3,7 +3,12 @@ import { getSession } from '../_shared/auth'
 import { BadJson, PayloadTooLarge, fail, json, readJson, requireBindings, safeEqual, type Env } from '../_shared/env'
 
 const OVERRIDES_KEY = 'site/overrides.json'
-const MAX_OVERRIDES_BYTES = 4 * 1024 * 1024 // inlined images add up quickly
+// Base64 alone inflates a file by ~1/3, so the 6 MB video cap (dock.ts's
+// MAX_VIDEO_UPLOAD_BYTES) already needs ~8 MB by itself once inlined —
+// before counting whatever photos, logo or text are already overridden
+// alongside it. 4 MB was set before video existed and would reject a
+// publish the client itself had just told the user was fine.
+const MAX_OVERRIDES_BYTES = 16 * 1024 * 1024
 
 /**
  * GET  /api/studio — the overrides currently published to the live site.
