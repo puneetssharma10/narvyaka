@@ -10,12 +10,15 @@
  * Both <video> tags are always rendered, even with no src set, so the
  * Studio can target either slot from the very first upload onward — same
  * reasoning as the single-video version this replaced. They're stacked
- * absolutely and swapped by opacity/pointer-events rather than being two
- * separate sections, so there's exactly one on-screen target to click at
- * any moment: whichever one is currently playing. A script below hands off
- * from one to the other on 'ended' and loops forever; with only one slot
- * filled it just loops that one natively; with neither filled the light
- * technical grid shows through, same as before.
+ * absolutely and swapped by opacity/pointer-events, with a small "Video 1"
+ * / "Video 2" button (Studio-only) in each top corner as the actual click
+ * target — not the video area itself, since only one slot is ever visible
+ * or interactive at a time and the other would otherwise be unreachable
+ * (most importantly: unreachable *before it has a video yet*, which is
+ * exactly when someone needs to click it). A script below hands off from
+ * one to the other on 'ended' and loops forever; with only one slot filled
+ * it just loops that one natively; with neither filled the light technical
+ * grid shows through, same as before.
  */
 interface Props {
   src: string
@@ -39,7 +42,6 @@ const { src, srcTwo, editPath, editPathTwo } = Astro.props
   <div class="grid-field-light absolute inset-0" aria-hidden="true"></div>
 
   <div class="nv-hero-video__slot" data-hero-slot="0" data-edit-video={editPath}>
-    <span class="nv-hero-video__slot-label">Video 1</span>
     <video
       class="absolute inset-0 h-full w-full object-cover"
       muted
@@ -51,7 +53,6 @@ const { src, srcTwo, editPath, editPathTwo } = Astro.props
   </div>
 
   <div class="nv-hero-video__slot nv-hero-video__slot--two" data-hero-slot="1" data-edit-video={editPathTwo}>
-    <span class="nv-hero-video__slot-label">Video 2</span>
     <video
       class="absolute inset-0 h-full w-full object-cover"
       muted
@@ -60,6 +61,20 @@ const { src, srcTwo, editPath, editPathTwo } = Astro.props
       {...srcTwo ? { src: srcTwo } : {}}
     />
   </div>
+
+  <!-- Always clickable, regardless of which slot happens to be on screen —
+       siblings of the slots above rather than nested inside them, so
+       neither one's opacity/pointer-events toggling can hide or disable
+       these. Without this, "Video 2" would be unreachable until it already
+       had a video (it starts hidden, and only the sequencing script in the
+       page's own <script> below ever promotes it to visible) — a real
+       chicken-and-egg gap, not a hypothetical one. -->
+  <button type="button" class="nv-hero-video__slot-btn nv-hero-video__slot-btn--one" data-edit-video={editPath}>
+    Video 1
+  </button>
+  <button type="button" class="nv-hero-video__slot-btn nv-hero-video__slot-btn--two" data-edit-video={editPathTwo}>
+    Video 2
+  </button>
 
   <a href="#after-hero-video" class="nv-hero-video__hint" aria-label="Scroll down">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
@@ -97,28 +112,44 @@ const { src, srcTwo, editPath, editPathTwo } = Astro.props
     pointer-events: none;
   }
 
-  /* Studio-only — which slot is which is otherwise indistinguishable once
-     both are playing video. Hidden for every ordinary visitor. */
-  .nv-hero-video__slot-label {
+  /* Studio-only, and deliberately NOT nested inside a .nv-hero-video__slot
+     — a child can't be more visible or more clickable than an ancestor
+     whose own opacity/pointer-events say otherwise, so living outside
+     those is what makes both buttons reachable at all times, not just
+     when their slot happens to be the one currently on screen. */
+  .nv-hero-video__slot-btn {
     display: none;
   }
 
-  :global([data-studio-active]) .nv-hero-video__slot-label {
+  :global([data-studio-active]) .nv-hero-video__slot-btn {
     display: block;
     position: absolute;
     top: 1rem;
-    left: 1rem;
-    z-index: 3;
-    padding: 0.3rem 0.6rem;
+    z-index: 4;
+    padding: 0.4rem 0.7rem;
+    border: 1px solid color-mix(in srgb, #fff 30%, transparent);
     border-radius: var(--radius-control);
-    background: rgba(11, 14, 20, 0.6);
+    background: var(--color-carbon);
     color: #fff;
     font-family: var(--font-body);
-    font-size: 0.72rem;
+    font-size: 0.74rem;
     font-weight: 600;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    pointer-events: none;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    opacity: 0.88;
+    transition: opacity 150ms var(--ease-calm);
+  }
+
+  :global([data-studio-active]) .nv-hero-video__slot-btn:hover {
+    opacity: 1;
+  }
+
+  .nv-hero-video__slot-btn--one {
+    left: 1rem;
+  }
+
+  .nv-hero-video__slot-btn--two {
+    right: 1rem;
   }
 
   .nv-hero-video__hint {

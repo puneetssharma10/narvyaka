@@ -675,7 +675,14 @@ class Dock {
       // is no <video> element on the page yet, because index.astro only
       // renders one once site.json's video field is non-empty. The override
       // is still saved correctly either way; only the *live preview* differs.
-      const video = holder.querySelector('video')
+      //
+      // A holder that doesn't directly contain one (e.g. the hero's two
+      // corner buttons, which sit beside their slot rather than inside it,
+      // so the *other* slot's opacity/pointer-events can't hide or disable
+      // them too) falls back to whatever else on the page shares this exact
+      // override path — same addressing the rest of the Studio already
+      // relies on, just not assuming holder-contains-video this one time.
+      const video = holder.querySelector('video') ?? document.querySelector<HTMLVideoElement>(`[data-edit-video="${path}"] video`)
       if (video) {
         this.say('Loading video…', 'info')
         // Preview from a blob URL built off the original File, not the
