@@ -239,7 +239,12 @@ export function isSafeCssValue(v: string): boolean {
  */
 export function isSafeImageSrc(v: string): boolean {
   if (v === '') return true
-  if (v.length > 8_000_000) return false
+  // Base64 inflates bytes by 4/3, so dock.ts's 6 MB video cap needs
+  // ~8,388,608 characters once inlined here — the old 8,000,000 ceiling
+  // was actually *below* that, silently dropping (not rejecting — parseOverrides
+  // just omits the key) any video within about 300 KB of its own advertised
+  // limit. Comfortable margin above the worst case, not just past it.
+  if (v.length > 10_000_000) return false
   if (/^data:(image\/(png|jpeg|jpg|webp|gif|avif|svg\+xml)|video\/(mp4|webm));base64,[A-Za-z0-9+/=\s]+$/i.test(v))
     return true
   if (/^\/[^\s"'<>\\]*$/.test(v)) return true // same-origin absolute path

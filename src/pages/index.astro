@@ -4,7 +4,6 @@ import Wordmark from '../components/Wordmark.astro'
 import Icon from '../components/Icon.astro'
 import AudioPlayer from '../components/AudioPlayer.astro'
 import PlaceholderNotice from '../components/PlaceholderNotice.astro'
-import WisdomSlider from '../components/WisdomSlider.astro'
 import MotionStrip from '../components/MotionStrip.astro'
 import CapsulePhotoRotator from '../components/CapsulePhotoRotator.astro'
 import CapsuleVideo from '../components/CapsuleVideo.astro'
@@ -16,13 +15,19 @@ const home = content.home
 const example = home.exampleCapsule
 const problemParagraphs = list<string>('home.problem.paragraphs')
 const iconFor = { voice: 'voice', note: 'note', photo: 'photo', identity: 'identity' } as const
-const wisdomSlides = home.wisdomSlider.slides
 const motion = content.motion
 ---
 
 <Base title={siteConfig.name}>
-  <!-- ── Full-screen video, first thing on the page, no text over it ────── -->
-  <HeroVideo src={home.hero.video} editPath="home.hero.video" />
+  <!-- ── Full-screen videos, first thing on the page, no text over them ──
+       Two clips stitched into one loop (1, 2, 1, 2, ...) — carries what the
+       old wisdom-thoughts carousel used to, so that carousel is gone. -->
+  <HeroVideo
+    src={home.hero.video}
+    srcTwo={home.hero.videoTwo}
+    editPath="home.hero.video"
+    editPathTwo="home.hero.videoTwo"
+  />
 
   <!-- ── Wordmark, headline, intro, CTAs and the example capsule ─────────
        Everything that used to share the hero with the video now lives here,
@@ -149,23 +154,6 @@ const motion = content.motion
           </div>
         </div>
       </div>
-    </div>
-  </section>
-
-  <!-- ── Nine short thoughts on wisdom ────────────────────────────────────
-       A slow image carousel, deliberately free of any mythological or
-       religious reference since this is the first content after the hero.
-       Every picture is a plain Studio-editable image — click it, upload a
-       replacement — so the whole set can become real photographs later. -->
-  <section class="section border-b border-hairline">
-    <div class="wrap reveal">
-      <span class="light-bar mb-7"></span>
-      <WisdomSlider
-        items={wisdomSlides}
-        basePath="home.wisdomSlider.slides"
-        rotationSeconds={home.wisdomSlider.rotationSeconds}
-        timingPath="home.wisdomSlider.rotationSeconds"
-      />
     </div>
   </section>
 

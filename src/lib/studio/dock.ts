@@ -30,8 +30,8 @@ const EXPORT_FILENAME = 'narvyaka-overrides.json'
 // Video is stored inline as base64, same as a photo — but unlike a photo it
 // is never re-encoded down first, so this cap is far stricter than
 // MAX_UPLOAD_BYTES (300 MB, meant for a file the Cropper is about to shrink).
-// 6 MB keeps a stored video comfortably under isSafeImageSrc's 8M-character
-// ceiling once base64 inflates it by ~4/3.
+// 6 MB stays under isSafeImageSrc's 10M-character ceiling once base64
+// inflates it by ~4/3 (6 MB -> ~8.39M characters).
 const MAX_VIDEO_UPLOAD_BYTES = 6 * 1024 * 1024
 
 let mounted = false
@@ -448,25 +448,33 @@ class Dock {
 
     return this.section('Save & publish', false, [
       h('p', { class: 'nv-sec__note' }, [
-        'Two ways to keep these changes. Export writes a file you apply to the code — that is the permanent one. Publishing to the server stores them for every visitor without a rebuild, which is useful for a quick correction.',
+        'Publish sends everything above straight to the live site — every visitor sees it immediately, nothing to run.',
       ]),
-      h('button', { class: 'nv-btn nv-btn--primary nv-btn--wide', onClick: () => this.exportOverrides() }, [
-        'Export changes to a file',
-      ]),
-      h('p', { class: 'nv-sec__note' }, [
-        'Then run this in the project folder:',
-        h('code', { style: 'display:block;margin-top:5px;font-size:11.5px;overflow-wrap:anywhere' }, [
-          `npm run studio:apply ~/Downloads/${EXPORT_FILENAME}`,
-        ]),
-      ]),
-      h('button', { class: 'nv-btn nv-btn--ghost nv-btn--wide', onClick: () => this.copyApplyCommand() }, [
-        'Copy that command',
+      h('label', { class: 'nv-label' }, ['Studio token']),
+      token,
+      h('button', { class: 'nv-btn nv-btn--primary nv-btn--wide', onClick: () => void this.publish() }, [
+        'Publish to server',
       ]),
       h('hr', { style: 'border:0;border-top:1px solid #E7E2DA;margin:4px 0' }),
-      h('label', { class: 'nv-label' }, ['Publish to the live site']),
-      token,
-      h('button', { class: 'nv-btn nv-btn--ghost nv-btn--wide', onClick: () => void this.publish() }, [
-        'Publish to server',
+      h('details', { style: 'margin:0' }, [
+        h('summary', { class: 'nv-sec__note', style: 'cursor:pointer;user-select:none' }, [
+          'Prefer a permanent code change instead?',
+        ]),
+        h('p', { class: 'nv-sec__note', style: 'margin-top:8px' }, [
+          'Export writes a file you apply to the code, so it shows up in a diff and survives a rebuild — the one worth doing for anything you want to keep.',
+        ]),
+        h('button', { class: 'nv-btn nv-btn--ghost nv-btn--wide', onClick: () => this.exportOverrides() }, [
+          'Export changes to a file',
+        ]),
+        h('p', { class: 'nv-sec__note' }, [
+          'Then run this in the project folder:',
+          h('code', { style: 'display:block;margin-top:5px;font-size:11.5px;overflow-wrap:anywhere' }, [
+            `npm run studio:apply ~/Downloads/${EXPORT_FILENAME}`,
+          ]),
+        ]),
+        h('button', { class: 'nv-btn nv-btn--ghost nv-btn--wide', onClick: () => this.copyApplyCommand() }, [
+          'Copy that command',
+        ]),
       ]),
       h('hr', { style: 'border:0;border-top:1px solid #E7E2DA;margin:4px 0' }),
       h('button', { class: 'nv-btn nv-btn--ghost nv-btn--wide', onClick: () => importInput.click() }, [
@@ -670,6 +678,15 @@ class Dock {
       const video = holder.querySelector('video')
       if (video) {
         this.say('Loading video…', 'info')
+        // Preview from a blob URL built off the original File, not the
+        // data: URI just saved to the store — <video src="data:...."> is
+        // unreliably supported in some browsers (Safari in particular has
+        // had bugs loading video, as opposed to images, from a data URI)
+        // even for a file that decodes fine everywhere else. A blob: URL is
+        // the exact original bytes with no such quirk, so it's what decides
+        // whether this file can actually play — the stored override still
+        // keeps the data: URI, which is what gets exported/published.
+        const previewUrl = URL.createObjectURL(file)
         // Wait to hear back from the element itself before calling this a
         // success: a rejected play() alone can't tell a harmless autoplay
         // block (file is fine, will play on the first user gesture) apart
@@ -686,6 +703,7 @@ class Dock {
             })
             this.say(`Video replaced (${formatBytes(file.size)}). Export your changes to keep it.`, 'ok')
           } else {
+            URL.revokeObjectURL(previewUrl)
             this.say(
               'That file saved, but this browser could not play it back — the codec is probably unsupported (H.264 MP4 or VP9 WebM both work) or the file is corrupt. Try re-exporting it and upload again.',
               'warn',
@@ -696,7 +714,7 @@ class Dock {
         const onError = () => settle(false)
         video.addEventListener('loadeddata', onLoaded, { once: true })
         video.addEventListener('error', onError, { once: true })
-        video.src = url
+        video.src = previewUrl
         video.load()
       } else {
         this.say(

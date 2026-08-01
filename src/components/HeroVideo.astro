@@ -1,27 +1,30 @@
 ---
 /**
- * The very first thing on the page: a full-viewport looping video, no text
- * over it — the wordmark, headline and everything else that used to share
- * this space now lives in its own section right below, reached by scrolling
- * (or clicking the hint at the bottom).
+ * The very first thing on the page: two full-viewport looping videos,
+ * stitched into one continuous loop (1, 2, 1, 2, ...), no text over either —
+ * the wordmark, headline and everything else that used to share this space
+ * now lives in its own section right below, reached by scrolling (or
+ * clicking the hint at the bottom). Carries what the old 11-image wisdom
+ * carousel used to (the "thoughts"), now as video instead of photo + quote.
  *
- * The <video> tag is always rendered, even with no src set — unlike the
- * capsule's photo/video toggle, there's no second component being swapped
- * out here, so there's no first-upload "no live preview yet" limitation:
- * the element always exists for the Studio to target, from the very first
- * upload onward.
- *
- * Falls back to the same light technical grid the hero always had, so an
- * empty slot before a real video is uploaded doesn't read as broken —
- * and it stays visible through a video with transparency, for what that's
- * worth on an autoplaying background clip.
+ * Both <video> tags are always rendered, even with no src set, so the
+ * Studio can target either slot from the very first upload onward — same
+ * reasoning as the single-video version this replaced. They're stacked
+ * absolutely and swapped by opacity/pointer-events rather than being two
+ * separate sections, so there's exactly one on-screen target to click at
+ * any moment: whichever one is currently playing. A script below hands off
+ * from one to the other on 'ended' and loops forever; with only one slot
+ * filled it just loops that one natively; with neither filled the light
+ * technical grid shows through, same as before.
  */
 interface Props {
   src: string
+  srcTwo: string
   editPath: string
+  editPathTwo: string
 }
 
-const { src, editPath } = Astro.props
+const { src, srcTwo, editPath, editPathTwo } = Astro.props
 ---
 
 <!-- 100vh alone would run 69px past the actual viewport: the header is
@@ -31,19 +34,32 @@ const { src, editPath } = Astro.props
      together fill exactly one screen — not one screen plus a header. -->
 <section
   class="relative h-[calc(100vh-69px)] min-h-[420px] w-full overflow-hidden border-b border-hairline"
-  data-edit-video={editPath}
+  data-hero-loop
 >
   <div class="grid-field-light absolute inset-0" aria-hidden="true"></div>
 
-  <video
-    class="absolute inset-0 h-full w-full object-cover"
-    autoplay
-    muted
-    loop
-    playsinline
-    preload="auto"
-    {...src ? { src } : {}}
-  />
+  <div class="nv-hero-video__slot" data-hero-slot="0" data-edit-video={editPath}>
+    <span class="nv-hero-video__slot-label">Video 1</span>
+    <video
+      class="absolute inset-0 h-full w-full object-cover"
+      muted
+      loop
+      playsinline
+      preload="auto"
+      {...src ? { src } : {}}
+    />
+  </div>
+
+  <div class="nv-hero-video__slot nv-hero-video__slot--two" data-hero-slot="1" data-edit-video={editPathTwo}>
+    <span class="nv-hero-video__slot-label">Video 2</span>
+    <video
+      class="absolute inset-0 h-full w-full object-cover"
+      muted
+      playsinline
+      preload="auto"
+      {...srcTwo ? { src: srcTwo } : {}}
+    />
+  </div>
 
   <a href="#after-hero-video" class="nv-hero-video__hint" aria-label="Scroll down">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
@@ -53,6 +69,58 @@ const { src, editPath } = Astro.props
 </section>
 
 <style>
+  .nv-hero-video__slot {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    opacity: 1;
+    transition: opacity 480ms ease;
+  }
+
+  /* Starts hidden and click-through — the sequencing script below promotes
+     it (and demotes slot one) once slot one's playback ends. If slot one
+     never gets a video, the script's empty-slot handling still shows
+     whichever slot IS filled, so an editor with only "Video 2" uploaded
+     isn't stuck looking at a blank first slot forever. */
+  .nv-hero-video__slot--two {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .nv-hero-video__slot[data-hero-active] {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .nv-hero-video__slot[data-hero-inactive] {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* Studio-only — which slot is which is otherwise indistinguishable once
+     both are playing video. Hidden for every ordinary visitor. */
+  .nv-hero-video__slot-label {
+    display: none;
+  }
+
+  :global([data-studio-active]) .nv-hero-video__slot-label {
+    display: block;
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    z-index: 3;
+    padding: 0.3rem 0.6rem;
+    border-radius: var(--radius-control);
+    background: rgba(11, 14, 20, 0.6);
+    color: #fff;
+    font-family: var(--font-body);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    pointer-events: none;
+  }
+
   .nv-hero-video__hint {
     position: absolute;
     inset-inline: 0;
@@ -90,3 +158,84 @@ const { src, editPath } = Astro.props
     }
   }
 </style>
+
+<script>
+  type Slot = { el: HTMLElement; video: HTMLVideoElement }
+
+  document.querySelectorAll<HTMLElement>('[data-hero-loop]').forEach((section) => {
+    const slotEls = Array.from(section.querySelectorAll<HTMLElement>('[data-hero-slot]'))
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const wired = new WeakSet<HTMLVideoElement>()
+    let current = 0
+
+    function liveSlots(): Slot[] {
+      return slotEls
+        .map((el) => ({ el, video: el.querySelector('video') }))
+        .filter((slot): slot is Slot => !!slot.video && !!slot.video.getAttribute('src'))
+    }
+
+    function show(slots: Slot[], index: number) {
+      slots.forEach((slot, i) => {
+        if (i === index) {
+          slot.el.setAttribute('data-hero-active', '')
+          slot.el.removeAttribute('data-hero-inactive')
+        } else {
+          slot.el.setAttribute('data-hero-inactive', '')
+          slot.el.removeAttribute('data-hero-active')
+          slot.video.pause()
+        }
+      })
+      const video = slots[index].video
+      video.currentTime = 0
+      if (!reduceMotion) void video.play().catch(() => {})
+    }
+
+    // Whichever slot(s) have a src *right now* — called on first run and
+    // again every time a src changes. Overrides published from the Studio
+    // are injected by a separate, later script (StudioBoot's applyContent),
+    // not present in the markup this component was handed at parse time, so
+    // a single check on load isn't enough: a visitor loading the published
+    // (not code-applied) version would see this run before that injection
+    // happens and, without the observer below, never notice either video.
+    function refresh() {
+      const slots = liveSlots()
+      if (slots.length === 0) return
+
+      // .loop has to be re-derived on every call, not just the first: the
+      // two source-change events for a fresh two-video load don't land in
+      // the same tick, so the first refresh() can easily see only one slot
+      // and set loop=true — which would then never get corrected, and the
+      // video would silently loop forever instead of ever firing 'ended'.
+      // The listener itself only needs attaching once, since its own body
+      // re-reads the slot count fresh each time it actually fires.
+      slots.forEach((slot) => {
+        slot.video.loop = slots.length === 1
+        if (wired.has(slot.video)) return
+        wired.add(slot.video)
+        slot.video.addEventListener('ended', () => {
+          const now = liveSlots()
+          if (now.length < 2) return
+          current = (current + 1) % now.length
+          show(now, current)
+        })
+      })
+
+      // Don't restart something already playing just because the *other*
+      // slot's src changed (e.g. uploading video 2 while video 1 is on
+      // screen shouldn't interrupt video 1) — only pick a starting slot the
+      // first time anything becomes available.
+      if (!slots.some((s) => s.el.hasAttribute('data-hero-active'))) {
+        current = 0
+        show(slots, 0)
+      }
+    }
+
+    slotEls.forEach((el) => {
+      const video = el.querySelector('video')
+      if (!video) return
+      new MutationObserver(refresh).observe(video, { attributes: true, attributeFilter: ['src'] })
+    })
+
+    refresh()
+  })
+</script>
