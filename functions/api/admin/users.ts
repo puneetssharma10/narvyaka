@@ -1,5 +1,6 @@
 import { generateTempPassword, getSession, hashPassword, requireRole } from '../../_shared/auth'
 import { newId } from '../../../shared/record-schema'
+import { isCountry } from '../../../shared/countries'
 import {
   BadJson,
   PayloadTooLarge,
@@ -21,7 +22,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
   if (denied) return denied
 
   const rows = await env.DB!.prepare(
-    `SELECT id, email, role, status, created_at, last_login_at FROM users ORDER BY created_at DESC`,
+    `SELECT id, email, role, status, can_download, country, created_at, last_login_at FROM users ORDER BY created_at DESC`,
   ).all()
 
   return json({ users: rows.results ?? [] })
@@ -34,6 +35,12 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
  * there is no self-service admin signup, and admins cannot create other
  * admins (Founding Vision decision — only you decide who else can touch
  * every record and every volunteer account).
+ *
+ * Every admin is scoped to exactly one country, required here — an admin
+ * with no country assigned would default to seeing only *unassigned*
+ * records (contributor_country IS NULL) rather than everything, which is
+ * almost certainly not what creating the account was for. If you need an
+ * admin with global reach, that's what super_admin is for.
  */
 export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
   const missing = requireBindings(env, ['DB'])
@@ -52,9 +59,10 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     throw error
   }
 
-  const { email } = (body ?? {}) as { email?: string }
+  const { email, country } = (body ?? {}) as { email?: string; country?: string }
   const loginEmail = (email ?? '').trim().toLowerCase()
   if (!loginEmail.includes('@')) return fail(400, 'A valid email is required.')
+  if (!isCountry(country)) return fail(400, 'A valid country is required.')
 
   const already = await env.DB!.prepare(`SELECT id FROM users WHERE email = ?1`).bind(loginEmail).first()
   if (already) return fail(409, 'An account already exists with that email.', { code: 'email_taken' })
@@ -65,11 +73,11 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
   const now = new Date().toISOString()
 
   await env.DB!.prepare(
-    `INSERT INTO users (id, email, password_hash, role, status, must_change_password, created_at, created_by)
-     VALUES (?1, ?2, ?3, 'admin', 'active', 1, ?4, ?5)`,
+    `INSERT INTO users (id, email, password_hash, role, status, must_change_password, country, created_at, created_by)
+     VALUES (?1, ?2, ?3, 'admin', 'active', 1, ?4, ?5, ?6)`,
   )
-    .bind(userId, loginEmail, passwordHash, now, session!.id)
+    .bind(userId, loginEmail, passwordHash, country, now, session!.id)
     .run()
 
-  return json({ ok: true, email: loginEmail, tempPassword }, 201)
+  return json({ ok: true, email: loginEmail, country, tempPassword }, 201)
 }

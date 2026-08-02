@@ -5,6 +5,7 @@ import { PhotoStep, type PhotoItem } from './PhotoStep'
 import { useAutosave } from './useAutosave'
 import { ApiError, downloadBackup, extensionFor, submitJson, uploadFile, type SubmitResult } from './api'
 import { newId } from '../../../shared/record-schema'
+import { COUNTRIES } from '../../../shared/countries'
 
 /* ── Types ───────────────────────────────────────────────────────────────── */
 
@@ -95,6 +96,7 @@ interface Draft {
     anonymous: boolean
     preferred_name: string
     location: string
+    country: string
     profession: string
     languages: string
     record_language: string
@@ -122,6 +124,7 @@ const emptyDraft = (): Draft => ({
     anonymous: false,
     preferred_name: '',
     location: '',
+    country: '',
     profession: '',
     languages: '',
     record_language: '',
@@ -236,6 +239,7 @@ export default function IntakeForm({ mode, copy, endpoints, storageKey }: Props)
       display_as_anonymous: draft.contributor.anonymous,
       preferred_name: draft.contributor.preferred_name || null,
       location: draft.contributor.location,
+      country: draft.contributor.country,
       profession: draft.contributor.profession,
       languages: draft.contributor.languages,
       record_language: draft.contributor.record_language,
@@ -668,7 +672,7 @@ function AboutStep({
         />
       </Field>
 
-      <div className="grid gap-6 sm:grid-cols-2">
+      <div className="grid gap-6 sm:grid-cols-3">
         <Field label={c.location} htmlFor="c-location" optional>
           <TextInput
             id="c-location"
@@ -676,6 +680,22 @@ function AboutStep({
             onChange={(value) => patch('contributor', { location: value })}
             placeholder={c.locationPlaceholder}
           />
+        </Field>
+
+        <Field label="Country" htmlFor="c-country" optional>
+          <select
+            id="c-country"
+            className="field"
+            value={draft.contributor.country}
+            onChange={(e) => patch('contributor', { country: e.target.value })}
+          >
+            <option value="">—</option>
+            {COUNTRIES.map((country) => (
+              <option key={country} value={country}>
+                {country}
+              </option>
+            ))}
+          </select>
         </Field>
 
         <Field label={c.profession} htmlFor="c-profession" optional>
@@ -1021,6 +1041,7 @@ function ReviewStep({
           <PreviewBlock title={copy.about.heading} onEdit={() => onEdit(1)} editLabel={c.editStep}>
             <PreviewRow label={copy.about.name} value={draft.contributor.anonymous ? 'Anonymous Contributor' : draft.contributor.name} empty={c.emptyValue} />
             <PreviewRow label={copy.about.location} value={draft.contributor.location} empty={c.emptyValue} />
+            <PreviewRow label="Country" value={draft.contributor.country} empty={c.emptyValue} />
             <PreviewRow label={copy.about.profession} value={draft.contributor.profession} empty={c.emptyValue} />
             <PreviewRow label={copy.about.recordLanguage} value={draft.contributor.record_language} empty={c.emptyValue} />
           </PreviewBlock>

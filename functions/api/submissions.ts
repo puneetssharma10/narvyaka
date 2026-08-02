@@ -83,16 +83,16 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     await env.DB!.prepare(
       `INSERT INTO submissions (
          id, status, submitted_at, source, object_key,
-         contributor_name, display_as_anonymous, contributor_location, contributor_profession,
+         contributor_name, display_as_anonymous, contributor_location, contributor_country, contributor_profession,
          record_language, contact, age_confirmed_30_plus, exception_reason,
          key_lesson, access_level, release_date, verification_status,
          has_audio, photo_count, payload_json, client_ip, owner_user_id
        ) VALUES (
          ?1, ?2, ?3, ?4, ?5,
-         ?6, ?7, ?8, ?9,
-         ?10, ?11, ?12, ?13,
-         ?14, ?15, ?16, ?17,
-         ?18, ?19, ?20, ?21, ?22
+         ?6, ?7, ?8, ?9, ?10,
+         ?11, ?12, ?13, ?14,
+         ?15, ?16, ?17, ?18,
+         ?19, ?20, ?21, ?22, ?23
        )`,
     )
       .bind(
@@ -104,6 +104,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
         record.contributor.name,
         record.contributor.display_as_anonymous ? 1 : 0,
         record.contributor.location,
+        record.contributor.country || null,
         record.contributor.profession,
         record.contributor.record_language,
         record.contributor.contact,

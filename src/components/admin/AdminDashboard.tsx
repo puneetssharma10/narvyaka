@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { COUNTRIES } from '../../../shared/countries'
 
 type Role = 'super_admin' | 'admin' | 'volunteer'
 interface Me {
@@ -36,6 +37,8 @@ interface UserRow {
   email: string
   role: Role
   status: string
+  can_download: number
+  country: string | null
   created_at: string
   last_login_at: string | null
 }
@@ -368,6 +371,7 @@ function SubmissionQueue() {
 function Accounts({ me, onCreated }: { me: Me; onCreated: (cred: { email: string; password: string }) => void }) {
   const [rows, setRows] = useState<UserRow[] | null>(null)
   const [newEmail, setNewEmail] = useState('')
+  const [newCountry, setNewCountry] = useState('')
   const [busyId, setBusyId] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
@@ -389,16 +393,29 @@ function Accounts({ me, onCreated }: { me: Me; onCreated: (cred: { email: string
     void load()
   }
 
+  async function toggleDownload(row: UserRow) {
+    setBusyId(row.id)
+    const action = row.can_download ? 'revoke_download' : 'grant_download'
+    const { ok, data } = await api<{ error?: string }>(`/api/admin/users/${row.id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ action }),
+    })
+    setBusyId(null)
+    if (!ok) setError((data as { error?: string }).error ?? 'Could not change download permission.')
+    void load()
+  }
+
   async function createAdmin(e: React.FormEvent) {
     e.preventDefault()
     setError(null)
     const { ok, data } = await api<{ email?: string; tempPassword?: string; error?: string }>('/api/admin/users', {
       method: 'POST',
-      body: JSON.stringify({ email: newEmail }),
+      body: JSON.stringify({ email: newEmail, country: newCountry }),
     })
     if (!ok) return setError(data.error ?? 'Could not create that account.')
     if (data.email && data.tempPassword) onCreated({ email: data.email, password: data.tempPassword })
     setNewEmail('')
+    setNewCountry('')
     void load()
   }
 
@@ -416,6 +433,17 @@ function Accounts({ me, onCreated }: { me: Me; onCreated: (cred: { email: string
               onChange={(e) => setNewEmail(e.target.value)}
             />
           </label>
+          <label className="grid gap-2">
+            <span className="label">Country (read/write scope)</span>
+            <select required className="field" value={newCountry} onChange={(e) => setNewCountry(e.target.value)}>
+              <option value="">Choose a country…</option>
+              {COUNTRIES.map((country) => (
+                <option key={country} value={country}>
+                  {country}
+                </option>
+              ))}
+            </select>
+          </label>
           <button className="btn btn-primary">Create admin account</button>
         </form>
       )}
@@ -432,14 +460,27 @@ function Accounts({ me, onCreated }: { me: Me; onCreated: (cred: { email: string
                 <p className="m-0 font-medium">{row.email}</p>
                 <p className="m-0 text-[0.85rem] text-muted">
                   {row.role.replace('_', ' ')} · {row.status}
+                  {row.role === 'admin' && row.country ? ` · ${row.country}` : ''}
+                  {row.role === 'volunteer' && row.can_download ? ' · can download' : ''}
                   {row.last_login_at ? ` · last seen ${new Date(row.last_login_at).toLocaleDateString()}` : ''}
                 </p>
               </div>
-              {canAct && (
-                <button className="btn btn-quiet" disabled={busyId === row.id} onClick={() => void toggle(row)}>
-                  {row.status === 'active' ? 'Revoke' : 'Reactivate'}
-                </button>
-              )}
+              <div className="flex gap-2">
+                {me.role === 'super_admin' && row.role === 'volunteer' && (
+                  <button
+                    className="btn btn-quiet"
+                    disabled={busyId === row.id}
+                    onClick={() => void toggleDownload(row)}
+                  >
+                    {row.can_download ? 'Revoke download' : 'Grant download'}
+                  </button>
+                )}
+                {canAct && (
+                  <button className="btn btn-quiet" disabled={busyId === row.id} onClick={() => void toggle(row)}>
+                    {row.status === 'active' ? 'Revoke' : 'Reactivate'}
+                  </button>
+                )}
+              </div>
             </div>
           )
         })}
