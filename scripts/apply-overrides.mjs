@@ -9,6 +9,8 @@
  *   theme.logo    →  public/uploads/logo.<ext>  +  src/data/site.json
  *   text.*        →  src/data/site.json  (by dotted path)
  *   images.*      →  public/uploads/<name>.<ext>  +  src/data/site.json
+ *                    (also covers the one capsule video — same field, same path)
+ *   timing.*      →  src/data/site.json  (by dotted path, seconds per slide)
  *
  * Inlined data URIs are written out as real files, so the repository never
  * carries a megabyte of base64 and the browser gets a cacheable asset.
@@ -92,6 +94,10 @@ const EXT_BY_MIME = {
   'image/gif': 'gif',
   'image/avif': 'avif',
   'image/svg+xml': 'svg',
+  // The one capsule video shares the images.* override field and this same
+  // materialise() path — it's a different mime, not a different mechanism.
+  'video/mp4': 'mp4',
+  'video/webm': 'webm',
 }
 
 /** Writes a data: URI out as a real file under public/uploads and returns its site path. */
@@ -194,6 +200,21 @@ for (const [path, value] of Object.entries(overrides.images ?? {})) {
     applied.push(`image ${path} → ${src}`)
   } else {
     skipped.push(`image ${path}: no such key in src/data/site.json`)
+  }
+}
+
+/* ── Timing ───────────────────────────────────────────────────────────────── */
+
+for (const [path, value] of Object.entries(overrides.timing ?? {})) {
+  const seconds = Number(value)
+  if (!Number.isFinite(seconds)) {
+    skipped.push(`timing ${path}: "${value}" is not a number`)
+    continue
+  }
+  if (setPath(site, path, seconds)) {
+    applied.push(`timing ${path} → ${seconds}s`)
+  } else {
+    skipped.push(`timing ${path}: no such key in src/data/site.json`)
   }
 }
 

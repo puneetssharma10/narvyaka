@@ -1,0 +1,281 @@
+---
+/**
+ * The example capsule's photo — a single 4:3 slot, now a set of images that
+ * crossfade automatically instead of one static picture. Each frame is an
+ * ordinary Studio-editable image (click it, upload a replacement), same as
+ * every other photo on the site — plus a bulk "Upload all N" control so all
+ * ten can be replaced in one go instead of clicking through them one by one.
+ *
+ * Deliberately no quote overlay: this sits inside a card that already has
+ * its own badge, lesson and attribution below it. Arrows are kept minimal —
+ * small, on the image itself — for the same reason.
+ */
+import Icon from './Icon.astro'
+
+interface Props {
+  items: string[]
+  basePath: string
+  alt: string
+  /** Seconds each slide holds before crossfading to the next. Studio-editable
+   *  live via the Timing panel, through the data-timing/data-interval-ms
+   *  attributes below — see StudioBoot.astro's applyTiming. */
+  rotationSeconds: number
+  timingPath: string
+  /** When set, a small studio-only button offers switching this whole slot
+   *  to a single video instead — see CapsuleVideo.astro. This is the only
+   *  way to *start* using a video: the video element itself doesn't exist
+   *  in the page until one is already set, so without this control there
+   *  would be nothing to click to begin. */
+  videoEditPath?: string
+  class?: string
+}
+
+const { items, basePath, alt, rotationSeconds, timingPath, videoEditPath, class: className = '' } = Astro.props
+---
+
+<div
+  class={`nv-capsule-photo relative overflow-hidden ${className}`}
+  data-capsule-photo
+  data-timing={timingPath}
+  data-timing-label="Example capsule photos"
+  data-interval-ms={Math.round(rotationSeconds * 1000)}
+>
+  {
+    items.map((src, i) => (
+      <div
+        class="nv-capsule-photo__slide"
+        data-capsule-photo-slide
+        aria-hidden={i === 0 ? 'false' : 'true'}
+        data-edit-image={`${basePath}.${i}`}
+        data-edit-aspect="4:3"
+      >
+        <img
+          src={src}
+          alt={i === 0 ? alt : ''}
+          class="h-full w-full object-cover"
+          width="640"
+          height="480"
+          loading={i === 0 ? 'eager' : 'lazy'}
+        />
+      </div>
+    ))
+  }
+
+  <button
+    type="button"
+    class="nv-capsule-photo__bulk"
+    data-edit-image-group={basePath}
+    data-edit-image-group-count={items.length}
+    data-edit-aspect="4:3"
+  >
+    Upload all {items.length}
+  </button>
+
+  {
+    videoEditPath && (
+      <button type="button" class="nv-capsule-photo__video-btn" data-edit-video={videoEditPath}>
+        Use a video instead
+      </button>
+    )
+  }
+
+  {
+    items.length > 1 && (
+      <>
+        <button
+          type="button"
+          class="nv-capsule-photo__arrow nv-capsule-photo__arrow--prev"
+          data-capsule-photo-prev
+          aria-label="Previous photo"
+        >
+          <Icon name="arrow" size={15} class="rotate-180" />
+        </button>
+        <button
+          type="button"
+          class="nv-capsule-photo__arrow nv-capsule-photo__arrow--next"
+          data-capsule-photo-next
+          aria-label="Next photo"
+        >
+          <Icon name="arrow" size={15} />
+        </button>
+
+        <div class="nv-capsule-photo__dots" data-capsule-photo-dots aria-hidden="true">
+          {items.map((_, i) => (
+            <span class="nv-capsule-photo__dot" data-index={i} />
+          ))}
+        </div>
+      </>
+    )
+  }
+</div>
+
+<style>
+  .nv-capsule-photo {
+    background: var(--color-accent-soft);
+  }
+
+  .nv-capsule-photo__slide {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    opacity: 0;
+    transition: opacity 620ms ease;
+  }
+
+  .nv-capsule-photo__slide[aria-hidden='false'] {
+    z-index: 1;
+    opacity: 1;
+  }
+
+  .nv-capsule-photo__bulk {
+    top: 0.6rem;
+    left: 0.6rem;
+  }
+
+  /* The studio-only display:none/inline-flex toggle for this button lives in
+     global.css, not here. An Astro scoped <style> block silently rewrites a
+     *leading* ancestor attribute selector like [data-studio-active] to also
+     require the component's own data-astro-cid — which <html> never has —
+     so a rule written as "[data-studio-active] .nv-capsule-photo__video-btn"
+     right here would never match anything. Position/colour only in scope. */
+  .nv-capsule-photo__video-btn {
+    top: 0.6rem;
+    right: 0.6rem;
+  }
+
+  /* Suppresses the generic "Replace video" hover tooltip that
+     [data-edit-video] gets elsewhere (global.css) — this button already has
+     its own label, and the tooltip is centred absolutely, so left alone it
+     would render directly on top of that text. */
+  .nv-capsule-photo__video-btn::after {
+    /* !important because this and the rule it overrides (global.css's
+       [data-studio-active] [data-edit-video]::after) carry equal
+       specificity — without it, which one wins depends on build-order
+       luck rather than intent. */
+    content: none !important;
+  }
+
+  .nv-capsule-photo__arrow {
+    position: absolute;
+    top: 50%;
+    z-index: 3;
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(11, 14, 20, 0.4);
+    color: #fff;
+    transform: translateY(-50%);
+    transition: background-color 200ms ease;
+    cursor: pointer;
+  }
+
+  .nv-capsule-photo__arrow:hover {
+    background: rgba(11, 14, 20, 0.65);
+  }
+
+  .nv-capsule-photo__arrow--prev {
+    left: 0.6rem;
+  }
+
+  .nv-capsule-photo__arrow--next {
+    right: 0.6rem;
+  }
+
+  .nv-capsule-photo__dots {
+    position: absolute;
+    right: 0.75rem;
+    bottom: 0.75rem;
+    z-index: 2;
+    display: flex;
+    gap: 0.35rem;
+  }
+
+  .nv-capsule-photo__dot {
+    display: block;
+    width: 14px;
+    height: 3px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.55);
+    box-shadow: 0 0 0 1px rgba(11, 14, 20, 0.12);
+  }
+
+  .nv-capsule-photo__dot[data-on] {
+    background: #fff;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .nv-capsule-photo__slide {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-capsule-photo]').forEach((root) => {
+    const slides = Array.from(root.querySelectorAll<HTMLElement>('[data-capsule-photo-slide]'))
+    const dots = Array.from(root.querySelectorAll<HTMLElement>('.nv-capsule-photo__dot'))
+    const prevBtn = root.querySelector<HTMLButtonElement>('[data-capsule-photo-prev]')
+    const nextBtn = root.querySelector<HTMLButtonElement>('[data-capsule-photo-next]')
+    if (slides.length < 2) return
+
+    let current = 0
+    let timer: number
+
+    function show(next: number) {
+      slides[current].setAttribute('aria-hidden', 'true')
+      dots[current]?.removeAttribute('data-on')
+      current = (next + slides.length) % slides.length
+      slides[current].setAttribute('aria-hidden', 'false')
+      dots[current]?.setAttribute('data-on', '')
+    }
+
+    dots[0]?.setAttribute('data-on', '')
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+    function intervalMs() {
+      const ms = Number(root.dataset.intervalMs)
+      return Number.isFinite(ms) && ms > 0 ? ms : 7000
+    }
+
+    function start() {
+      if (reduceMotion) return
+      timer = window.setInterval(() => show(current + 1), intervalMs())
+    }
+
+    function stop() {
+      window.clearInterval(timer)
+    }
+
+    start()
+    root.addEventListener('mouseenter', stop)
+    root.addEventListener('mouseleave', start)
+    // A Studio timing edit updates data-interval-ms and fires this so the
+    // running timer picks up the new speed immediately, not on next cycle.
+    root.addEventListener('nv:interval-changed', () => {
+      stop()
+      start()
+    })
+
+    prevBtn?.addEventListener('click', () => {
+      stop()
+      show(current - 1)
+      start()
+    })
+    nextBtn?.addEventListener('click', () => {
+      stop()
+      show(current + 1)
+      start()
+    })
+    dots.forEach((dot, i) => {
+      dot.addEventListener('click', () => {
+        stop()
+        show(i)
+        start()
+      })
+    })
+  })
+</script>

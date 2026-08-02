@@ -23,6 +23,10 @@ CREATE TABLE IF NOT EXISTS submissions (
   contributor_name        TEXT,
   display_as_anonymous    INTEGER NOT NULL DEFAULT 0,
   contributor_location    TEXT,
+  -- One of shared/countries.ts's COUNTRIES, or '' if not given. What an
+  -- admin's country-scoped access (users.country) actually filters by —
+  -- contributor_location is free text and not reliable enough for that.
+  contributor_country     TEXT,
   contributor_profession  TEXT,
   record_language         TEXT,
   contact                 TEXT,                              -- never published
@@ -58,6 +62,7 @@ CREATE TABLE IF NOT EXISTS submissions (
 
 CREATE INDEX IF NOT EXISTS idx_submissions_status ON submissions (status, submitted_at DESC);
 CREATE INDEX IF NOT EXISTS idx_submissions_access ON submissions (access_level);
+CREATE INDEX IF NOT EXISTS idx_submissions_country ON submissions (contributor_country);
 CREATE INDEX IF NOT EXISTS idx_submissions_exception ON submissions (age_confirmed_30_plus, status);
 
 -- ── Founding volunteers ────────────────────────────────────────────────────
@@ -121,11 +126,16 @@ CREATE INDEX IF NOT EXISTS idx_rate_limits_window ON rate_limits (window_start);
 -- Four tiers. Only three ever get a row here — a reader is just a visitor,
 -- nothing to store.
 --
---   super_admin   You. Site content (the Studio), creating/revoking admins,
---                 everything an admin can do.
---   admin         Reviews and edits any record, approves/revokes volunteer
---                 accounts. Cannot touch the Studio and cannot create another
---                 admin — that boundary is deliberate, see CONTENT_STATUS.md.
+--   super_admin   You. Full access — every record, every account, the
+--                 Studio. Not country-scoped.
+--   admin         Read/write access to records, but only the ones whose
+--                 contributor_country matches this account's own country
+--                 (or whose country isn't set at all — an old/unassigned
+--                 record isn't hidden from everyone just because no one's
+--                 filled that field in yet). Approves/revokes volunteer
+--                 accounts. Cannot touch the Studio and cannot create
+--                 another admin — that boundary is deliberate, see
+--                 CONTENT_STATUS.md.
 --   volunteer     Can create records and edit only the records they own
 --                 (submissions.owner_user_id = their own id). Nothing else.
 --
@@ -138,6 +148,15 @@ CREATE TABLE IF NOT EXISTS users (
   role            TEXT NOT NULL,
   status          TEXT NOT NULL DEFAULT 'active',
   must_change_password INTEGER NOT NULL DEFAULT 0,  -- set on admin-issued temp passwords
+  -- Only ever meaningful for role = 'admin' — one of shared/countries.ts's
+  -- COUNTRIES, set by the super_admin when the account is created (see
+  -- functions/api/admin/users.ts). NULL for super_admin/volunteer, who
+  -- aren't country-scoped at all.
+  country         TEXT,
+  -- Only ever meaningful for role = 'volunteer'. Granted/revoked by the
+  -- super_admin alone (functions/api/admin/users/[id].ts) — an admin can
+  -- revoke a volunteer's whole account but not this specifically.
+  can_download    INTEGER NOT NULL DEFAULT 0,
   created_at      TEXT NOT NULL,
   created_by      TEXT,                   -- user id that approved/created this account
   last_login_at   TEXT,

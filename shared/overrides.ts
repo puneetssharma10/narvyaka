@@ -98,6 +98,35 @@ export interface StudioOverrides {
   text: Record<string, string>
   /** Dotted path into src/data/site.json → replacement image src. */
   images: Record<string, string>
+  /** Dotted path into src/data/site.json → seconds between slides, for an
+   *  auto-rotating gallery (the example capsule photos, the wisdom slider). */
+  timing: Record<string, number>
+}
+
+/** Slower than this and a rotation reads as broken, not deliberate; faster
+ *  and nobody can actually read what changed. Shared by validation and by
+ *  the Studio's range input, so the two can never disagree. This is the
+ *  default range for a [data-timing] host that doesn't declare its own
+ *  (data-timing-min/-max) — a plain photo/slide rotator, in practice. */
+export const MIN_ROTATION_SECONDS = 2
+export const MAX_ROTATION_SECONDS = 20
+
+/** The floor/ceiling every [data-timing] value is sanity-checked against
+ *  server-side, regardless of which specific control produced it — wider
+ *  than MIN/MAX_ROTATION_SECONDS on purpose, since a per-host slider (the
+ *  hero video crossfade, e.g., which wants ~0.2–2.5s) can have its own,
+ *  narrower range without this generic check clamping it back up. */
+export const TIMING_FLOOR_SECONDS = 0.2
+export const TIMING_CEILING_SECONDS = 20
+
+export function clampRotationSeconds(
+  v: unknown,
+  min: number = MIN_ROTATION_SECONDS,
+  max: number = MAX_ROTATION_SECONDS,
+): number {
+  const n = typeof v === 'number' ? v : Number(v)
+  if (!Number.isFinite(n)) return min
+  return Math.min(max, Math.max(min, n))
 }
 
 export function emptyOverrides(): StudioOverrides {
@@ -107,6 +136,7 @@ export function emptyOverrides(): StudioOverrides {
     theme: { colors: {}, fonts: {} },
     text: {},
     images: {},
+    timing: {},
   }
 }
 
@@ -117,7 +147,8 @@ export function isEmptyOverrides(o: StudioOverrides | null | undefined): boolean
     Object.keys(o.theme?.fonts ?? {}).length === 0 &&
     !o.theme?.logo?.src &&
     Object.keys(o.text ?? {}).length === 0 &&
-    Object.keys(o.images ?? {}).length === 0
+    Object.keys(o.images ?? {}).length === 0 &&
+    Object.keys(o.timing ?? {}).length === 0
   )
 }
 
@@ -128,7 +159,8 @@ export function countOverrides(o: StudioOverrides | null | undefined): number {
     Object.keys(o.theme?.fonts ?? {}).length +
     (o.theme?.logo?.src ? 1 : 0) +
     Object.keys(o.text ?? {}).length +
-    Object.keys(o.images ?? {}).length
+    Object.keys(o.images ?? {}).length +
+    Object.keys(o.timing ?? {}).length
   )
 }
 
@@ -158,6 +190,12 @@ export function parseOverrides(input: unknown): StudioOverrides | null {
       if (typeof v === 'string' && isSafeImageSrc(v)) images[k] = v
     }
 
+    const timing: Record<string, number> = {}
+    for (const [k, v] of Object.entries(raw.timing ?? {})) {
+      if (typeof v === 'number' && Number.isFinite(v))
+        timing[k] = clampRotationSeconds(v, TIMING_FLOOR_SECONDS, TIMING_CEILING_SECONDS)
+    }
+
     const logoSrc = raw.theme?.logo?.src
     const logo: LogoOverride | undefined =
       typeof logoSrc === 'string' && isSafeImageSrc(logoSrc)
@@ -174,6 +212,7 @@ export function parseOverrides(input: unknown): StudioOverrides | null {
       theme: { colors, fonts, ...(logo ? { logo } : {}) },
       text,
       images,
+      timing,
     }
   } catch {
     return null
@@ -200,18 +239,29 @@ export function isSafeCssValue(v: string): boolean {
 }
 
 /**
- * Only same-origin paths and inline image data — never javascript:, and never
- * a remote host that could serve something other than an image.
+ * Only same-origin paths and inline image/video data — never javascript:, and
+ * never a remote host that could serve something other than media.
  *
  * SVG is allowed because a logomark should stay vector. It is only ever
  * rendered through <img src>, which is a passive context: scripts and external
  * references inside an SVG do not execute there. The Studio additionally
  * refuses any SVG containing a <script> before it gets this far.
+ *
+ * Video shares this same override field and validator rather than a separate
+ * one — it is stored and applied identically (a same-origin path, an https
+ * URL, or inline data), just rendered through <video src> instead of <img
+ * src>, which is exactly as passive a context as <img>.
  */
 export function isSafeImageSrc(v: string): boolean {
   if (v === '') return true
-  if (v.length > 8_000_000) return false
-  if (/^data:image\/(png|jpeg|jpg|webp|gif|avif|svg\+xml);base64,[A-Za-z0-9+/=\s]+$/i.test(v)) return true
+  // Base64 inflates bytes by 4/3, so dock.ts's 6 MB video cap needs
+  // ~8,388,608 characters once inlined here — the old 8,000,000 ceiling
+  // was actually *below* that, silently dropping (not rejecting — parseOverrides
+  // just omits the key) any video within about 300 KB of its own advertised
+  // limit. Comfortable margin above the worst case, not just past it.
+  if (v.length > 10_000_000) return false
+  if (/^data:(image\/(png|jpeg|jpg|webp|gif|avif|svg\+xml)|video\/(mp4|webm));base64,[A-Za-z0-9+/=\s]+$/i.test(v))
+    return true
   if (/^\/[^\s"'<>\\]*$/.test(v)) return true // same-origin absolute path
   if (/^https:\/\/[^\s"'<>\\]+$/i.test(v)) return true // object storage URL
   return false

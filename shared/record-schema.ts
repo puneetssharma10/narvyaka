@@ -6,6 +6,8 @@
  * No dependencies: this file must run in a Worker, in Node, and in a browser.
  */
 
+import { isCountry } from './countries'
+
 /* ── Locked vocabularies ─────────────────────────────────────────────────── */
 
 /**
@@ -47,6 +49,10 @@ export interface Contributor {
   display_as_anonymous: boolean
   preferred_name: string | null
   location: string
+  /** One of shared/countries.ts's COUNTRIES, or '' if not given — the
+   *  free-text `location` field isn't reliable enough to filter by, this
+   *  is what an admin's country-scoped access actually matches against. */
+  country: string
   profession: string
   languages: string[]
   record_language: string
@@ -284,6 +290,7 @@ export function normaliseRecord(input: unknown, opts: { source?: 'self' | 'on_be
       display_as_anonymous: bool(c.display_as_anonymous),
       preferred_name: strOrNull(c.preferred_name, 300),
       location: str(c.location, 300),
+      country: isCountry(c.country) ? c.country : '',
       profession: str(c.profession, 300),
       languages: strArray(c.languages),
       record_language: str(c.record_language, 100),
