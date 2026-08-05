@@ -9,6 +9,18 @@
 @import '@fontsource-variable/public-sans/wght.css';
 @import '@fontsource-variable/fraunces/wght.css';
 @import '@fontsource-variable/fraunces/wght-italic.css';
+@import '@fontsource-variable/lora/wght.css';
+@import '@fontsource-variable/source-serif-4/wght.css';
+@import '@fontsource-variable/playfair-display/wght.css';
+
+/* Artistic and handwritten faces — for anyone who wants the site to read
+   less like software and more like a kept notebook. */
+@import '@fontsource-variable/caveat/wght.css';
+@import '@fontsource-variable/dancing-script/wght.css';
+@import '@fontsource/patrick-hand/400.css';
+@import '@fontsource/shadows-into-light/400.css';
+@import '@fontsource/homemade-apple/400.css';
+@import '@fontsource/great-vibes/400.css';
 
 /* ───────────────────────────────────────────────────────────────────────────
    DESIGN TOKENS
@@ -54,7 +66,7 @@
      natural italic cut for the wordmark and pull-quotes. Inter stays for
      body copy — a page of italic serif paragraphs is a strain to read. */
   --font-wordmark: 'Fraunces Variable', 'Source Serif 4 Variable', Georgia, serif;
-  --font-heading: 'Fraunces Variable', 'Source Serif 4 Variable', Georgia, serif;
+  --font-heading: 'Caveat Variable', cursive;
   --font-body: 'Inter Variable', 'Public Sans Variable', system-ui, sans-serif;
 
   /* Radius — Build Brief §2.3: soft, not sharp, not pill-shaped. */
@@ -744,11 +756,13 @@
   background: color-mix(in srgb, var(--color-accent) 5%, transparent);
 }
 
-[data-studio-active] [data-edit-image] {
+[data-studio-active] [data-edit-image],
+[data-studio-active] [data-edit-video] {
   position: relative;
 }
 
-[data-studio-active] [data-edit-image]::after {
+[data-studio-active] [data-edit-image]::after,
+[data-studio-active] [data-edit-video]::after {
   content: 'Replace image';
   position: absolute;
   inset-inline-start: 50%;
@@ -766,20 +780,66 @@
   z-index: 5;
 }
 
-[data-studio-active] [data-edit-image]:hover::after {
+[data-studio-active] [data-edit-video]::after {
+  content: 'Replace video';
+}
+
+[data-studio-active] [data-edit-image]:hover::after,
+[data-studio-active] [data-edit-video]:hover::after {
   opacity: 1;
 }
 
-[data-studio-active] [data-edit-image]:hover {
+[data-studio-active] [data-edit-image]:hover,
+[data-studio-active] [data-edit-video]:hover {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
   cursor: pointer;
 }
 
 [data-studio-dropping] [data-edit-image],
+[data-studio-dropping] [data-edit-video],
 [data-studio-dropping] [data-logo-slot] {
   outline: 2px dashed var(--color-accent);
   outline-offset: 3px;
+}
+
+/* "Upload all N" (a bulk file picker for a whole set of images) and "Use a
+   video instead" (switches the example capsule to a single video — see
+   CapsulePhotoRotator) share this look and this gating: invisible and inert
+   until the Studio is actually open, same as every other Studio affordance.
+   Deliberately kept here rather than in either component's own scoped
+   <style>: an Astro scoped block silently rewrites a *leading* ancestor
+   attribute selector like [data-studio-active] to also require that
+   component's own data-astro-cid, which <html> never has — so the same rule
+   written inside the component would never match anything. */
+[data-edit-image-group],
+.nv-capsule-photo__video-btn {
+  display: none;
+}
+
+[data-studio-active] [data-edit-image-group],
+[data-studio-active] .nv-capsule-photo__video-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  position: absolute;
+  z-index: 6;
+  border: 1px solid color-mix(in srgb, #fff 30%, transparent);
+  border-radius: var(--radius-control);
+  background: var(--color-carbon);
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.4rem 0.7rem;
+  cursor: pointer;
+  opacity: 0.88;
+  transition: opacity 150ms var(--ease-calm);
+}
+
+[data-studio-active] [data-edit-image-group]:hover,
+[data-studio-active] .nv-capsule-photo__video-btn:hover {
+  opacity: 1;
 }
 
 @media print {

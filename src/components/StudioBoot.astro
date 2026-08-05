@@ -35,10 +35,19 @@
     function safeSrc(v) {
       return (
         typeof v === 'string' &&
-        (/^data:image\/(png|jpeg|jpg|webp|gif|avif|svg\+xml);base64,[A-Za-z0-9+/=\s]+$/i.test(v) ||
+        (/^data:(image\/(png|jpeg|jpg|webp|gif|avif|svg\+xml)|video\/(mp4|webm));base64,[A-Za-z0-9+/=\s]+$/i.test(
+          v,
+        ) ||
           /^\/[^\s"'<>\\]*$/.test(v) ||
           /^https:\/\/[^\s"'<>\\]+$/i.test(v))
       )
+    }
+
+    // Keep in step with MIN/MAX_ROTATION_SECONDS in shared/overrides.ts —
+    // duplicated rather than imported because this script runs is:inline,
+    // before any module graph exists.
+    function safeSeconds(v) {
+      return typeof v === 'number' && isFinite(v) && v >= 2 && v <= 20
     }
 
     function applyTheme(o) {
@@ -62,12 +71,21 @@
       var images = o.images || {}
       for (var ipath in images) {
         if (!safeSrc(images[ipath])) continue
-        var holders = document.querySelectorAll('[data-edit-image="' + cssEscape(ipath) + '"]')
+        // The same override field covers photos and the one capsule video —
+        // both are looked up by the same dotted path, just under a
+        // different attribute name depending on which element it is.
+        var holders = document.querySelectorAll(
+          '[data-edit-image="' + cssEscape(ipath) + '"], [data-edit-video="' + cssEscape(ipath) + '"]',
+        )
         for (var j = 0; j < holders.length; j++) {
           var img = holders[j].querySelector('img')
+          var vid = holders[j].querySelector('video')
           if (img) {
             img.src = images[ipath]
             img.removeAttribute('srcset')
+          } else if (vid) {
+            vid.src = images[ipath]
+            vid.load()
           }
         }
       }
@@ -96,6 +114,18 @@
       }
     }
 
+    function applyTiming(o) {
+      var timing = o.timing || {}
+      for (var path in timing) {
+        if (!safeSeconds(timing[path])) continue
+        var hosts = document.querySelectorAll('[data-timing="' + cssEscape(path) + '"]')
+        for (var i = 0; i < hosts.length; i++) {
+          hosts[i].setAttribute('data-interval-ms', String(Math.round(timing[path] * 1000)))
+          hosts[i].dispatchEvent(new CustomEvent('nv:interval-changed'))
+        }
+      }
+    }
+
     function cssEscape(s) {
       return String(s).replace(/["\\]/g, '\\$&')
     }
@@ -106,9 +136,11 @@
       if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', function () {
           applyContent(o)
+          applyTiming(o)
         })
       } else {
         applyContent(o)
+        applyTiming(o)
       }
     }
 
@@ -135,6 +167,7 @@
       KEY: KEY,
       applyTheme: applyTheme,
       applyContent: applyContent,
+      applyTiming: applyTiming,
       current: local,
       published: published,
     }

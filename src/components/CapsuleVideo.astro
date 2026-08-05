@@ -1,0 +1,30 @@
+---
+/**
+ * A single looping video in place of the example capsule's rotating photos —
+ * for when a short animation says it better than a set of stills. Swapped in
+ * by index.astro only once home.exampleCapsule.video is set; until then the
+ * photo rotator keeps showing.
+ *
+ * Click-to-replace like any other Studio media (see dock.ts's
+ * wireVideoClicks), but deliberately without a cropper: nothing here gets
+ * re-encoded, so there is no aspect to negotiate — the video is expected to
+ * already be cut to roughly this shape.
+ */
+interface Props {
+  src: string
+  editPath: string
+  class?: string
+}
+
+const { src, editPath, class: className = '' } = Astro.props
+---
+
+<div class={`nv-capsule-video relative overflow-hidden ${className}`} data-edit-video={editPath}>
+  <video src={src} class="h-full w-full object-cover" autoplay muted loop playsinline preload="auto" />
+</div>
+
+<style>
+  .nv-capsule-video {
+    background: var(--color-accent-soft);
+  }
+</style>

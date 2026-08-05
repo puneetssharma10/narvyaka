@@ -19,7 +19,7 @@
     },
     "fonts": {
       "wordmark": "'Fraunces Variable', 'Source Serif 4 Variable', Georgia, serif",
-      "heading": "'Fraunces Variable', 'Source Serif 4 Variable', Georgia, serif",
+      "heading": "'Caveat Variable', cursive",
       "body": "'Inter Variable', 'Public Sans Variable', system-ui, sans-serif"
     },
     "logo": {
@@ -111,11 +111,13 @@
     "emailLabel": "Write to us"
   },
   "motion": {
-    "image": "/motion-figure.svg",
-    "alt": "A single figure walking forward"
+    "text": "Because No Generation Should Start From Zero."
   },
   "home": {
     "hero": {
+      "video": "/uploads/home-hero-video.mp4",
+      "videoTwo": "/uploads/home-hero-videotwo.mp4",
+      "transitionSeconds": 0.8,
       "wordmark": "Narvyaka",
       "tagline": "Because No Generation Should Start From Zero.",
       "subhead": "What knowledge should outlive you?",
@@ -130,9 +132,22 @@
       }
     },
     "exampleCapsule": {
+      "rotationSeconds": 7,
+      "video": "",
       "badge": "Example",
       "note": "This is an illustrative capsule showing the format. It is not a real contributor's record. It will be replaced by the first real Wisdom Record once one has been made.",
-      "photo": "",
+      "photos": [
+        "/capsule/01.svg",
+        "/capsule/02.svg",
+        "/capsule/03.svg",
+        "/capsule/04.svg",
+        "/capsule/05.svg",
+        "/capsule/06.svg",
+        "/capsule/07.svg",
+        "/capsule/08.svg",
+        "/capsule/09.svg",
+        "/capsule/10.svg"
+      ],
       "photoCaption": "Placeholder — a real contributor photograph goes here.",
       "lesson": "Ask the question while the person is still in the room. There is no later.",
       "attribution": "Founder's own account",
@@ -240,17 +255,53 @@
       "photoAlt": "Portrait of the founder"
     },
     "wisdomSlider": {
-      "heading": "Nine short thoughts on wisdom",
+      "rotationSeconds": 5.2,
+      "heading": "Eleven short thoughts on wisdom",
       "slides": [
-        { "image": "/wisdom/01-tree.svg", "quote": "Every story kept is a door left open for someone not yet born." },
-        { "image": "/wisdom/02-path.svg", "quote": "Wisdom is not what we know. It is what we manage to pass on." },
-        { "image": "/wisdom/03-hands.svg", "quote": "A voice recorded once can still be heard a hundred years from now." },
-        { "image": "/wisdom/04-book.svg", "quote": "The smallest lesson, kept, can outlast the largest fortune, spent." },
-        { "image": "/wisdom/05-sunrise.svg", "quote": "What we forget to write down, our children learn the hard way instead." },
-        { "image": "/wisdom/06-compass.svg", "quote": "One honest sentence from someone who lived it is worth a shelf of theory." },
-        { "image": "/wisdom/07-seed.svg", "quote": "Memory is fragile. A record is not." },
-        { "image": "/wisdom/08-ripples.svg", "quote": "The best inheritance is not what we own — it is what we understood." },
-        { "image": "/wisdom/09-lantern.svg", "quote": "Listen once. Keep it forever." }
+        {
+          "image": "/wisdom/01-tree.svg",
+          "quote": "Every story kept is a door left open for someone not yet born."
+        },
+        {
+          "image": "/wisdom/02-path.svg",
+          "quote": "Wisdom is not what we know. It is what we manage to pass on."
+        },
+        {
+          "image": "/wisdom/03-hands.svg",
+          "quote": "A voice recorded once can still be heard a hundred years from now."
+        },
+        {
+          "image": "/wisdom/04-book.svg",
+          "quote": "The smallest lesson, kept, can outlast the largest fortune, spent."
+        },
+        {
+          "image": "/wisdom/05-sunrise.svg",
+          "quote": "What we forget to write down, our children learn the hard way instead."
+        },
+        {
+          "image": "/wisdom/06-compass.svg",
+          "quote": "One honest sentence from someone who lived it is worth a shelf of theory."
+        },
+        {
+          "image": "/wisdom/07-seed.svg",
+          "quote": "Memory is fragile. A record is not."
+        },
+        {
+          "image": "/wisdom/08-ripples.svg",
+          "quote": "The best inheritance is not what we own — it is what we understood."
+        },
+        {
+          "image": "/wisdom/09-lantern.svg",
+          "quote": "Listen once. Keep it forever."
+        },
+        {
+          "image": "/wisdom/10-handshake.svg",
+          "quote": "Every generation that teaches the next one is a generation that did not start from zero."
+        },
+        {
+          "image": "/wisdom/11-hourglass.svg",
+          "quote": "Time takes the person. It should not have to take the lesson too."
+        }
       ]
     }
   },
@@ -863,14 +914,14 @@
     },
     "photos": {
       "heading": "Photographs",
-      "intro": "Up to five. A face, a place, a tool, a handwritten page. A record with no photographs is a complete record — this step can be skipped entirely.",
+      "intro": "Up to ten. A face, a place, a tool, a handwritten page. A record with no photographs is a complete record — this step can be skipped entirely.",
       "dropLabel": "Drag photographs here, or choose files",
       "dropHint": "JPEG, PNG, WebP or HEIC. Up to 300 MB each.",
       "captionLabel": "Who, what, or where",
       "captionPlaceholder": "One line, if you want one",
       "removeLabel": "Remove",
       "cropLabel": "Crop",
-      "maxReached": "That is five photographs — the maximum for one record.",
+      "maxReached": "That is ten photographs — the maximum for one record.",
       "tooLarge": "That file is over 300 MB. Try a smaller version.",
       "wrongType": "That file type isn't supported. Use JPEG, PNG or WebP."
     },
@@ -1039,9 +1090,18 @@
       }
     ],
     "footerLinks": [
-      { "label": "Privacy", "href": "/privacy" },
-      { "label": "Copyright", "href": "/terms" },
-      { "label": "Community guidelines", "href": "/volunteer#pledge" }
+      {
+        "label": "Privacy",
+        "href": "/privacy"
+      },
+      {
+        "label": "Copyright",
+        "href": "/terms"
+      },
+      {
+        "label": "Community guidelines",
+        "href": "/volunteer#pledge"
+      }
     ]
   },
   "categories": [
