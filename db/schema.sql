@@ -118,8 +118,8 @@ CREATE TABLE IF NOT EXISTS rate_limits (
 CREATE INDEX IF NOT EXISTS idx_rate_limits_window ON rate_limits (window_start);
 
 -- ── Accounts ───────────────────────────────────────────────────────────────
--- Four tiers. Only three ever get a row here — a reader is just a visitor,
--- nothing to store.
+-- Five tiers. Only four ever get a row here — an anonymous visitor is just
+-- that, nothing to store.
 --
 --   super_admin   You. Site content (the Studio), creating/revoking admins,
 --                 everything an admin can do.
@@ -127,7 +127,15 @@ CREATE INDEX IF NOT EXISTS idx_rate_limits_window ON rate_limits (window_start);
 --                 accounts. Cannot touch the Studio and cannot create another
 --                 admin — that boundary is deliberate, see CONTENT_STATUS.md.
 --   volunteer     Can create records and edit only the records they own
---                 (submissions.owner_user_id = their own id). Nothing else.
+--                 (submissions.owner_user_id = their own id). Can download
+--                 what they own always, everything only if can_download is
+--                 set.
+--   reader        Self-signup, no admin approval — a plain registered
+--                 account. Full view of published records, same as a
+--                 volunteer's view; never a download, regardless of any
+--                 flag.
+--   (anonymous)   No account at all. Sees a teaser only — never the full
+--                 record — see functions/api/capsule/[id].ts.
 --
 -- Passwords are salted PBKDF2-SHA256, hashed in the Worker with WebCrypto —
 -- never anything reversible, never plaintext, never logged.
@@ -138,11 +146,16 @@ CREATE TABLE IF NOT EXISTS users (
   role            TEXT NOT NULL,
   status          TEXT NOT NULL DEFAULT 'active',
   must_change_password INTEGER NOT NULL DEFAULT 0,  -- set on admin-issued temp passwords
+  -- Only ever meaningful for role = 'volunteer'. Without it, a volunteer can
+  -- still download whatever they own (owner_user_id match) — this is what
+  -- extends that to every published record. Granted/revoked by the
+  -- super_admin alone (functions/api/admin/users/[id].ts).
+  can_download    INTEGER NOT NULL DEFAULT 0,
   created_at      TEXT NOT NULL,
   created_by      TEXT,                   -- user id that approved/created this account
   last_login_at   TEXT,
 
-  CHECK (role IN ('super_admin', 'admin', 'volunteer')),
+  CHECK (role IN ('super_admin', 'admin', 'volunteer', 'reader')),
   CHECK (status IN ('active', 'revoked'))
 );
 
