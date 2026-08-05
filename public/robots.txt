@@ -12,4 +12,45 @@ Disallow: /studio
 Disallow: /preserve
 Disallow: /record-someone
 
+# Named AI crawlers and scrapers, blocked outright — the note above about
+# training isn't a request for these specifically, it's the reason for them.
+User-agent: GPTBot
+Disallow: /
+
+User-agent: ChatGPT-User
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: ClaudeBot
+Disallow: /
+
+User-agent: Claude-Web
+Disallow: /
+
+User-agent: anthropic-ai
+Disallow: /
+
+User-agent: Google-Extended
+Disallow: /
+
+User-agent: Applebot-Extended
+Disallow: /
+
+User-agent: Bytespider
+Disallow: /
+
+User-agent: Amazonbot
+Disallow: /
+
+User-agent: PerplexityBot
+Disallow: /
+
+User-agent: Meta-ExternalAgent
+Disallow: /
+
+User-agent: Diffbot
+Disallow: /
+
 # Sitemap is added automatically once a domain is set in site.config.ts.

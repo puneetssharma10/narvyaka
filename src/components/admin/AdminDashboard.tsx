@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
 
-type Role = 'super_admin' | 'admin' | 'volunteer'
+type Role = 'super_admin' | 'admin' | 'volunteer' | 'reader'
 interface Me {
   id: string
   email: string
   role: Role
   mustChangePassword: boolean
+  canDownload: boolean
 }
 
 interface VolunteerRow {
@@ -36,6 +37,7 @@ interface UserRow {
   email: string
   role: Role
   status: string
+  can_download: number
   created_at: string
   last_login_at: string | null
 }
@@ -148,7 +150,7 @@ export default function AdminDashboard() {
       {tab === 'volunteers' && isReviewer && <VolunteerQueue onApproved={setTempCred} />}
       {tab === 'submissions' && isReviewer && <SubmissionQueue />}
       {tab === 'accounts' && isReviewer && <Accounts me={me} onCreated={setTempCred} />}
-      {tab === 'mine' && <MyRecords />}
+      {tab === 'mine' && <MyRecords canDownload={me.role !== 'reader'} />}
     </div>
   )
 }
@@ -358,6 +360,9 @@ function SubmissionQueue() {
                 Withdraw
               </button>
             )}
+            <a className="btn btn-quiet" href={`/api/submissions/${row.id}/download`}>
+              Download
+            </a>
           </div>
         </div>
       ))}
@@ -380,6 +385,18 @@ function Accounts({ me, onCreated }: { me: Me; onCreated: (cred: { email: string
   async function toggle(row: UserRow) {
     setBusyId(row.id)
     const action = row.status === 'active' ? 'revoke' : 'reactivate'
+    const { ok, data } = await api<{ error?: string }>(`/api/admin/users/${row.id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ action }),
+    })
+    setBusyId(null)
+    if (!ok) setError((data as { error?: string }).error ?? 'Could not change that account.')
+    void load()
+  }
+
+  async function toggleDownload(row: UserRow) {
+    setBusyId(row.id)
+    const action = row.can_download ? 'revoke_download' : 'grant_download'
     const { ok, data } = await api<{ error?: string }>(`/api/admin/users/${row.id}`, {
       method: 'PATCH',
       body: JSON.stringify({ action }),
@@ -426,20 +443,29 @@ function Accounts({ me, onCreated }: { me: Me; onCreated: (cred: { email: string
       <div className="grid gap-3">
         {rows?.map((row) => {
           const canAct = me.role === 'super_admin' ? row.id !== me.id : row.role === 'volunteer'
+          const canGrantDownload = me.role === 'super_admin' && row.role === 'volunteer'
           return (
             <div key={row.id} className="card flex flex-wrap items-center justify-between gap-3 p-5">
               <div>
                 <p className="m-0 font-medium">{row.email}</p>
                 <p className="m-0 text-[0.85rem] text-muted">
                   {row.role.replace('_', ' ')} · {row.status}
+                  {row.role === 'volunteer' && row.can_download ? ' · can download everything' : ''}
                   {row.last_login_at ? ` · last seen ${new Date(row.last_login_at).toLocaleDateString()}` : ''}
                 </p>
               </div>
-              {canAct && (
-                <button className="btn btn-quiet" disabled={busyId === row.id} onClick={() => void toggle(row)}>
-                  {row.status === 'active' ? 'Revoke' : 'Reactivate'}
-                </button>
-              )}
+              <div className="flex flex-wrap gap-2">
+                {canGrantDownload && (
+                  <button className="btn btn-quiet" disabled={busyId === row.id} onClick={() => void toggleDownload(row)}>
+                    {row.can_download ? 'Revoke download-all' : 'Grant download-all'}
+                  </button>
+                )}
+                {canAct && (
+                  <button className="btn btn-quiet" disabled={busyId === row.id} onClick={() => void toggle(row)}>
+                    {row.status === 'active' ? 'Revoke' : 'Reactivate'}
+                  </button>
+                )}
+              </div>
             </div>
           )
         })}
@@ -448,7 +474,7 @@ function Accounts({ me, onCreated }: { me: Me; onCreated: (cred: { email: string
   )
 }
 
-function MyRecords() {
+function MyRecords({ canDownload }: { canDownload: boolean }) {
   const [rows, setRows] = useState<MySubmissionRow[] | null>(null)
 
   useEffect(() => {
@@ -478,6 +504,11 @@ function MyRecords() {
           <p className="m-0 mt-2 text-[0.85rem] text-muted">
             {row.status} · submitted {new Date(row.submitted_at).toLocaleDateString()}
           </p>
+          {canDownload && (
+            <a className="btn btn-quiet mt-3" href={`/api/submissions/${row.id}/download`}>
+              Download
+            </a>
+          )}
         </div>
       ))}
     </div>

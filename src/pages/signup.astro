@@ -1,0 +1,22 @@
+---
+import Base from '../layouts/Base.astro'
+import PageHeader from '../components/PageHeader.astro'
+import SignupForm from '../components/admin/SignupForm'
+---
+
+<Base title="Create an account" noindex>
+  <PageHeader
+    eyebrow="Narvyaka"
+    heading="Create an account"
+    intro="A free reader account — nothing to approve, no download access. Everyone can already read the archive without one; signing in just makes it yours."
+  />
+
+  <section class="section">
+    <div class="wrap-read">
+      <SignupForm client:load />
+      <p class="mt-6 text-[0.9rem] text-muted">
+        Already have an account? <a href="/login">Sign in</a>.
+      </p>
+    </div>
+  </section>
+</Base>

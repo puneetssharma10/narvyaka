@@ -29,6 +29,14 @@ const isActive = (href: string) => path === href || (href !== '/' && path.starts
           </a>
         ))
       }
+      <a
+        href="/login"
+        class={`text-[0.78rem] font-semibold uppercase tracking-[0.12em] no-underline transition-colors hover:text-accent ${
+          isActive('/login') || isActive('/admin') ? 'text-accent' : 'text-muted'
+        }`}
+      >
+        Sign in
+      </a>
       <a href={cta.href} class="btn btn-primary px-4 py-2.5 text-[0.78rem] uppercase tracking-[0.1em]" {...editable('nav.cta.label')}>
         {cta.label}
       </a>
@@ -57,6 +65,9 @@ const isActive = (href: string) => path === href || (href !== '/' && path.starts
           </a>
         ))
       }
+      <a href="/login" class="rounded-[4px] px-2 py-2.5 text-[0.85rem] font-semibold uppercase tracking-[0.1em] text-ink no-underline hover:bg-accent-soft">
+        Sign in
+      </a>
       <a href={cta.href} class="btn btn-primary mt-2">{t('nav.cta.label')}</a>
     </div>
   </nav>
