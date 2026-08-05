@@ -27,6 +27,13 @@ export interface SessionUser {
   email: string
   role: Role
   mustChangePassword: boolean
+  /** Only ever true for a volunteer — granted/revoked by the super_admin.
+   *  See functions/api/admin/users/[id].ts. */
+  canDownload: boolean
+  /** Only ever set for an admin — which country's records they can read
+   *  and write. null means unscoped: every record (super_admin, always;
+   *  an admin, only until assigned one). */
+  country: string | null
 }
 
 const SESSION_COOKIE = 'nv_session'
@@ -69,7 +76,7 @@ async function pbkdf2(password: string, salt: Uint8Array, iterations: number): P
 /** Rejects passwords too weak to bother hashing — checked before hashPassword. */
 export function passwordIssues(password: string): string[] {
   const issues: string[] = []
-  if (password.length < 10) issues.push('Use at least 10 characters.')
+  if (password.length < 6) issues.push('Use at least 6 characters.')
   if (password.length > 200) issues.push('That password is unreasonably long.')
   return issues
 }
@@ -121,16 +128,31 @@ export async function getSession(env: Env, request: Request): Promise<SessionUse
 
   const tokenHash = await sha256Hex(token)
   const row = await env.DB.prepare(
-    `SELECT u.id, u.email, u.role, u.status, u.must_change_password
+    `SELECT u.id, u.email, u.role, u.status, u.must_change_password, u.can_download, u.country
      FROM sessions s JOIN users u ON u.id = s.user_id
      WHERE s.token_hash = ?1 AND s.expires_at > ?2`,
   )
     .bind(tokenHash, new Date().toISOString())
-    .first<{ id: string; email: string; role: Role; status: string; must_change_password: number }>()
+    .first<{
+      id: string
+      email: string
+      role: Role
+      status: string
+      must_change_password: number
+      can_download: number
+      country: string | null
+    }>()
 
   if (!row || row.status !== 'active') return null
 
-  return { id: row.id, email: row.email, role: row.role, mustChangePassword: row.must_change_password === 1 }
+  return {
+    id: row.id,
+    email: row.email,
+    role: row.role,
+    mustChangePassword: row.must_change_password === 1,
+    canDownload: row.can_download === 1,
+    country: row.country,
+  }
 }
 
 /** Every protected route starts with this. Returns a ready 401/403, or null if allowed. */
