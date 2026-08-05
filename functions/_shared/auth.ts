@@ -40,7 +40,11 @@ export interface SessionUser {
 
 const SESSION_COOKIE = 'nv_session'
 const SESSION_DAYS = 30
-const PBKDF2_ITERATIONS = 210_000 // OWASP 2023 minimum for PBKDF2-SHA256
+// OWASP's 2023 minimum for PBKDF2-SHA256 is 210,000 — but the Workers
+// runtime's WebCrypto refuses anything above 100,000 ("NotSupportedError:
+// Pbkdf2 failed: iteration counts above 100000 are not supported"), a hard
+// platform ceiling this code cannot ask past. 100,000 it is.
+const PBKDF2_ITERATIONS = 100_000
 
 /* ── Passwords ───────────────────────────────────────────────────────────── */
 
