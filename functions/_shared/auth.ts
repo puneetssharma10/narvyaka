@@ -3,7 +3,7 @@ import { fail, type Env } from './env'
 /**
  * Accounts, passwords and sessions.
  *
- * Four tiers exist; only three ever have a row in `users`:
+ * Five tiers exist; four ever have a row in `users`:
  *
  *   super_admin  You. The only role that can publish Studio edits to the
  *                live site, and the only one that can create another admin.
@@ -12,21 +12,30 @@ import { fail, type Env } from './env'
  *                another admin — see CONTENT_STATUS.md for why that
  *                boundary is deliberate rather than an oversight.
  *   volunteer    Can create records and edit only the ones they own
- *                (submissions.owner_user_id = their own id). Nothing else.
- *   (reader)     No account at all — the public site, unchanged.
+ *                (submissions.owner_user_id = their own id). Can always
+ *                download what they own; everything only if can_download
+ *                is set (super_admin grants/revokes it — see
+ *                functions/api/admin/users/[id].ts).
+ *   reader       Self-signup, no admin approval. Full view of any
+ *                published record, same as a volunteer's view — never a
+ *                download, regardless of anything.
+ *   (anonymous)  No account at all. A teaser only, never the full record —
+ *                see functions/api/capsule/[id].ts.
  *
  * Passwords are PBKDF2-SHA256 with a random salt, computed with the
  * platform's own WebCrypto — no third-party crypto dependency, nothing
  * reversible, nothing ever logged.
  */
 
-export type Role = 'super_admin' | 'admin' | 'volunteer'
+export type Role = 'super_admin' | 'admin' | 'volunteer' | 'reader'
 
 export interface SessionUser {
   id: string
   email: string
   role: Role
   mustChangePassword: boolean
+  /** Only ever true for a volunteer — see the can_download note above. */
+  canDownload: boolean
 }
 
 const SESSION_COOKIE = 'nv_session'
@@ -121,16 +130,29 @@ export async function getSession(env: Env, request: Request): Promise<SessionUse
 
   const tokenHash = await sha256Hex(token)
   const row = await env.DB.prepare(
-    `SELECT u.id, u.email, u.role, u.status, u.must_change_password
+    `SELECT u.id, u.email, u.role, u.status, u.must_change_password, u.can_download
      FROM sessions s JOIN users u ON u.id = s.user_id
      WHERE s.token_hash = ?1 AND s.expires_at > ?2`,
   )
     .bind(tokenHash, new Date().toISOString())
-    .first<{ id: string; email: string; role: Role; status: string; must_change_password: number }>()
+    .first<{
+      id: string
+      email: string
+      role: Role
+      status: string
+      must_change_password: number
+      can_download: number
+    }>()
 
   if (!row || row.status !== 'active') return null
 
-  return { id: row.id, email: row.email, role: row.role, mustChangePassword: row.must_change_password === 1 }
+  return {
+    id: row.id,
+    email: row.email,
+    role: row.role,
+    mustChangePassword: row.must_change_password === 1,
+    canDownload: row.can_download === 1,
+  }
 }
 
 /** Every protected route starts with this. Returns a ready 401/403, or null if allowed. */
@@ -156,12 +178,12 @@ export function readCookie(request: Request, name: string): string | null {
   return null
 }
 
-function randomToken(): string {
+export function randomToken(): string {
   const bytes = crypto.getRandomValues(new Uint8Array(32))
   return toBase64Url(bytes)
 }
 
-async function sha256Hex(input: string): Promise<string> {
+export async function sha256Hex(input: string): Promise<string> {
   const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(input))
   return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, '0')).join('')
 }
