@@ -115,9 +115,9 @@ diagonal between them carrying the cobalt-to-Rosso gradient. Also at
 `public/logo.svg` and in the favicon. A supplied logo file dropped in via the
 Studio still replaces it entirely, with no component changes.
 
-**Scope.** Ten records, two volunteers — stated on the homepage and enforced on
-`/volunteer`, which advertises exactly two openings and offers only those two in
-the form.
+**Scope.** Ten records is the first-phase target, stated on the homepage.
+Volunteering is not capped: `/volunteer` advertises every role and the form
+offers all of them, both built from `volunteer.openings` so they cannot drift.
 
 ---
 

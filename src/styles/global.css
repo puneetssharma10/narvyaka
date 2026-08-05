@@ -9,6 +9,18 @@
 @import '@fontsource-variable/public-sans/wght.css';
 @import '@fontsource-variable/fraunces/wght.css';
 @import '@fontsource-variable/fraunces/wght-italic.css';
+@import '@fontsource-variable/lora/wght.css';
+@import '@fontsource-variable/source-serif-4/wght.css';
+@import '@fontsource-variable/playfair-display/wght.css';
+
+/* Artistic and handwritten faces — for anyone who wants the site to read
+   less like software and more like a kept notebook. */
+@import '@fontsource-variable/caveat/wght.css';
+@import '@fontsource-variable/dancing-script/wght.css';
+@import '@fontsource/patrick-hand/400.css';
+@import '@fontsource/shadows-into-light/400.css';
+@import '@fontsource/homemade-apple/400.css';
+@import '@fontsource/great-vibes/400.css';
 
 /* ───────────────────────────────────────────────────────────────────────────
    DESIGN TOKENS
@@ -54,7 +66,7 @@
      natural italic cut for the wordmark and pull-quotes. Inter stays for
      body copy — a page of italic serif paragraphs is a strain to read. */
   --font-wordmark: 'Fraunces Variable', 'Source Serif 4 Variable', Georgia, serif;
-  --font-heading: 'Fraunces Variable', 'Source Serif 4 Variable', Georgia, serif;
+  --font-heading: 'Caveat Variable', cursive;
   --font-body: 'Inter Variable', 'Public Sans Variable', system-ui, sans-serif;
 
   /* Radius — Build Brief §2.3: soft, not sharp, not pill-shaped. */
@@ -196,6 +208,22 @@
     background: var(--color-surface);
     border: 1px solid var(--color-hairline);
     border-radius: var(--radius-card);
+    transition:
+      transform 220ms var(--ease-calm),
+      box-shadow 220ms var(--ease-calm),
+      border-color 220ms var(--ease-calm);
+  }
+
+  .card:hover {
+    transform: translateY(-3px);
+    border-color: color-mix(in srgb, var(--color-accent) 30%, var(--color-hairline));
+    box-shadow: 0 20px 36px -20px rgba(11, 14, 20, 0.18);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card:hover {
+      transform: none;
+    }
   }
 
   /* ── Dark carbon sections ────────────────────────────────────────────── */
@@ -286,6 +314,14 @@
   .btn-primary:hover:not(:disabled) {
     background: var(--color-accent-hover);
     border-color: var(--color-accent-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 10px 24px -12px color-mix(in srgb, var(--color-accent) 55%, transparent);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .btn-primary:hover:not(:disabled) {
+      transform: none;
+    }
   }
 
   .btn-secondary {
@@ -544,6 +580,160 @@
 }
 
 /* ───────────────────────────────────────────────────────────────────────────
+   AMBIENT — slow background motion for a premium, high-end feel. Idle drift
+   and hover response only, never scroll-linked parallax. Every animation
+   here freezes under prefers-reduced-motion instead of simply speeding up.
+   ─────────────────────────────────────────────────────────────────────────── */
+@layer utilities {
+  /* Two soft, slowly drifting colour blobs behind hero-style sections. The
+     host element needs position:relative + overflow:hidden (both already
+     true of .relative.overflow-hidden sections). */
+  .ambient-glow {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .ambient-glow::before,
+  .ambient-glow::after {
+    content: '';
+    position: absolute;
+    width: 46vw;
+    height: 46vw;
+    max-width: 640px;
+    max-height: 640px;
+    border-radius: 50%;
+    filter: blur(64px);
+    opacity: 0.16;
+    animation: nv-drift 26s var(--ease-calm) infinite alternate;
+  }
+
+  .ambient-glow::before {
+    top: -14%;
+    left: -8%;
+    background: var(--color-accent);
+  }
+
+  .ambient-glow::after {
+    right: -10%;
+    bottom: -18%;
+    background: var(--color-signal);
+    animation-duration: 32s;
+    animation-delay: -6s;
+  }
+
+  @keyframes nv-drift {
+    0% {
+      transform: translate(0, 0) scale(1);
+    }
+    50% {
+      transform: translate(4%, 5%) scale(1.12);
+    }
+    100% {
+      transform: translate(-3%, -2%) scale(0.96);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ambient-glow::before,
+    .ambient-glow::after {
+      animation: none;
+    }
+  }
+
+  /* A soft radial highlight that follows the pointer — desktop, fine-pointer
+     only. Off by default; a script toggles --spot-x/--spot-y and .has-spot. */
+  .hero-spotlight {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 400ms var(--ease-calm);
+    background: radial-gradient(
+      420px circle at var(--spot-x, 50%) var(--spot-y, 20%),
+      color-mix(in srgb, var(--color-accent) 10%, transparent) 0%,
+      transparent 70%
+    );
+  }
+
+  .has-spot .hero-spotlight {
+    opacity: 1;
+  }
+
+  @media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) {
+    .hero-spotlight {
+      display: none;
+    }
+  }
+
+  /* Slow pan on the technical grid patterns — barely perceptible, reads as
+     a live schematic rather than a static print. */
+  .grid-field-light,
+  .grid-field {
+    animation: nv-grid-pan 50s linear infinite;
+  }
+
+  @keyframes nv-grid-pan {
+    from {
+      background-position: 0 0;
+    }
+    to {
+      background-position: 144px 144px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .grid-field-light,
+    .grid-field {
+      animation: none;
+    }
+  }
+
+  /* A slow light sweep along the signature top bar, instead of a static
+     gradient sitting still. */
+  .light-signature {
+    background: linear-gradient(90deg, var(--color-signal) 0%, var(--color-accent) 35%, transparent 60%, var(--color-signal) 100%);
+    background-size: 220% 100%;
+    animation: nv-sweep 9s ease-in-out infinite;
+  }
+
+  @keyframes nv-sweep {
+    0%,
+    100% {
+      background-position: 0% 0;
+    }
+    50% {
+      background-position: 100% 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .light-signature {
+      animation: none;
+      background-position: 0 0;
+    }
+  }
+
+  /* Lift on hover — cards and links that act as one large click target. */
+  .lift {
+    transition:
+      transform 220ms var(--ease-calm),
+      box-shadow 220ms var(--ease-calm);
+  }
+
+  .lift:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 32px -18px rgba(11, 14, 20, 0.22);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .lift:hover {
+      transform: none;
+    }
+  }
+}
+
+/* ───────────────────────────────────────────────────────────────────────────
    STUDIO — visual editor chrome. Never present unless the Studio is open.
    ─────────────────────────────────────────────────────────────────────────── */
 [data-studio-active] [data-edit]:not([contenteditable]) {
@@ -566,11 +756,13 @@
   background: color-mix(in srgb, var(--color-accent) 5%, transparent);
 }
 
-[data-studio-active] [data-edit-image] {
+[data-studio-active] [data-edit-image],
+[data-studio-active] [data-edit-video] {
   position: relative;
 }
 
-[data-studio-active] [data-edit-image]::after {
+[data-studio-active] [data-edit-image]::after,
+[data-studio-active] [data-edit-video]::after {
   content: 'Replace image';
   position: absolute;
   inset-inline-start: 50%;
@@ -588,20 +780,66 @@
   z-index: 5;
 }
 
-[data-studio-active] [data-edit-image]:hover::after {
+[data-studio-active] [data-edit-video]::after {
+  content: 'Replace video';
+}
+
+[data-studio-active] [data-edit-image]:hover::after,
+[data-studio-active] [data-edit-video]:hover::after {
   opacity: 1;
 }
 
-[data-studio-active] [data-edit-image]:hover {
+[data-studio-active] [data-edit-image]:hover,
+[data-studio-active] [data-edit-video]:hover {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
   cursor: pointer;
 }
 
 [data-studio-dropping] [data-edit-image],
+[data-studio-dropping] [data-edit-video],
 [data-studio-dropping] [data-logo-slot] {
   outline: 2px dashed var(--color-accent);
   outline-offset: 3px;
+}
+
+/* "Upload all N" (a bulk file picker for a whole set of images) and "Use a
+   video instead" (switches the example capsule to a single video — see
+   CapsulePhotoRotator) share this look and this gating: invisible and inert
+   until the Studio is actually open, same as every other Studio affordance.
+   Deliberately kept here rather than in either component's own scoped
+   <style>: an Astro scoped block silently rewrites a *leading* ancestor
+   attribute selector like [data-studio-active] to also require that
+   component's own data-astro-cid, which <html> never has — so the same rule
+   written inside the component would never match anything. */
+[data-edit-image-group],
+.nv-capsule-photo__video-btn {
+  display: none;
+}
+
+[data-studio-active] [data-edit-image-group],
+[data-studio-active] .nv-capsule-photo__video-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  position: absolute;
+  z-index: 6;
+  border: 1px solid color-mix(in srgb, #fff 30%, transparent);
+  border-radius: var(--radius-control);
+  background: var(--color-carbon);
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.4rem 0.7rem;
+  cursor: pointer;
+  opacity: 0.88;
+  transition: opacity 150ms var(--ease-calm);
+}
+
+[data-studio-active] [data-edit-image-group]:hover,
+[data-studio-active] .nv-capsule-photo__video-btn:hover {
+  opacity: 1;
 }
 
 @media print {

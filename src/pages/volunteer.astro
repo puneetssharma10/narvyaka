@@ -7,8 +7,8 @@ import { content, editable, t } from '../lib/content'
 import { siteConfig } from '../../site.config'
 
 const v = content.volunteer
-// Only the two open positions are selectable — we do not collect applications
-// for roles that have no work attached to them yet.
+// Every role on the page is selectable in the form — the two lists are built
+// from one source so an opening can never be advertised but not applicable for.
 const roleNames = v.openings.map((opening) => opening.title)
 ---
 
@@ -22,16 +22,18 @@ const roleNames = v.openings.map((opening) => opening.title)
     introPath="volunteer.intro"
   />
 
-  <!-- ── The two openings ──────────────────────────────────────────────── -->
+  <!-- ── The open roles ────────────────────────────────────────────────── -->
   <section class="section border-b border-hairline">
-    <div class="wrap">
+    <!-- Stacked rather than a two-column split, but held to the reading
+         measure: full `wrap` width would run these lines past 120 characters. -->
+    <div class="wrap-read">
       <div class="max-w-[54ch]">
         <span class="light-bar mb-6"></span>
         <h2 {...editable('volunteer.rolesHeading')}>{t('volunteer.rolesHeading')}</h2>
         <p class="mt-5 text-muted" {...editable('volunteer.rolesIntro')}>{t('volunteer.rolesIntro')}</p>
       </div>
 
-      <div class="mt-12 grid gap-6 lg:grid-cols-2">
+      <div class="mt-12 grid gap-6">
         {
           v.openings.map((opening, i) => (
             <article class="card reveal flex flex-col p-7 md:p-9" style={`transition-delay:${i * 70}ms`}>
@@ -104,30 +106,6 @@ const roleNames = v.openings.map((opening) => opening.title)
       <p class="mx-auto mt-7 max-w-[52ch] leading-[1.7] text-muted" {...editable('volunteer.commitmentNote')}>
         {t('volunteer.commitmentNote')}
       </p>
-    </div>
-  </section>
-
-  <!-- ── Roles that are not open yet ───────────────────────────────────── -->
-  <section class="section border-b border-hairline">
-    <div class="wrap-read reveal">
-      <h2 class="font-heading text-[1.3rem] text-muted" {...editable('volunteer.laterHeading')}>
-        {t('volunteer.laterHeading')}
-      </h2>
-      <p class="mt-3 text-[0.98rem] text-muted" {...editable('volunteer.laterIntro')}>
-        {t('volunteer.laterIntro')}
-      </p>
-      <ul class="mt-6 flex list-none flex-wrap gap-2 p-0">
-        {
-          v.laterRoles.map((role, i) => (
-            <li
-              class="rounded-[3px] border border-hairline px-3 py-1.5 text-[0.8rem] font-medium uppercase tracking-[0.1em] text-muted"
-              {...editable(`volunteer.laterRoles.${i}`)}
-            >
-              {role}
-            </li>
-          ))
-        }
-      </ul>
     </div>
   </section>
 

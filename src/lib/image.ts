@@ -46,11 +46,21 @@ export function loadImageElement(src: string): Promise<HTMLImageElement> {
   })
 }
 
-export function readAsDataUrl(file: File): Promise<string> {
+/**
+ * `onProgress` (0–1) is optional and only meaningful for larger files —
+ * photos finish reading fast enough that it isn't worth wiring up, but
+ * video (read inline, not re-encoded) can take a visible moment.
+ */
+export function readAsDataUrl(file: File, onProgress?: (fraction: number) => void): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
     reader.onload = () => resolve(String(reader.result))
     reader.onerror = () => reject(new Error('That file could not be read.'))
+    if (onProgress) {
+      reader.onprogress = (event) => {
+        if (event.lengthComputable) onProgress(event.loaded / event.total)
+      }
+    }
     reader.readAsDataURL(file)
   })
 }

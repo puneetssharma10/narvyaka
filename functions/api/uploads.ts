@@ -9,6 +9,7 @@ import {
   requireBindings,
   type Env,
 } from '../_shared/env'
+import { PRIMARY_NODE_ID } from '../_shared/storage-nodes'
 
 /**
  * POST /api/uploads — one audio recording or photograph, multipart.
@@ -88,10 +89,13 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
   // Best-effort index. A missing row must not fail an upload that succeeded.
   if (env.DB) {
     try {
+      // This path always writes through the binding, so the object is always
+      // on the primary bucket — never a remote node.
       await env.DB.prepare(
-        `INSERT INTO uploads (key, record_id, kind, content_type, bytes, uploaded_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6)`,
+        `INSERT INTO uploads (key, record_id, kind, content_type, bytes, uploaded_at, storage_node)
+         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)`,
       )
-        .bind(key, recordId, kind, declaredType, file.size, new Date().toISOString())
+        .bind(key, recordId, kind, declaredType, file.size, new Date().toISOString(), PRIMARY_NODE_ID)
         .run()
     } catch {
       /* the object is stored; the index can be rebuilt from the bucket */

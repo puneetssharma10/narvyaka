@@ -10,6 +10,9 @@ import {
   COLOR_TOKENS,
   FONT_OPTIONS,
   FONT_SLOTS,
+  MAX_ROTATION_SECONDS,
+  MIN_ROTATION_SECONDS,
+  clampRotationSeconds,
   parseOverrides,
   type ColorToken,
   type FontSlot,
@@ -23,6 +26,13 @@ import { studioStore, type StudioStore } from './store'
 const STORAGE_OPEN = 'narvyaka.studio.open'
 const STORAGE_TOKEN = 'narvyaka.studio.token'
 const EXPORT_FILENAME = 'narvyaka-overrides.json'
+
+// Video is stored inline as base64, same as a photo — but unlike a photo it
+// is never re-encoded down first, so this cap is far stricter than
+// MAX_UPLOAD_BYTES (300 MB, meant for a file the Cropper is about to shrink).
+// 6 MB stays under isSafeImageSrc's 10M-character ceiling once base64
+// inflates it by ~4/3 (6 MB -> ~8.39M characters).
+const MAX_VIDEO_UPLOAD_BYTES = 6 * 1024 * 1024
 
 let mounted = false
 
@@ -71,6 +81,7 @@ class Dock {
         this.sectionType(),
         this.sectionLogo(),
         this.sectionImages(),
+        this.sectionTiming(),
         this.sectionPublish(),
       ]),
       h('div', { class: 'nv-dock__foot' }, [
@@ -92,6 +103,8 @@ class Dock {
     )
 
     this.wireImageClicks()
+    this.wireImageGroupClicks()
+    this.wireVideoClicks()
     this.wireGlobalDrop()
     this.refreshCount()
   }
@@ -338,11 +351,98 @@ class Dock {
     ])
   }
 
+  /**
+   * One slider per [data-timing] host found on the current page — the
+   * example capsule photos, the wisdom-thoughts slider, and anything else
+   * built the same way later. Deliberately not a fixed list: this section
+   * doesn't know what "capsule photos" or "wisdom slider" are, only that
+   * some element asked to have its rotation speed controlled.
+   */
+  private sectionTiming(): HTMLElement {
+    const hosts = new Map<string, { label: string; el: HTMLElement; min: number; max: number; step: number }>()
+    document.querySelectorAll<HTMLElement>('[data-timing]').forEach((el) => {
+      const path = el.getAttribute('data-timing')
+      if (!path || hosts.has(path)) return
+      // A host can declare its own narrower range (the hero video's
+      // crossfade wants ~0.2–2.5s, nothing like a photo rotator's 2–20s) —
+      // absent that, it gets the same range every rotator has always used.
+      const min = Number(el.dataset.timingMin)
+      const max = Number(el.dataset.timingMax)
+      const step = Number(el.dataset.timingStep)
+      hosts.set(path, {
+        label: el.getAttribute('data-timing-label') || path,
+        el,
+        min: Number.isFinite(min) ? min : MIN_ROTATION_SECONDS,
+        max: Number.isFinite(max) ? max : MAX_ROTATION_SECONDS,
+        step: Number.isFinite(step) && step > 0 ? step : 0.5,
+      })
+    })
+
+    if (hosts.size === 0) {
+      return this.section('Timing', false, [
+        h('p', { class: 'nv-sec__note' }, ['No auto-rotating galleries on this page.']),
+      ])
+    }
+
+    const children: Node[] = [
+      h('p', { class: 'nv-sec__note' }, [
+        'How long each picture (or, for a video crossfade, the fade itself) takes before the next one takes over. Applies live as you drag — no reload.',
+      ]),
+    ]
+
+    for (const [path, { label, el, min, max, step }] of hosts) {
+      const currentMs = Number(el.dataset.intervalMs)
+      const initial = clampRotationSeconds(Number.isFinite(currentMs) && currentMs > 0 ? currentMs / 1000 : min, min, max)
+
+      const valueLabel = h('span', { style: 'font-size:11.5px;color:#6B675F' }, [`${initial.toFixed(1)}s`])
+
+      const slider = h('input', {
+        type: 'range',
+        min: String(min),
+        max: String(max),
+        step: String(step),
+        value: String(initial),
+        style: 'width:100%;accent-color:var(--nv-accent)',
+        onInput: (e: Event) => {
+          const seconds = clampRotationSeconds((e.target as HTMLInputElement).value, min, max)
+          valueLabel.textContent = `${seconds.toFixed(1)}s`
+          this.store.setTiming(path, seconds)
+        },
+      }) as HTMLInputElement
+
+      children.push(
+        h('div', { style: 'margin-top:14px' }, [
+          h('div', { style: 'display:flex;justify-content:space-between;align-items:baseline;gap:8px' }, [
+            h('label', { class: 'nv-label', style: 'margin-bottom:0' }, [label]),
+            valueLabel,
+          ]),
+          slider,
+        ]),
+      )
+    }
+
+    children.push(
+      h(
+        'button',
+        {
+          class: 'nv-btn nv-btn--ghost nv-btn--wide',
+          style: 'margin-top:12px',
+          onClick: () => {
+            for (const path of hosts.keys()) this.store.clearTiming(path)
+          },
+        },
+        [hosts.size === 1 ? 'Reset to default' : `Reset all ${hosts.size} to default`],
+      ),
+    )
+
+    return this.section('Timing', false, children)
+  }
+
   private sectionPublish(): HTMLElement {
     const token = h('input', {
       class: 'nv-input',
       type: 'password',
-      placeholder: 'Studio token (see INTEGRATIONS.md)',
+      placeholder: 'Studio token — only needed if not signed in',
       value: localStorage.getItem(STORAGE_TOKEN) ?? '',
       onChange: (e: Event) => localStorage.setItem(STORAGE_TOKEN, (e.target as HTMLInputElement).value),
     }) as HTMLInputElement
@@ -360,25 +460,33 @@ class Dock {
 
     return this.section('Save & publish', false, [
       h('p', { class: 'nv-sec__note' }, [
-        'Two ways to keep these changes. Export writes a file you apply to the code — that is the permanent one. Publishing to the server stores them for every visitor without a rebuild, which is useful for a quick correction.',
+        'Publish sends everything above straight to the live site — every visitor sees it immediately, nothing to run. If you’re signed in as the admin, that alone is enough — just click. The token below is only a fallback for publishing while signed out.',
       ]),
-      h('button', { class: 'nv-btn nv-btn--primary nv-btn--wide', onClick: () => this.exportOverrides() }, [
-        'Export changes to a file',
-      ]),
-      h('p', { class: 'nv-sec__note' }, [
-        'Then run this in the project folder:',
-        h('code', { style: 'display:block;margin-top:5px;font-size:11.5px;overflow-wrap:anywhere' }, [
-          `npm run studio:apply ~/Downloads/${EXPORT_FILENAME}`,
-        ]),
-      ]),
-      h('button', { class: 'nv-btn nv-btn--ghost nv-btn--wide', onClick: () => this.copyApplyCommand() }, [
-        'Copy that command',
+      h('label', { class: 'nv-label' }, ['Studio token (optional)']),
+      token,
+      h('button', { class: 'nv-btn nv-btn--primary nv-btn--wide', onClick: () => void this.publish() }, [
+        'Publish to server',
       ]),
       h('hr', { style: 'border:0;border-top:1px solid #E7E2DA;margin:4px 0' }),
-      h('label', { class: 'nv-label' }, ['Publish to the live site']),
-      token,
-      h('button', { class: 'nv-btn nv-btn--ghost nv-btn--wide', onClick: () => void this.publish() }, [
-        'Publish to server',
+      h('details', { style: 'margin:0' }, [
+        h('summary', { class: 'nv-sec__note', style: 'cursor:pointer;user-select:none' }, [
+          'Prefer a permanent code change instead?',
+        ]),
+        h('p', { class: 'nv-sec__note', style: 'margin-top:8px' }, [
+          'Export writes a file you apply to the code, so it shows up in a diff and survives a rebuild — the one worth doing for anything you want to keep.',
+        ]),
+        h('button', { class: 'nv-btn nv-btn--ghost nv-btn--wide', onClick: () => this.exportOverrides() }, [
+          'Export changes to a file',
+        ]),
+        h('p', { class: 'nv-sec__note' }, [
+          'Then run this in the project folder:',
+          h('code', { style: 'display:block;margin-top:5px;font-size:11.5px;overflow-wrap:anywhere' }, [
+            `npm run studio:apply ~/Downloads/${EXPORT_FILENAME}`,
+          ]),
+        ]),
+        h('button', { class: 'nv-btn nv-btn--ghost nv-btn--wide', onClick: () => this.copyApplyCommand() }, [
+          'Copy that command',
+        ]),
       ]),
       h('hr', { style: 'border:0;border-top:1px solid #E7E2DA;margin:4px 0' }),
       h('button', { class: 'nv-btn nv-btn--ghost nv-btn--wide', onClick: () => importInput.click() }, [
@@ -511,6 +619,133 @@ class Dock {
     input.click()
   }
 
+  /**
+   * The one video slot (the example capsule photo area, when a video has
+   * been set in place of the rotating photos). Same override field as
+   * images — home.exampleCapsule.video is just another path in `images` —
+   * so it gets clear/revert, export and studio:apply for free, but the
+   * upload flow itself is separate: no cropper, and a much stricter size
+   * cap, since nothing here ever gets re-encoded down.
+   */
+  private wireVideoClicks() {
+    document.addEventListener(
+      'click',
+      (event) => {
+        const target = event.target as HTMLElement | null
+        const holder = target?.closest<HTMLElement>('[data-edit-video]')
+        if (!holder || this.root.contains(holder)) return
+        event.preventDefault()
+        event.stopPropagation()
+        this.pickVideoFor(holder)
+      },
+      true,
+    )
+  }
+
+  private pickVideoFor(holder: HTMLElement) {
+    const input = h('input', {
+      type: 'file',
+      accept: 'video/mp4,video/webm',
+      style: 'display:none',
+    }) as HTMLInputElement
+
+    input.addEventListener('change', () => {
+      const file = input.files?.[0]
+      input.remove()
+      if (file) void this.applyVideo(holder, file)
+    })
+
+    document.body.appendChild(input)
+    input.click()
+  }
+
+  private async applyVideo(holder: HTMLElement, file: File) {
+    const path = holder.getAttribute('data-edit-video')
+    if (!path) return
+
+    if (!/^video\/(mp4|webm)$/.test(file.type)) {
+      this.say('That file type is not supported. Use MP4 or WebM.', 'warn')
+      return
+    }
+    if (file.size > MAX_VIDEO_UPLOAD_BYTES) {
+      this.say(
+        `That file is ${formatBytes(file.size)} — video is stored inline rather than re-encoded, so the limit is ${formatBytes(MAX_VIDEO_UPLOAD_BYTES)}. Compress it and try again.`,
+        'warn',
+      )
+      return
+    }
+
+    try {
+      const url = await readAsDataUrl(file, (fraction) => {
+        this.say(`Reading video… ${Math.round(fraction * 100)}%`, 'info')
+      })
+      this.store.setImage(path, url)
+
+      // The trigger is a real <video> when one is already showing (clicking
+      // the video itself to replace it), but the very first time — clicked
+      // from the "Use a video instead" button on the photo rotator — there
+      // is no <video> element on the page yet, because index.astro only
+      // renders one once site.json's video field is non-empty. The override
+      // is still saved correctly either way; only the *live preview* differs.
+      //
+      // A holder that doesn't directly contain one (e.g. the hero's two
+      // corner buttons, which sit beside their slot rather than inside it,
+      // so the *other* slot's opacity/pointer-events can't hide or disable
+      // them too) falls back to whatever else on the page shares this exact
+      // override path — same addressing the rest of the Studio already
+      // relies on, just not assuming holder-contains-video this one time.
+      const video = holder.querySelector('video') ?? document.querySelector<HTMLVideoElement>(`[data-edit-video="${path}"] video`)
+      if (video) {
+        this.say('Loading video…', 'info')
+        // Preview from a blob URL built off the original File, not the
+        // data: URI just saved to the store — <video src="data:...."> is
+        // unreliably supported in some browsers (Safari in particular has
+        // had bugs loading video, as opposed to images, from a data URI)
+        // even for a file that decodes fine everywhere else. A blob: URL is
+        // the exact original bytes with no such quirk, so it's what decides
+        // whether this file can actually play — the stored override still
+        // keeps the data: URI, which is what gets exported/published.
+        const previewUrl = URL.createObjectURL(file)
+        // Wait to hear back from the element itself before calling this a
+        // success: a rejected play() alone can't tell a harmless autoplay
+        // block (file is fine, will play on the first user gesture) apart
+        // from a genuine decode failure (wrong codec, corrupt file — will
+        // never play, ever). The 'error' event only fires for the latter,
+        // so it — not play()'s rejection — decides which message to show.
+        const settle = (playable: boolean) => {
+          video.removeEventListener('loadeddata', onLoaded)
+          video.removeEventListener('error', onError)
+          if (playable) {
+            void video.play().catch(() => {
+              /* autoplay can be refused before a user gesture — the video is
+                 still correctly set and will play once one occurs */
+            })
+            this.say(`Video replaced (${formatBytes(file.size)}). Export your changes to keep it.`, 'ok')
+          } else {
+            URL.revokeObjectURL(previewUrl)
+            this.say(
+              'That file saved, but this browser could not play it back — the codec is probably unsupported (H.264 MP4 or VP9 WebM both work) or the file is corrupt. Try re-exporting it and upload again.',
+              'warn',
+            )
+          }
+        }
+        const onLoaded = () => settle(true)
+        const onError = () => settle(false)
+        video.addEventListener('loadeddata', onLoaded, { once: true })
+        video.addEventListener('error', onError, { once: true })
+        video.src = previewUrl
+        video.load()
+      } else {
+        this.say(
+          `Video saved (${formatBytes(file.size)}). This slot switches to it only after you export and run npm run studio:apply — there's nothing to preview live here yet.`,
+          'ok',
+        )
+      }
+    } catch {
+      this.say('That video could not be read.', 'warn')
+    }
+  }
+
   private async openCropper(holder: HTMLElement, file: File) {
     const path = holder.getAttribute('data-edit-image')
     if (!path) return
@@ -590,6 +825,134 @@ class Dock {
     void close
   }
 
+  /**
+   * "Upload all N" — a single file picker for a whole set of images at once
+   * (e.g. the ten example-capsule photos), instead of clicking through them
+   * one at a time. Deliberately not interactive per image: with ten files at
+   * once there is no reasonable UI for cropping each in turn, so every file
+   * gets the same automatic centred crop at the slot's declared aspect,
+   * through the same Cropper class the single-image flow uses — mounted
+   * off-screen so it can measure real layout without ever being shown.
+   * Files beyond the slot count, or past the first N selected, are ignored;
+   * fewer files than slots just fills the first ones and leaves the rest as
+   * they were.
+   */
+  private wireImageGroupClicks() {
+    document.addEventListener(
+      'click',
+      (event) => {
+        const target = event.target as HTMLElement | null
+        const trigger = target?.closest<HTMLElement>('[data-edit-image-group]')
+        if (!trigger || this.root.contains(trigger)) return
+        event.preventDefault()
+        event.stopPropagation()
+        this.pickImagesForGroup(trigger)
+      },
+      true,
+    )
+  }
+
+  private pickImagesForGroup(trigger: HTMLElement) {
+    const base = trigger.getAttribute('data-edit-image-group')
+    const count = Number(trigger.getAttribute('data-edit-image-group-count') ?? '0')
+    if (!base || !Number.isFinite(count) || count < 1) return
+
+    // Appended after the index in each computed path — '' for a flat array of
+    // image strings (home.exampleCapsule.photos.3), '.image' for an array of
+    // { image, quote } objects (home.wisdomSlider.slides.3.image). Keeps this
+    // mechanism usable against either data shape without assuming one.
+    const suffix = trigger.getAttribute('data-edit-image-group-suffix') ?? ''
+
+    const input = h('input', {
+      type: 'file',
+      accept: 'image/png,image/jpeg,image/webp,image/avif',
+      multiple: true,
+      style: 'display:none',
+    }) as HTMLInputElement
+
+    input.addEventListener('change', () => {
+      const files = Array.from(input.files ?? [])
+      input.remove()
+      if (files.length) void this.applyImageGroup(base, suffix, count, files, trigger.getAttribute('data-edit-aspect'))
+    })
+
+    document.body.appendChild(input)
+    input.click()
+  }
+
+  private async applyImageGroup(
+    base: string,
+    suffix: string,
+    count: number,
+    files: File[],
+    aspectAttr: string | null,
+  ) {
+    const aspect = parseAspect(aspectAttr)
+    const slots = Math.min(files.length, count)
+    let applied = 0
+    let rejected = 0
+
+    for (let i = 0; i < slots; i++) {
+      const file = files[i]
+      if (!fileIsImage(file)) {
+        rejected++
+        continue
+      }
+      if (file.size > MAX_UPLOAD_BYTES) {
+        rejected++
+        continue
+      }
+
+      try {
+        const url = await this.autoCrop(file, aspect)
+        const path = `${base}.${i}${suffix}`
+        this.store.setImage(path, url)
+
+        // CSS.escape isn't guaranteed in every runtime this bundle targets,
+        // and a dotted-numeric path never contains characters that need it.
+        const holder = document.querySelector<HTMLElement>(`[data-edit-image="${path}"]`)
+        const img = holder?.querySelector('img')
+        if (img) {
+          img.src = url
+          img.removeAttribute('srcset')
+        }
+        applied++
+      } catch {
+        rejected++
+      }
+    }
+
+    if (files.length > count) {
+      this.say(`Only the first ${count} were used — that's how many slots there are.`, 'warn')
+    }
+    if (applied) {
+      this.say(`${applied} picture${applied === 1 ? '' : 's'} replaced. Export your changes to keep them.`, 'ok')
+    }
+    if (rejected) {
+      this.say(`${rejected} file${rejected === 1 ? '' : 's'} could not be used (wrong type or over 300 MB).`, 'warn')
+    }
+  }
+
+  /** Same crop/resize pipeline as the interactive cropper, run without a UI:
+   *  mounted off-screen (not display:none — it needs real layout to measure
+   *  against) so Cropper's own default centred framing does the work. */
+  private async autoCrop(file: File, aspect: number | null): Promise<string> {
+    const stage = h('div', {
+      style: `position:fixed;left:-9999px;top:0;width:800px;height:${Math.round(800 / (aspect ?? 1))}px;`,
+    })
+    document.body.appendChild(stage)
+    try {
+      const cropper = new Cropper(stage, { aspect, maxEdge: 1800, mimeType: 'image/jpeg', quality: 0.86 })
+      const dataUrl = await readAsDataUrl(file)
+      await cropper.load(dataUrl)
+      const blob = await cropper.toBlob()
+      cropper.destroy()
+      return blobToDataUrl(blob)
+    } finally {
+      stage.remove()
+    }
+  }
+
   private async acceptLogo(file: File) {
     if (!fileIsImage(file, true)) {
       this.say('Use a PNG, SVG, WebP or JPEG for the logo.', 'warn')
@@ -664,11 +1027,15 @@ class Dock {
 
       const target = e.target as HTMLElement | null
       const imageHolder = target?.closest<HTMLElement>('[data-edit-image]')
+      const videoHolder = target?.closest<HTMLElement>('[data-edit-video]')
       const logoSlot = target?.closest<HTMLElement>('[data-logo-slot]')
 
       if (imageHolder && !this.root.contains(imageHolder)) {
         e.preventDefault()
         void this.openCropper(imageHolder, file)
+      } else if (videoHolder && !this.root.contains(videoHolder)) {
+        e.preventDefault()
+        void this.applyVideo(videoHolder, file)
       } else if (logoSlot) {
         e.preventDefault()
         void this.acceptLogo(file)
@@ -711,17 +1078,23 @@ class Dock {
   }
 
   private async publish() {
+    // A signed-in super_admin needs no token at all — the server accepts
+    // that session by itself (functions/api/studio.ts's canPublish checks
+    // it first, the token second). This used to hard-block here whenever no
+    // token happened to be saved in *this* browser, even for someone
+    // already logged in, for whom the request would otherwise have just
+    // worked. Send whatever's available and let the server (which actually
+    // knows whether either one is valid) be the one to say no.
     const token = localStorage.getItem(STORAGE_TOKEN) ?? ''
-    if (!token) {
-      this.say('Publishing needs the Studio token. See INTEGRATIONS.md for where to set it.', 'warn')
-      return
-    }
 
     this.say('Publishing…', 'info')
     try {
       const response = await fetch('/api/studio', {
         method: 'POST',
-        headers: { 'content-type': 'application/json', 'x-studio-token': token },
+        headers: {
+          'content-type': 'application/json',
+          ...(token ? { 'x-studio-token': token } : {}),
+        },
         body: this.store.export(),
       })
 

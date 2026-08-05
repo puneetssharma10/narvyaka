@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480" width="640" height="480" role="img" aria-label="An abstract waveform in a viewfinder, frame 04 of 10">
+  <!-- Drawn placeholder, one of a rotating set. Replace via Studio -> click the picture, or drop a new file in public/capsule/. -->
+  <defs>
+    <linearGradient id="sweep04" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#2B6CB0"/>
+      <stop offset="100%" stop-color="#8A5A22"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="640" height="480" fill="#F2F4FA"/>
+
+  <g stroke="#2B6CB0" stroke-opacity="0.07" stroke-width="1">
+    <path d="M0 80h640M0 160h640M0 240h640M0 320h640M0 400h640"/>
+    <path d="M80 0v480M160 0v480M240 0v480M320 0v480M400 0v480M480 0v480M560 0v480"/>
+  </g>
+
+  <g stroke="url(#sweep04)" stroke-width="3" stroke-linecap="round">
+    <path d="M92 208v77M120 200v64M148 194v76M176 189v109M204 205v49M232 211v55M260 208v62M288 179v104M316 202v65M344 227v33M372 202v70M400 213v58M428 200v83M456 182v105M484 198v75M512 183v92M540 214v33M568 194v70"/>
+  </g>
+
+  <g stroke="#0B0E14" stroke-opacity="0.22" stroke-width="2" fill="none">
+    <path d="M40 72V40h32M568 40h32v32M600 408v32h-32M72 440H40v-32"/>
+  </g>
+</svg>

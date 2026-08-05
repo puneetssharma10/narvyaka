@@ -45,22 +45,10 @@ INTAKE_PAUSED = "0"
 # R2_SECRET_ACCESS_KEY
 # R2_BUCKET_NAME       Required for uploads over ~100 MB (direct-to-R2 presigned
 #                      URLs). See INTEGRATIONS.md §7.
+# STORAGE_NODES        Optional. JSON array of extra buckets — in other accounts,
+#                      with other providers, in other countries — that this site
+#                      writes to and reads from over the S3 API. A binding like
+#                      MEDIA above can only ever see this account's own buckets;
+#                      this is how a partner archive joins. See INTEGRATIONS.md §8.
 #
 #   npx wrangler pages secret put <NAME>
-
-# ── Preview environment ───────────────────────────────────────────────────────
-# Pages gives every branch a preview deployment. Point it at separate stores so
-# test submissions never touch the real archive.
-[env.preview]
-[[env.preview.d1_databases]]
-binding = "DB"
-database_name = "narvyaka-preview"
-database_id = "REPLACE_WITH_YOUR_PREVIEW_D1_DATABASE_ID"
-
-[[env.preview.r2_buckets]]
-binding = "MEDIA"
-bucket_name = "narvyaka-media-preview"
-
-[env.preview.vars]
-PUBLIC_MEDIA_BASE_URL = ""
-INTAKE_PAUSED = "0"

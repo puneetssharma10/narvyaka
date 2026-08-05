@@ -94,6 +94,12 @@ CREATE TABLE IF NOT EXISTS uploads (
   bytes        INTEGER NOT NULL,
   uploaded_at  TEXT NOT NULL,
 
+  -- Which bucket actually holds this object. 'primary' is the bucket bound as
+  -- env.MEDIA; any other value is a node id from the STORAGE_NODES secret,
+  -- possibly a bucket in an account this deployment does not own. Rows written
+  -- before storage nodes existed have NULL here and are read as 'primary'.
+  storage_node TEXT NOT NULL DEFAULT 'primary',
+
   CHECK (kind IN ('audio', 'photo'))
 );
 

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" width="960" height="540" role="img" aria-label="A winding path leading toward a horizon, representing a life's journey worth recording">
+  <!-- Drawn placeholder. Replace via Studio -> click the picture, or drop a new file in public/wisdom/. -->
+  <rect width="960" height="540" fill="#F2F4FA"/>
+  <g stroke="#2B6CB0" stroke-opacity="0.07" stroke-width="1">
+    <path d="M0 90h960M0 180h960M0 270h960M0 360h960M0 450h960"/>
+    <path d="M120 0v540M240 0v540M360 0v540M480 0v540M600 0v540M720 0v540M840 0v540"/>
+  </g>
+  <g transform="translate(480,270)" stroke="#2B6CB0" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <path d="M-140 130C-90 90 -60 130 -10 90C40 50 70 90 130 40" />
+    <circle cx="-140" cy="130" r="6" fill="#2B6CB0" stroke="none" />
+    <circle cx="130" cy="40" r="6" fill="#8A5A22" stroke="none" />
+    <path d="M-160 150h320" stroke-opacity="0.3" />
+  </g>
+  <g stroke="#8A5A22" stroke-opacity="0.25" stroke-width="2" fill="none">
+    <path d="M56 108V56h52M904 56h-52v52M904 432v52h-52M56 432v52h52"/>
+  </g>
+</svg>

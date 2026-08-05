@@ -19,7 +19,7 @@
     },
     "fonts": {
       "wordmark": "'Fraunces Variable', 'Source Serif 4 Variable', Georgia, serif",
-      "heading": "'Fraunces Variable', 'Source Serif 4 Variable', Georgia, serif",
+      "heading": "'Caveat Variable', cursive",
       "body": "'Inter Variable', 'Public Sans Variable', system-ui, sans-serif"
     },
     "logo": {
@@ -110,8 +110,14 @@
     ],
     "emailLabel": "Write to us"
   },
+  "motion": {
+    "text": "Because No Generation Should Start From Zero."
+  },
   "home": {
     "hero": {
+      "video": "/uploads/home-hero-video.mp4",
+      "videoTwo": "/uploads/home-hero-videotwo.mp4",
+      "transitionSeconds": 0.8,
       "wordmark": "Narvyaka",
       "tagline": "Because No Generation Should Start From Zero.",
       "subhead": "What knowledge should outlive you?",
@@ -126,9 +132,22 @@
       }
     },
     "exampleCapsule": {
+      "rotationSeconds": 7,
+      "video": "",
       "badge": "Example",
       "note": "This is an illustrative capsule showing the format. It is not a real contributor's record. It will be replaced by the first real Wisdom Record once one has been made.",
-      "photo": "",
+      "photos": [
+        "/capsule/01.svg",
+        "/capsule/02.svg",
+        "/capsule/03.svg",
+        "/capsule/04.svg",
+        "/capsule/05.svg",
+        "/capsule/06.svg",
+        "/capsule/07.svg",
+        "/capsule/08.svg",
+        "/capsule/09.svg",
+        "/capsule/10.svg"
+      ],
       "photoCaption": "Placeholder — a real contributor photograph goes here.",
       "lesson": "Ask the question while the person is still in the room. There is no later.",
       "attribution": "Founder's own account",
@@ -149,8 +168,8 @@
     },
     "status": {
       "eyebrow": "Phase one",
-      "heading": "Ten records. Two volunteers. That is the whole of the first phase.",
-      "body": "Narvyaka begins deliberately small — a handful of carefully preserved Wisdom Records, a small circle of trusted volunteers — because trust, once broken, cannot be rebuilt at scale.",
+      "heading": "Ten records to begin. Every volunteer role open.",
+      "body": "Narvyaka begins deliberately small on records — a handful, preserved carefully, because trust once broken cannot be rebuilt at scale. Volunteering is not capped the same way: the right person is worth more than a quota, and we would rather hear from them now.",
       "metrics": [
         {
           "value": "0",
@@ -160,9 +179,9 @@
         },
         {
           "value": "0",
-          "target": "2",
+          "target": "—",
           "label": "Founding volunteers",
-          "note": "Two people, chosen carefully"
+          "note": "Every role open — apply any time"
         },
         {
           "value": "0",
@@ -189,9 +208,9 @@
         },
         {
           "title": "Become a founding volunteer",
-          "body": "Two openings for the first ten records: one interviewer, one writer and archivist. The archive is built by people, not software.",
+          "body": "Interviewing, writing, translating, research, photography, archiving — every role is open. The archive is built by people, not software.",
           "href": "/volunteer",
-          "action": "See both openings"
+          "action": "See the roles"
         }
       ]
     },
@@ -234,6 +253,56 @@
       },
       "photo": "",
       "photoAlt": "Portrait of the founder"
+    },
+    "wisdomSlider": {
+      "rotationSeconds": 5.2,
+      "heading": "Eleven short thoughts on wisdom",
+      "slides": [
+        {
+          "image": "/wisdom/01-tree.svg",
+          "quote": "Every story kept is a door left open for someone not yet born."
+        },
+        {
+          "image": "/wisdom/02-path.svg",
+          "quote": "Wisdom is not what we know. It is what we manage to pass on."
+        },
+        {
+          "image": "/wisdom/03-hands.svg",
+          "quote": "A voice recorded once can still be heard a hundred years from now."
+        },
+        {
+          "image": "/wisdom/04-book.svg",
+          "quote": "The smallest lesson, kept, can outlast the largest fortune, spent."
+        },
+        {
+          "image": "/wisdom/05-sunrise.svg",
+          "quote": "What we forget to write down, our children learn the hard way instead."
+        },
+        {
+          "image": "/wisdom/06-compass.svg",
+          "quote": "One honest sentence from someone who lived it is worth a shelf of theory."
+        },
+        {
+          "image": "/wisdom/07-seed.svg",
+          "quote": "Memory is fragile. A record is not."
+        },
+        {
+          "image": "/wisdom/08-ripples.svg",
+          "quote": "The best inheritance is not what we own — it is what we understood."
+        },
+        {
+          "image": "/wisdom/09-lantern.svg",
+          "quote": "Listen once. Keep it forever."
+        },
+        {
+          "image": "/wisdom/10-handshake.svg",
+          "quote": "Every generation that teaches the next one is a generation that did not start from zero."
+        },
+        {
+          "image": "/wisdom/11-hourglass.svg",
+          "quote": "Time takes the person. It should not have to take the lesson too."
+        }
+      ]
     }
   },
   "preserve": {
@@ -315,42 +384,8 @@
   "volunteer": {
     "eyebrow": "Founding volunteers",
     "heading": "This Is Not Someone Else's Job.",
-    "intro": "No institution is coming to do this for us. Historians will not interview your grandmother. A university will not sit with your neighbour's father before he passes. That knowledge belongs to ordinary families, workplaces and communities — which means its survival depends on ordinary people. Right now we are looking for exactly two.",
-    "rolesHeading": "Two openings",
-    "roles": [
-      {
-        "title": "Interviewer",
-        "body": "Sits with a contributor, asks the questions in Part V, and does not rush them."
-      },
-      {
-        "title": "Writer",
-        "body": "Turns a recording into a readable Wisdom Note without changing what was meant."
-      },
-      {
-        "title": "Translator",
-        "body": "Carries a record into another language, and marks what does not translate cleanly."
-      },
-      {
-        "title": "Researcher",
-        "body": "Checks what can be checked, and is honest about what cannot."
-      },
-      {
-        "title": "Photographer",
-        "body": "Makes one good photograph of a person, a place, or the thing they made."
-      },
-      {
-        "title": "Technologist",
-        "body": "Keeps the archive readable in fifty years, which is mostly a question of formats and discipline."
-      },
-      {
-        "title": "Archivist",
-        "body": "Classifies, files and keeps the record consistent as the collection grows."
-      },
-      {
-        "title": "Community organiser",
-        "body": "Finds the people whose knowledge would otherwise never reach us."
-      }
-    ],
+    "intro": "No institution is coming to do this for us. Historians will not interview your grandmother. A university will not sit with your neighbour's father before he passes. That knowledge belongs to ordinary families, workplaces and communities — which means its survival depends on ordinary people. Every role is open, and we would rather hear from you than not.",
+    "rolesHeading": "Open roles",
     "expectationsHeading": "What we ask",
     "expectations": [
       "None of these roles require credentials. They require patience, curiosity, and enough respect for another person's story to get it right.",
@@ -360,12 +395,12 @@
       "Do not ask whether you are important enough to help. Ask whose wisdom you can save."
     ],
     "formHeading": "Apply",
-    "formIntro": "Two places. Applications are read personally — there is no automated stage and no scoring — and everyone who applies gets a reply.",
+    "formIntro": "Applications are read personally — there is no automated stage and no scoring — and everyone who applies gets a reply.",
     "afterSubmit": {
       "heading": "Thank you — your application is in.",
-      "body": "A person will read this, not a filter. There are two places, so replies take time, and everyone who applies gets one either way."
+      "body": "A person will read this, not a filter. We are a small group, so replies take time, and everyone who applies gets one either way."
     },
-    "rolesIntro": "Two people, for the first ten records. Not a shortlist to be whittled down — two roles that need filling, and then we stop recruiting and start recording.",
+    "rolesIntro": "Every role below is open, and none of them is capped. We would rather hear from one person who is genuinely right for this than fill a quota — so if something here fits you, say so, even if you are not certain.",
     "openings": [
       {
         "count": "01",
@@ -386,18 +421,57 @@
           "Fastidious about not improving on what someone actually said.",
           "Happy to be pedantic about file names, formats and dates."
         ]
+      },
+      {
+        "count": "03",
+        "title": "Translator",
+        "body": "Carries a record into another language, and marks plainly what does not translate cleanly. A lesson that survives in only one language reaches only the people who already speak it.",
+        "asks": [
+          "Fluent enough in both languages to hear tone, not only meaning.",
+          "Willing to leave a word untranslated with a note, rather than approximate it.",
+          "Roughly two hours per record."
+        ]
+      },
+      {
+        "count": "04",
+        "title": "Researcher",
+        "body": "Checks what can be checked — a date, a place, a public record — and is honest in writing about what cannot. This is what decides whether a record is labelled Documented or Contributor's Account.",
+        "asks": [
+          "Comfortable concluding “this could not be verified” and leaving it there.",
+          "Keeps a note of what was checked and where, so the next person can retrace it.",
+          "An hour or two per record, often less."
+        ]
+      },
+      {
+        "count": "05",
+        "title": "Photographer",
+        "body": "Makes one good photograph of a person, a place, or the thing they made. A portrait gives the voice a face; a workbench gives the lesson somewhere it came from.",
+        "asks": [
+          "A camera you know well — a phone counts.",
+          "Asks before photographing anything, every time.",
+          "Usually a single visit."
+        ]
+      },
+      {
+        "count": "06",
+        "title": "Technologist",
+        "body": "Keeps the archive readable in fifty years — which is mostly a question of formats, backups and discipline rather than clever code.",
+        "asks": [
+          "Opinions about file formats that you can defend.",
+          "Prefers boring, well-documented choices over interesting ones.",
+          "Occasional work rather than weekly."
+        ]
+      },
+      {
+        "count": "07",
+        "title": "Community organiser",
+        "body": "Finds the people whose knowledge would otherwise never reach us — the ones who would never think to volunteer a story about themselves.",
+        "asks": [
+          "Knows a community well enough to be trusted inside it.",
+          "Comfortable explaining consent in plain language, more than once.",
+          "As much or as little time as you have."
+        ]
       }
-    ],
-    "laterHeading": "Later, not now",
-    "laterIntro": "These roles matter, and none of them are needed to make ten records. We would rather leave them empty than recruit people we cannot yet give real work to.",
-    "laterRoles": [
-      "Translate a record",
-      "Research and add context",
-      "Photograph a person or place",
-      "Archive and protect",
-      "Build the tools",
-      "Coordinate a region",
-      "Teach others"
     ],
     "commitmentHeading": "One volunteer. One contributor. One beginning.",
     "commitment": "I will help preserve at least one meaningful experience, from one person.",
@@ -840,14 +914,14 @@
     },
     "photos": {
       "heading": "Photographs",
-      "intro": "Up to five. A face, a place, a tool, a handwritten page. A record with no photographs is a complete record — this step can be skipped entirely.",
+      "intro": "Up to ten. A face, a place, a tool, a handwritten page. A record with no photographs is a complete record — this step can be skipped entirely.",
       "dropLabel": "Drag photographs here, or choose files",
       "dropHint": "JPEG, PNG, WebP or HEIC. Up to 300 MB each.",
       "captionLabel": "Who, what, or where",
       "captionPlaceholder": "One line, if you want one",
       "removeLabel": "Remove",
       "cropLabel": "Crop",
-      "maxReached": "That is five photographs — the maximum for one record.",
+      "maxReached": "That is ten photographs — the maximum for one record.",
       "tooLarge": "That file is over 300 MB. Try a smaller version.",
       "wrongType": "That file type isn't supported. Use JPEG, PNG or WebP."
     },
@@ -973,9 +1047,9 @@
         "linkHref": "/preserve"
       },
       {
+        "answer": "Every role is open — interviewing, writing and archiving, translating, research, photography, keeping the archive readable, and finding the people whose knowledge would otherwise never reach us. Applications are read personally, one at a time, never scored automatically.",
         "label": "Become a Volunteer",
-        "answer": "Two founding roles are open right now — Interviewer, and Writer & Archivist. Applications are read personally, one at a time, never scored automatically.",
-        "linkLabel": "See both openings",
+        "linkLabel": "See the roles",
         "linkHref": "/volunteer"
       },
       {
@@ -1016,9 +1090,18 @@
       }
     ],
     "footerLinks": [
-      { "label": "Privacy", "href": "/privacy" },
-      { "label": "Copyright", "href": "/terms" },
-      { "label": "Community guidelines", "href": "/volunteer#pledge" }
+      {
+        "label": "Privacy",
+        "href": "/privacy"
+      },
+      {
+        "label": "Copyright",
+        "href": "/terms"
+      },
+      {
+        "label": "Community guidelines",
+        "href": "/volunteer#pledge"
+      }
     ]
   },
   "categories": [

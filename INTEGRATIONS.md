@@ -283,6 +283,119 @@ through a 300 MB upload.
 
 ---
 
+## 8. More than one bucket — storage in other accounts
+
+The archive does not have to live in one bucket, in one account, in one
+country. It can be spread across buckets owned by different people and
+different organisations, anywhere in the world.
+
+### Why a binding is not enough
+
+`env.MEDIA` is a Cloudflare **binding**, and a binding can only ever reach a
+bucket inside *this* Cloudflare account. There is no way to bind someone
+else's R2, a university's S3, or a partner archive abroad. That is a hard
+platform limit, not a configuration gap.
+
+The **S3-compatible API** has no such limit. Anything that speaks S3 — another
+account's R2, AWS S3, Backblaze B2, Wasabi, a MinIO box in a basement — is
+reachable with nothing but a hostname and a pair of keys, signed per request.
+So that is how a second bucket joins: as a registered **node**, not a binding.
+
+This is what `/how-it-works` already promises the reader — *"deliberate
+redundancy … so the archive does not depend on any one organisation continuing
+to exist."* A bucket in someone else's account, holding records this account
+cannot delete, is that sentence made true.
+
+### Registering a node
+
+One secret, `STORAGE_NODES`, holding a JSON array:
+
+```jsonc
+[
+  {
+    "id": "in-mumbai",                                    // never reuse an id
+    "label": "R2 — founder's account",
+    "endpoint": "<account-id>.r2.cloudflarestorage.com",  // hostname only
+    "region": "auto",                                     // "auto" for R2
+    "bucket": "narvyaka-media",
+    "accessKeyId": "…",
+    "secretAccessKey": "…"
+  },
+  {
+    "id": "de-partner",
+    "label": "Partner archive, Frankfurt",
+    "endpoint": "s3.eu-central-1.amazonaws.com",
+    "region": "eu-central-1",                             // a real region for S3
+    "bucket": "narvyaka-mirror",
+    "accessKeyId": "…",
+    "secretAccessKey": "…",
+    "publicBaseUrl": "https://media.partner.example",     // optional, reads go here
+    "accepting": false          // default. true = also take NEW records
+  }
+]
+```
+
+```bash
+npx wrangler pages secret put STORAGE_NODES
+npx wrangler d1 execute narvyaka --remote --file=./db/migrations/0002_storage_nodes.sql
+npx wrangler d1 execute narvyaka --local  --file=./db/migrations/0002_storage_nodes.sql
+```
+
+The partner generates their own keys, scoped to their own bucket, and can
+revoke them at any time without touching anything here.
+
+### The primary bucket is guaranteed
+
+Your original bucket — the one bound as `MEDIA`, configured by the `R2_*`
+secrets — is protected by the code, not by convention:
+
+- **Its id, `primary`, is reserved.** A `STORAGE_NODES` entry that tries to
+  claim it is discarded outright. Without this, writes tagged `primary` would
+  be signed at the impostor's endpoint while reads for `primary` kept going
+  through the binding, and those files could never be read back.
+- **It is always present and always first** in the registry, whatever else is
+  configured.
+- **It always accepts new records**, and no flag can turn that off.
+- **A broken `STORAGE_NODES` cannot disconnect it.** Invalid JSON, a
+  non-array, an empty array, or entries that all fail validation each leave
+  the primary bucket serving and receiving exactly as before.
+
+### How files are placed and found
+
+- **Attaching a bucket does not move your uploads.** `accepting` defaults to
+  **false**, so a new node joins for redundancy and reading only. New records
+  keep landing on the primary bucket until you explicitly set
+  `"accepting": true` on a node. A partner joining can never quietly divert
+  uploads away from you.
+- **Placement** is decided from the record id, so every file belonging to one
+  submission lands in **one** bucket. That is deliberate: a contributor who
+  withdraws must be satisfiable by deleting from a single place, not by
+  chasing fragments across jurisdictions.
+- **Changing the pool changes future records only.** Existing objects are
+  found through the node id stored beside them in `uploads.storage_node`,
+  never by recomputing placement — so nothing is orphaned, and turning a node
+  off never strands what is already on it.
+- **Reading** is unchanged from the outside. `/media/<key>` still works; if
+  the object is on a remote node it redirects to that node's own domain, or
+  to a short-lived signed URL if it has none. Links written before nodes
+  existed keep resolving.
+
+### Safety
+
+A node endpoint is validated as a bare hostname before anything is signed
+against it — no schemes, no paths, no bare IPs, no `localhost`/`.internal`.
+Configuration is still not a reason to let a signer reach a metadata service
+or a private network. A malformed entry is skipped rather than throwing, so
+one bad line cannot take uploads down for every other node.
+
+### If you set nothing
+
+Everything above is optional. With no `STORAGE_NODES` secret the registry
+falls back to a single node built from the `R2_*` values in §7, which is
+exactly how the site behaved before nodes existed.
+
+---
+
 ## Where a record actually goes
 
 ```

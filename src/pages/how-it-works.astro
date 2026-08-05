@@ -4,12 +4,14 @@ import PageHeader from '../components/PageHeader.astro'
 import Icon from '../components/Icon.astro'
 import CapsuleCard from '../components/CapsuleCard.astro'
 import PlaceholderNotice from '../components/PlaceholderNotice.astro'
+import MarqueeStrip from '../components/MarqueeStrip.astro'
 import { content, editable, t } from '../lib/content'
 import { getCapsule } from '../lib/capsules'
 
 const hiw = content.howItWorks
 const iconFor = { voice: 'voice', note: 'note', photo: 'photo', identity: 'identity' } as const
 const sample = getCapsule('example')
+const motion = content.motion
 ---
 
 <Base title="How it works" description={hiw.intro}>
@@ -170,4 +172,6 @@ const sample = getCapsule('example')
       }
     </div>
   </section>
+
+  <MarqueeStrip text={motion.text} editPath="motion.text" />
 </Base>

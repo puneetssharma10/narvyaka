@@ -2,9 +2,11 @@
 import Base from '../layouts/Base.astro'
 import PageHeader from '../components/PageHeader.astro'
 import PlaceholderNotice from '../components/PlaceholderNotice.astro'
+import MarqueeStrip from '../components/MarqueeStrip.astro'
 import { content, editable, t } from '../lib/content'
 
 const founder = content.founder
+const motion = content.motion
 ---
 
 <Base title="Letter from the founder" description={founder.letter[0]}>
@@ -62,4 +64,6 @@ const founder = content.founder
       </div>
     </div>
   </section>
+
+  <MarqueeStrip text={motion.text} editPath="motion.text" />
 </Base>

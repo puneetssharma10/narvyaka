@@ -1,0 +1,357 @@
+---
+/**
+ * The very first thing on the page: two full-viewport looping videos,
+ * stitched into one continuous loop (1, 2, 1, 2, ...), no text over either —
+ * the wordmark, headline and everything else that used to share this space
+ * now lives in its own section right below, reached by scrolling (or
+ * clicking the hint at the bottom). Carries what the old 11-image wisdom
+ * carousel used to (the "thoughts"), now as video instead of photo + quote.
+ *
+ * Both <video> tags are always rendered, even with no src set, so the
+ * Studio can target either slot from the very first upload onward — same
+ * reasoning as the single-video version this replaced. They're stacked
+ * absolutely and swapped by opacity/pointer-events, with a small "Video 1"
+ * / "Video 2" button (Studio-only) in each top corner as the actual click
+ * target — not the video area itself, since only one slot is ever visible
+ * or interactive at a time and the other would otherwise be unreachable
+ * (most importantly: unreachable *before it has a video yet*, which is
+ * exactly when someone needs to click it).
+ *
+ * The hand-off between them is a real overlapping crossfade, not a hard
+ * cut with an opacity flag on it: the outgoing video keeps playing for the
+ * whole fade instead of freezing the instant the swap starts (a frozen
+ * frame fading out under motion reads as a stutter, not a dissolve), and
+ * how long that overlap lasts is Studio-adjustable via the Timing panel
+ * (data-timing below) exactly like a photo rotator's rotation speed is —
+ * same mechanism, repurposed: the number it stores means "fade seconds"
+ * here instead of "seconds between rotations."
+ */
+interface Props {
+  src: string
+  srcTwo: string
+  editPath: string
+  editPathTwo: string
+  transitionSeconds: number
+}
+
+const { src, srcTwo, editPath, editPathTwo, transitionSeconds } = Astro.props
+---
+
+<!-- Full screen, cropped-to-fill on tablet/desktop; on phones, a landscape
+     (16:9) band sized to the video's own shape instead — full width, height
+     following from that, so the *complete* frame is always visible with
+     nothing cut off the sides or top/bottom (object-contain below, not
+     object-cover). sm: is the same 640px cutoff already used elsewhere for
+     "mobile vs. not" (e.g. the wisdom slider's arrows).
+
+     100vh alone would run 69px past the actual viewport: the header is
+     sticky (Header.astro, h-[68px] + a 1px border), which still occupies
+     real layout space above this section rather than floating over it.
+     Sized against what's actually left, so this section plus the header
+     together fill exactly one screen — not one screen plus a header.
+
+     dvh, not vh: a plain 100vh on a phone is measured against the tallest
+     the viewport ever gets (address bar hidden), so with the address bar
+     showing — the normal state on scroll — the section actually runs
+     taller than what's visible. dvh tracks the address bar's current
+     state instead. -->
+<section
+  class="relative aspect-video h-auto w-full overflow-hidden border-b border-hairline sm:aspect-auto sm:h-[calc(100dvh-69px)] sm:min-h-[420px]"
+  data-hero-loop
+  data-timing="home.hero.transitionSeconds"
+  data-timing-label="Hero video transition"
+  data-timing-min="0.2"
+  data-timing-max="2.5"
+  data-timing-step="0.1"
+  data-interval-ms={Math.round(transitionSeconds * 1000)}
+>
+  <div class="grid-field-light absolute inset-0" aria-hidden="true"></div>
+
+  <div class="nv-hero-video__slot" data-hero-slot="0" data-edit-video={editPath}>
+    <video
+      class="absolute inset-0 h-full w-full object-contain sm:object-cover"
+      muted
+      loop
+      playsinline
+      preload="auto"
+      {...src ? { src } : {}}
+    />
+  </div>
+
+  <div class="nv-hero-video__slot nv-hero-video__slot--two" data-hero-slot="1" data-edit-video={editPathTwo}>
+    <video
+      class="absolute inset-0 h-full w-full object-contain sm:object-cover"
+      muted
+      playsinline
+      preload="auto"
+      {...srcTwo ? { src: srcTwo } : {}}
+    />
+  </div>
+
+  <!-- Always clickable, regardless of which slot happens to be on screen —
+       siblings of the slots above rather than nested inside them, so
+       neither one's opacity/pointer-events toggling can hide or disable
+       these. Without this, "Video 2" would be unreachable until it already
+       had a video (it starts hidden, and only the sequencing script in the
+       page's own <script> below ever promotes it to visible) — a real
+       chicken-and-egg gap, not a hypothetical one. -->
+  <button type="button" class="nv-hero-video__slot-btn nv-hero-video__slot-btn--one" data-edit-video={editPath}>
+    Video 1
+  </button>
+  <button type="button" class="nv-hero-video__slot-btn nv-hero-video__slot-btn--two" data-edit-video={editPathTwo}>
+    Video 2
+  </button>
+
+  <a href="#after-hero-video" class="nv-hero-video__hint" aria-label="Scroll down">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+      <path d="M12 4v15M5 12l7 7 7-7" stroke-linecap="round" stroke-linejoin="round" />
+    </svg>
+  </a>
+</section>
+
+<style>
+  .nv-hero-video__slot {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    opacity: 1;
+    /* object-contain (mobile) shows the complete, uncropped frame, which
+       means bars wherever the source isn't exactly 16:9 — a solid backing
+       instead of leaving that transparent (showing the grid pattern behind
+       it through the gap, which read as broken rather than intentional).
+       Never visible on tablet/desktop, where object-cover always fills
+       the box completely. */
+    background: var(--color-carbon);
+    /* Set by the script below from the same value the crossfade timing
+       itself uses (data-interval-ms), so the visual fade and the actual
+       overlap window can never drift out of sync with each other. */
+    transition: opacity var(--nv-hero-fade-ms, 800ms) ease;
+  }
+
+  /* Starts hidden and click-through — the sequencing script below promotes
+     it (and demotes slot one) once slot one's playback ends. If slot one
+     never gets a video, the script's empty-slot handling still shows
+     whichever slot IS filled, so an editor with only "Video 2" uploaded
+     isn't stuck looking at a blank first slot forever. */
+  .nv-hero-video__slot--two {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .nv-hero-video__slot[data-hero-active] {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .nv-hero-video__slot[data-hero-inactive] {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* Studio-only, and deliberately NOT nested inside a .nv-hero-video__slot
+     — a child can't be more visible or more clickable than an ancestor
+     whose own opacity/pointer-events say otherwise, so living outside
+     those is what makes both buttons reachable at all times, not just
+     when their slot happens to be the one currently on screen. */
+  .nv-hero-video__slot-btn {
+    display: none;
+  }
+
+  :global([data-studio-active]) .nv-hero-video__slot-btn {
+    display: block;
+    position: absolute;
+    top: 1rem;
+    z-index: 4;
+    padding: 0.4rem 0.7rem;
+    border: 1px solid color-mix(in srgb, #fff 30%, transparent);
+    border-radius: var(--radius-control);
+    background: var(--color-carbon);
+    color: #fff;
+    font-family: var(--font-body);
+    font-size: 0.74rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    opacity: 0.88;
+    transition: opacity 150ms var(--ease-calm);
+  }
+
+  :global([data-studio-active]) .nv-hero-video__slot-btn:hover {
+    opacity: 1;
+  }
+
+  .nv-hero-video__slot-btn--one {
+    left: 1rem;
+  }
+
+  .nv-hero-video__slot-btn--two {
+    right: 1rem;
+  }
+
+  .nv-hero-video__hint {
+    position: absolute;
+    inset-inline: 0;
+    bottom: 1.75rem;
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    margin-inline: auto;
+    width: 40px;
+    height: 40px;
+    border-radius: 999px;
+    /* A solid backing, not just a drop-shadow on a white icon — the empty
+       state before any video is uploaded is the light technical grid, and
+       white-on-near-white was invisible there. This reads clearly over
+       both that fallback and an actual video, whatever its own colours. */
+    background: rgba(11, 14, 20, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+    animation: nv-hero-hint-bounce 2.2s ease-in-out infinite;
+  }
+
+  @keyframes nv-hero-hint-bounce {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(6px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .nv-hero-video__hint {
+      animation: none;
+    }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-hero-loop]').forEach((section) => {
+    const els = Array.from(section.querySelectorAll<HTMLElement>('[data-hero-slot]'))
+    const slotOne = els.find((el) => el.dataset.heroSlot === '0')
+    const slotTwo = els.find((el) => el.dataset.heroSlot === '1')
+    const videoOne = slotOne?.querySelector('video')
+    const videoTwo = slotTwo?.querySelector('video')
+    if (!slotOne || !slotTwo || !videoOne || !videoTwo) return
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    let current: 'one' | 'two' = 'one'
+    let crossfading = false
+    let wiredOne = false
+    let wiredTwo = false
+    let fadeSeconds = 0.8
+
+    function readFadeSeconds(): number {
+      const ms = Number(section.dataset.intervalMs)
+      return Number.isFinite(ms) && ms > 0 ? ms / 1000 : 0.8
+    }
+
+    // Keeps the CSS opacity transition's own duration equal to the actual
+    // overlap window below — if these drift apart, the picture visibly
+    // finishes fading before (or after) the outgoing video actually stops,
+    // which reads as a stutter again, just a smaller one.
+    function syncFadeDuration() {
+      fadeSeconds = readFadeSeconds()
+      section.style.setProperty('--nv-hero-fade-ms', `${Math.round(fadeSeconds * 1000)}ms`)
+    }
+
+    function filled(video: HTMLVideoElement) {
+      return !!video.getAttribute('src')
+    }
+
+    function activate(el: HTMLElement, video: HTMLVideoElement) {
+      el.setAttribute('data-hero-active', '')
+      el.removeAttribute('data-hero-inactive')
+      video.currentTime = 0
+      if (!reduceMotion) void video.play().catch(() => {})
+    }
+
+    function deactivate(el: HTMLElement) {
+      el.setAttribute('data-hero-inactive', '')
+      el.removeAttribute('data-hero-active')
+    }
+
+    // A real overlapping crossfade: the outgoing video keeps playing for
+    // the whole window instead of freezing the instant the swap starts —
+    // both play at once while opacity blends between them, then whichever
+    // is now hidden gets paused and rewound once the fade finishes.
+    function crossTo(next: 'one' | 'two') {
+      if (crossfading || !filled(videoOne!) || !filled(videoTwo!)) return
+      crossfading = true
+      const outEl = current === 'one' ? slotOne! : slotTwo!
+      const outVideo = current === 'one' ? videoOne! : videoTwo!
+      const inEl = next === 'one' ? slotOne! : slotTwo!
+      const inVideo = next === 'one' ? videoOne! : videoTwo!
+
+      activate(inEl, inVideo)
+      deactivate(outEl)
+      current = next
+
+      window.setTimeout(() => {
+        outVideo.pause()
+        outVideo.currentTime = 0
+        crossfading = false
+      }, fadeSeconds * 1000)
+    }
+
+    function wire(video: HTMLVideoElement, self: 'one' | 'two') {
+      const maybeCrossTo = () => {
+        if (crossfading || current !== self) return
+        if (!filled(videoOne!) || !filled(videoTwo!)) return
+        crossTo(self === 'one' ? 'two' : 'one')
+      }
+      // Starts the fade *before* the clip actually ends — a fixed lead of
+      // fadeSeconds, so the overlap window lands entirely within playback
+      // instead of after it (there'd be nothing left to overlap with).
+      video.addEventListener('timeupdate', () => {
+        const dur = video.duration
+        if (Number.isFinite(dur) && dur > 0 && dur - video.currentTime <= fadeSeconds) maybeCrossTo()
+      })
+      // Safety net — a very short clip or a stalled timeupdate stream could
+      // reach the real end before the check above ever fires.
+      video.addEventListener('ended', maybeCrossTo)
+    }
+
+    // Whichever slot(s) have a src *right now* — called on first run and
+    // again every time a src changes. Overrides published from the Studio
+    // are injected by a separate, later script (StudioBoot's applyContent),
+    // not present in the markup this component was handed at parse time, so
+    // a single check on load isn't enough: a visitor loading the published
+    // (not code-applied) version would see this run before that injection
+    // happens and, without the observer below, never notice either video.
+    function refresh() {
+      const oneReady = filled(videoOne!)
+      const twoReady = filled(videoTwo!)
+      if (!oneReady && !twoReady) return
+
+      if (oneReady && !wiredOne) {
+        wiredOne = true
+        wire(videoOne!, 'one')
+      }
+      if (twoReady && !wiredTwo) {
+        wiredTwo = true
+        wire(videoTwo!, 'two')
+      }
+
+      // Native loop only makes sense with a single video — with two, the
+      // crossfade logic above owns the hand-off instead.
+      videoOne!.loop = oneReady && !twoReady
+      videoTwo!.loop = twoReady && !oneReady
+
+      if (!slotOne!.hasAttribute('data-hero-active') && !slotTwo!.hasAttribute('data-hero-active')) {
+        current = oneReady ? 'one' : 'two'
+        activate(current === 'one' ? slotOne! : slotTwo!, current === 'one' ? videoOne! : videoTwo!)
+        deactivate(current === 'one' ? slotTwo! : slotOne!)
+      }
+    }
+
+    syncFadeDuration()
+    section.addEventListener('nv:interval-changed', syncFadeDuration)
+
+    new MutationObserver(refresh).observe(videoOne, { attributes: true, attributeFilter: ['src'] })
+    new MutationObserver(refresh).observe(videoTwo, { attributes: true, attributeFilter: ['src'] })
+
+    refresh()
+  })
+</script>

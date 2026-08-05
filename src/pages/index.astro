@@ -4,7 +4,10 @@ import Wordmark from '../components/Wordmark.astro'
 import Icon from '../components/Icon.astro'
 import AudioPlayer from '../components/AudioPlayer.astro'
 import PlaceholderNotice from '../components/PlaceholderNotice.astro'
-import RotatingShowcase from '../components/RotatingShowcase.astro'
+import MarqueeStrip from '../components/MarqueeStrip.astro'
+import CapsulePhotoRotator from '../components/CapsulePhotoRotator.astro'
+import CapsuleVideo from '../components/CapsuleVideo.astro'
+import HeroVideo from '../components/HeroVideo.astro'
 import { content, editable, t, list } from '../lib/content'
 import { siteConfig } from '../../site.config'
 
@@ -12,80 +15,88 @@ const home = content.home
 const example = home.exampleCapsule
 const problemParagraphs = list<string>('home.problem.paragraphs')
 const iconFor = { voice: 'voice', note: 'note', photo: 'photo', identity: 'identity' } as const
-
-// The showcase's slides are the four Wisdom Record parts plus the three
-// responsibility figures from /about — existing copy, not new writing.
-const figureIcon: Record<string, 'lock' | 'arrow' | 'quote'> = {
-  Vyasa: 'lock',
-  Narada: 'arrow',
-  Kakabhushundi: 'quote',
-}
-const showcaseItems = [
-  ...home.howItWorks.items.map((item) => ({
-    icon: iconFor[item.icon as keyof typeof iconFor] ?? ('note' as const),
-    eyebrow: 'One record, four parts',
-    title: item.title,
-    body: item.body,
-  })),
-  ...content.about.stage2.figures.map((figure) => ({
-    icon: figureIcon[figure.name] ?? ('quote' as const),
-    eyebrow: figure.responsibility,
-    title: figure.name,
-    body: figure.body,
-  })),
-]
+const motion = content.motion
 ---
 
 <Base title={siteConfig.name}>
-  <!-- ── Hero ──────────────────────────────────────────────────────────── -->
-  <section class="relative overflow-hidden border-b border-hairline bg-surface">
+  <!-- ── Full-screen videos, first thing on the page, no text over them ──
+       Two clips stitched into one loop (1, 2, 1, 2, ...) — carries what the
+       old wisdom-thoughts carousel used to, so that carousel is gone. -->
+  <HeroVideo
+    src={home.hero.video}
+    srcTwo={home.hero.videoTwo}
+    editPath="home.hero.video"
+    editPathTwo="home.hero.videoTwo"
+    transitionSeconds={home.hero.transitionSeconds}
+  />
+
+  <!-- ── Wordmark, headline, intro, CTAs and the example capsule ─────────
+       Everything that used to share the hero with the video now lives here,
+       the first thing reached by scrolling (or the hint at the video's
+       bottom edge). Same content, same order as before — only the video
+       above it is new. -->
+  <section id="after-hero-video" class="relative overflow-hidden border-b border-hairline bg-surface" data-spotlight>
+    <!-- Two soft colour blobs, drifting slowly — the premium, "alive"
+         background layer. Idle motion only, never tied to scroll. -->
+    <div class="ambient-glow" aria-hidden="true"></div>
     <!-- The faintest technical grid, masked so it fades before the copy. -->
     <div class="grid-field-light absolute inset-0" aria-hidden="true"></div>
-    <!-- Light signature: the logo's own brown-gold-to-blue sweep across the top edge. -->
-    <div
-      class="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-signal via-accent to-transparent"
-      aria-hidden="true"
-    >
-    </div>
+    <!-- A soft highlight that follows the pointer on desktop. -->
+    <div class="hero-spotlight" aria-hidden="true"></div>
+    <!-- Light signature: the logo's own brown-gold-to-blue sweep, slowly
+         travelling across the top edge rather than sitting still. -->
+    <div class="light-signature absolute inset-x-0 top-0 h-[3px]" aria-hidden="true"></div>
 
+    <!-- Single column, top to bottom, on every screen size — the same flow
+         mobile always had, now kept at every width instead of only switching
+         to a side-by-side split once the viewport widens.
+
+         The measures below only ever widen at md/lg/xl. A phone viewport is
+         narrower than even the smallest of them, so the mobile rendering is
+         untouched. The headline/subhead/intro each cap their own line length
+         in characters (below), independent of this container, so widening
+         it doesn't run those lines long — the extra width is spent on the
+         capsule photo card, which is the point: more room for the image. -->
     <div class="wrap relative section-lg">
-      <div class="grid items-center gap-16 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:gap-20">
-        <div>
-          <Wordmark size="xl" class="block" />
+      <div class="mx-auto flex max-w-xl flex-col items-center text-center md:max-w-2xl lg:max-w-4xl xl:max-w-5xl">
+        <Wordmark size="lg" class="block" />
 
-          <h1 class="mt-8 max-w-[15ch]" data-type-target {...editable('home.hero.tagline')}>
-            {t('home.hero.tagline')}
-          </h1>
+        <h1 class="mt-8 max-w-[16ch] md:max-w-[24ch]" data-type-target {...editable('home.hero.tagline')}>
+          {t('home.hero.tagline')}
+        </h1>
 
-          <p
-            class="mt-8 max-w-[24ch] font-heading text-[clamp(1.3rem,2.6vw,1.75rem)] font-normal leading-[1.25] tracking-tight text-accent"
-            {...editable('home.hero.subhead')}
+        <p
+          class="mt-8 max-w-[24ch] font-heading text-[clamp(1.3rem,2.6vw,1.75rem)] font-normal leading-[1.25] tracking-tight text-accent md:max-w-[36ch]"
+          {...editable('home.hero.subhead')}
+        >
+          {t('home.hero.subhead')}
+        </p>
+
+        <p
+          class="mt-7 max-w-[52ch] text-[1.05rem] leading-[1.7] text-muted md:max-w-[64ch]"
+          {...editable('home.hero.intro')}
+        >
+          {t('home.hero.intro')}
+        </p>
+
+        <div class="mt-10 flex flex-wrap justify-center gap-3">
+          <a href={home.hero.primaryCta.href} class="btn btn-primary" {...editable('home.hero.primaryCta.label')}>
+            {home.hero.primaryCta.label}
+            <Icon name="arrow" size={16} />
+          </a>
+          <a
+            href={home.hero.secondaryCta.href}
+            class="btn btn-secondary"
+            {...editable('home.hero.secondaryCta.label')}
           >
-            {t('home.hero.subhead')}
-          </p>
-
-          <p class="mt-7 max-w-[52ch] text-[1.05rem] leading-[1.7] text-muted" {...editable('home.hero.intro')}>
-            {t('home.hero.intro')}
-          </p>
-
-          <div class="mt-10 flex flex-wrap gap-3">
-            <a href={home.hero.primaryCta.href} class="btn btn-primary" {...editable('home.hero.primaryCta.label')}>
-              {home.hero.primaryCta.label}
-              <Icon name="arrow" size={16} />
-            </a>
-            <a
-              href={home.hero.secondaryCta.href}
-              class="btn btn-secondary"
-              {...editable('home.hero.secondaryCta.label')}
-            >
-              {home.hero.secondaryCta.label}
-            </a>
-          </div>
+            {home.hero.secondaryCta.label}
+          </a>
         </div>
 
-        <!-- The embedded playable capsule. Clearly marked as an example until a
-             real recording exists — we do not invent a contributor. -->
-        <div class="card overflow-hidden shadow-[0_1px_2px_rgba(11,14,20,0.04),0_12px_32px_-12px_rgba(11,14,20,0.10)]">
+        <!-- The embedded playable capsule, stacked below the copy rather than
+             beside it. Clearly marked as an example until a real recording
+             exists — we do not invent a contributor. -->
+        <div class="card mt-14 w-full overflow-hidden text-left shadow-[0_1px_2px_rgba(11,14,20,0.04),0_12px_32px_-12px_rgba(11,14,20,0.10)]">
           <div class="flex items-center justify-between gap-3 border-b border-hairline px-5 py-3.5">
             <span
               class="rounded-[5px] bg-signal px-2 py-0.5 text-[0.7rem] font-semibold uppercase tracking-[0.12em] text-white"
@@ -101,18 +112,21 @@ const showcaseItems = [
             </span>
           </div>
 
-          <div
-            class="aspect-[4/3] w-full bg-accent-soft"
-            {...{ 'data-edit-image': 'home.exampleCapsule.photo', 'data-edit-aspect': '4:3' }}
-          >
-            <img
-              src={example.photo || '/placeholder-capsule.svg'}
-              alt={example.photoCaption}
-              class="h-full w-full object-cover"
-              width="640"
-              height="480"
-            />
-          </div>
+          {
+            example.video ? (
+              <CapsuleVideo src={example.video} editPath="home.exampleCapsule.video" class="aspect-[4/3] w-full" />
+            ) : (
+              <CapsulePhotoRotator
+                items={example.photos}
+                basePath="home.exampleCapsule.photos"
+                alt={example.photoCaption}
+                rotationSeconds={example.rotationSeconds}
+                timingPath="home.exampleCapsule.rotationSeconds"
+                videoEditPath="home.exampleCapsule.video"
+                class="aspect-[4/3] w-full"
+              />
+            )
+          }
 
           <div class="space-y-5 p-6">
             <blockquote
@@ -141,17 +155,6 @@ const showcaseItems = [
           </div>
         </div>
       </div>
-    </div>
-  </section>
-
-  <!-- ── A living spotlight through what's already true ─────────────────
-       The four Wisdom Record parts and the three responsibility figures,
-       cycling one at a time — existing copy from howItWorks and about,
-       not new writing. -->
-  <section class="section border-b border-hairline">
-    <div class="wrap-read reveal">
-      <span class="light-bar mb-7"></span>
-      <RotatingShowcase items={showcaseItems} />
     </div>
   </section>
 
@@ -317,6 +320,8 @@ const showcaseItems = [
       </figure>
     </div>
   </section>
+
+  <MarqueeStrip text={motion.text} editPath="motion.text" />
 </Base>
 
 <script>

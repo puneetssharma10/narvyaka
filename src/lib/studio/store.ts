@@ -8,6 +8,9 @@
 import {
   OVERRIDES_STORAGE_KEY,
   OVERRIDES_VERSION,
+  TIMING_CEILING_SECONDS,
+  TIMING_FLOOR_SECONDS,
+  clampRotationSeconds,
   countOverrides,
   emptyOverrides,
   parseOverrides,
@@ -23,6 +26,7 @@ declare global {
       KEY: string
       applyTheme: (o: StudioOverrides) => void
       applyContent: (o: StudioOverrides) => void
+      applyTiming: (o: StudioOverrides) => void
       current: StudioOverrides | null
     }
   }
@@ -103,6 +107,20 @@ class StudioStore {
     this.commit({ reload: true })
   }
 
+  setTiming(path: string, seconds: number) {
+    // A generic sanity clamp, not the range any particular slider shows —
+    // dock.ts already clamps to that control's own (possibly narrower)
+    // min/max before calling this, so this floor/ceiling just has to be
+    // wide enough to never re-tighten a value a real slider produced.
+    this.state.timing[path] = clampRotationSeconds(seconds, TIMING_FLOOR_SECONDS, TIMING_CEILING_SECONDS)
+    this.commit()
+  }
+
+  clearTiming(path: string) {
+    delete this.state.timing[path]
+    this.commit({ reload: true })
+  }
+
   replaceAll(next: StudioOverrides) {
     this.state = next
     this.commit({ reload: true })
@@ -137,6 +155,7 @@ class StudioStore {
 
     window.__narvyaka?.applyTheme(this.state)
     window.__narvyaka?.applyContent(this.state)
+    window.__narvyaka?.applyTiming(this.state)
     this.listeners.forEach((fn) => fn(this.state))
   }
 

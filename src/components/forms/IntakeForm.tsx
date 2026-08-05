@@ -466,7 +466,7 @@ export default function IntakeForm({ mode, copy, endpoints, storageKey }: Props)
             <h2 className="font-heading text-[1.5rem]">{copy.photos.heading}</h2>
             <p className="mt-3 text-muted">{copy.photos.intro}</p>
             <div className="mt-6">
-              <PhotoStep photos={photos} onChange={setPhotos} labels={copy.photos} />
+              <PhotoStep photos={photos} onChange={setPhotos} labels={copy.photos} max={10} />
             </div>
           </section>
         )}
